@@ -94,6 +94,17 @@
 			<version>0.5-SNAPSHOT</version>
 		</dependency>
 		
+		<!-- ArcServerController -->
+		<dependency>
+			<groupId>org.n52.movingcode</groupId>
+			<artifactId>arcservercontroller</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/lib/arcservercontroller.jar
+			</systemPath>
+        </dependency>
+		
+		
 	</dependencies>
 	<build>
 		<plugins>
