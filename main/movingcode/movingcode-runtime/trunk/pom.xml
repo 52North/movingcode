@@ -87,18 +87,6 @@
 				<version>2.4</version>
 			</plugin>
 
-			<!-- SCM Plugin access to common scm commands by offering a set of command 
-				mappings for the configured scm -->
-			<plugin>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>1.0-rc1</version>
-				<configuration>
-					<connectionType>connection</connectionType>
-					<runChangeLog>true</runChangeLog>
-					<goalsDirectory>./..</goalsDirectory>
-					<!--checkoutDirectory>${basedir}/src</checkoutDirectory -->
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -107,22 +95,20 @@
 		<module>mc-runtime</module>
 	</modules>
 
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>n52-releases</id>
-			<name>52n Releases</name>
-			<url>http://52north.org/maven/repo/releases</url>
-			<layout>default</layout>
-		</repository>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<id>n52-releases</id>
-			<name>52n Releases</name>
-			<url>http://52north.org/maven/repo/releases</url>
-			<layout>legacy</layout>
-		</snapshotRepository>
-	</distributionManagement>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>mc-runtime-config</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>mc-runtime</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<profiles>
 		<profile>
