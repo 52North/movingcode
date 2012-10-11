@@ -3,29 +3,29 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.n52.movingcode</groupId>
-    <artifactId>mc-runtime-parent</artifactId>
-    <version>0.5-SNAPSHOT</version>
+		<artifactId>mc-runtime-parent</artifactId>
+		<version>0.5-SNAPSHOT</version>
 	</parent>
 	<groupId>org.n52.movingcode</groupId>
 	<artifactId>mc-runtime</artifactId>
 	<version>0.5-SNAPSHOT</version>
 	<name>movingcode-runtime</name>
 	<packaging>jar</packaging>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
+
 	<dependencies>
 		<!-- Dependencies for Scope 'test' -->
-        <dependency>
-            <!-- junit for the unit tests -->
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-		
+		<dependency>
+			<!-- junit for the unit tests -->
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
@@ -58,12 +58,12 @@
 			<version>1.2.16</version>
 		</dependency>
 		<dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
-            <scope>compile</scope>
-        </dependency>
-  		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-bundle</artifactId>
 			<version>1.1.2</version>
@@ -73,38 +73,35 @@
 			<artifactId>REngine</artifactId>
 			<version>0.6-1</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>org.nuiton.thirdparty</groupId>
 			<artifactId>Rserve</artifactId>
 			<version>0.6-1</version>
 		</dependency>
-		
+
 		<!-- Schema XML beans -->
 		<dependency>
 			<groupId>org.n52.mc</groupId>
- 			<artifactId>mc-schema</artifactId>
- 			<version>1.0-SNAPSHOT</version>
+			<artifactId>mc-schema</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
-		
+
 		<!-- Config Submodule -->
 		<dependency>
 			<groupId>org.n52.movingcode</groupId>
 			<artifactId>mc-config</artifactId>
 			<version>0.5-SNAPSHOT</version>
 		</dependency>
-		
+
 		<!-- ArcServerController -->
 		<dependency>
 			<groupId>org.n52.movingcode</groupId>
-			<artifactId>arcservercontroller</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/lib/arcservercontroller.jar
-			</systemPath>
-        </dependency>
-		
-		
+			<artifactId>mc-runtime-arcservercontroller</artifactId>
+			<version>0.5</version>
+		</dependency>
+
+
 	</dependencies>
 	<inceptionYear>2012</inceptionYear>
 	<build>

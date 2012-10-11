@@ -123,6 +123,7 @@
 	<modules>
 		<module>mc-runtime-config</module>
 		<module>mc-runtime</module>
+		<module>mc-runtime-arcservercontroller</module>
 	</modules>
 
 	<dependencyManagement>
@@ -135,6 +136,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>mc-runtime</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>mc-runtime-arcservercontroller</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
