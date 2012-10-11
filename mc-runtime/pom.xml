@@ -94,11 +94,14 @@
 			<version>0.5-SNAPSHOT</version>
 		</dependency>
 
-		<!-- ArcServerController -->
+		<!-- ArcServerController precompiled JAR -->
 		<dependency>
 			<groupId>org.n52.movingcode</groupId>
-			<artifactId>mc-runtime-arcservercontroller</artifactId>
-			<version>0.5-SNAPSHOT</version>
+			<artifactId>arcservercontroller</artifactId>
+			<version>${project.version}</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/src/main/lib/arcservercontroller.jar
+			</systemPath>
 		</dependency>
 
 
