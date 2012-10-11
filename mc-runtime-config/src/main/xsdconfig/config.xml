@@ -1,0 +1,14 @@
+<!-- An XSDCONFIG file must have a root "config" element in the
+    http://xml.apache.org/xmlbeans/2004/02/xbean/config namespace. Also, be sure
+    to declare any namespaces used to qualify types in your schema (here,
+    the namespace corresponding to the pol prefix). -->
+<xb:config xmlns:pol="http://openuri.org/easypoLocal"
+    xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config">
+ 
+    <!-- Use the "namespace" element to map a namespace to the Java package
+        name that should be generated. -->
+    <xb:namespace uri="http://52north.org/movingcode-runtime/processorconfig">
+        <xb:package>org.n52.movingcode-runtime.processorconfig</xb:package>
+    </xb:namespace>
+    
+</xb:config>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://52north.org/movingcode-runtime/processorconfig"
+	xmlns:pc="http://52north.org/movingcode-runtime/processorconfig">
+	<xs:element name="processors">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="processor" type="pc:processorType" maxOccurs="unbounded"/>
+				<xs:element name="defaults" type="pc:defaultsType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- Definition of an arbitrary processor -->
+	<xs:complexType name="processorType">
+		<xs:annotation>
+			<xs:documentation>A processor supports particular containers, may require a particular workspace and has a distinct ID. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="supportedContainer" maxOccurs="unbounded" type="xs:anyURI">
+			<xs:annotation>
+					<xs:documentation>A well known URI from the container registry</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tempWorkspace" type="xs:string" minOccurs="0"/>
+			<xs:element name="property" type="pc:propertyType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>A registered ID of the processor.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<!-- Extendable type definition for processor defaults -->
+	<xs:complexType name="defaultsType">
+		<xs:sequence>
+			<xs:element name="tempWorkspace" type="xs:string"/>
+			<xs:element name="availablePlatform" type="xs:anyURI" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A well known URI from the platform registry</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="propertyType">
+		<xs:attribute name="key" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	
+	
+	<!-- ID type for processors -->
+	<!-- 
+	<xs:simpleType name="processorID">
+		<xs:annotation>
+			<xs:documentation>Processor IDs are defined xs:IDs within this framework. Definition of valid IDs is below.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:ID">
+			<xs:enumeration value="r"/>
+			<xs:enumeration value="genericcli"/>
+			<xs:enumeration value="arctoolbox"/>
+		</xs:restriction>
+	</xs:simpleType>
+	 -->
+	
+</xs:schema>
