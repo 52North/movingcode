@@ -19,7 +19,23 @@
 			<url>http://www.gnu.org/licenses/gpl.txt</url>
 		</license>
 	</licenses>
-	<inceptionYear>2007</inceptionYear>
+	<inceptionYear>2012</inceptionYear>
+	<developers>
+		<developer>
+			<id>matthias</id>
+			<name>Matthias Mueller</name>
+			<email>matthias_mueller@tu-dresden.de</email>
+			<url>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mueller.m</url>
+			<organization>TU Dresden, Geoinformation Systems</organization>
+			<organizationUrl>http://tu-dresden.de/fgh/geo/gis</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+			<properties />
+		</developer>
+	</developers>
 	<scm>
 		<!-- Specification of the Source-Content-Managementsystem -->
 		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</connection>
