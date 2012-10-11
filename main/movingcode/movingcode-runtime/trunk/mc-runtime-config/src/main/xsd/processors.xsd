@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://52north.org/movingcode-runtime/processorconfig"
-	xmlns:pc="http://52north.org/movingcode-runtime/processorconfig">
+	targetNamespace="http://52north.org/movingcode/runtime/processorconfig"
+	xmlns:pc="http://52north.org/movingcode/runtime/processorconfig">
 	<xs:element name="processors">
 		<xs:complexType>
 			<xs:sequence>
