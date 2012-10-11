@@ -42,24 +42,6 @@
 		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
 		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
 	</scm>
-	<repositories>
-		<repository>
-			<id>n52-releases</id>
-			<name>52n Releases</name>
-			<url>http://52north.org/maven/repo/releases</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>Apache</id>
-			<name>Apache repository</name>
-			<url>http://repo1.maven.org/maven2</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<plugins>
@@ -124,21 +106,6 @@
 		<module>mc-runtime-config</module>
 		<module>mc-runtime</module>
 	</modules>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>mc-runtime-config</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>mc-runtime</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<distributionManagement>
 		<repository>
