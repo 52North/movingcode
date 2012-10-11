@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pc:processors xmlns:pc="http://gis.geo.tu-dresden.de/movingcode/library/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/library/processors processors.xsd">
+	<pc:processor pc:id="de.tudresden.gis.geoprocessing.movingcode.processors.python.PythonCLIProcessor">
+		<pc:supportedContainer>http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.5</pc:supportedContainer>
+	</pc:processor> 
+	<pc:processor pc:id="de.tudresden.gis.geoprocessing.movingcode.processors.arctoolbox.ArcServerProcessor">
+		<pc:supportedContainer>http://gis.geo.tu-dresden.de/movingcode/containerregistry/arctoolbox-10.0</pc:supportedContainer>
+		<pc:property pc:key="IP" pc:value="**"/>
+		<pc:property pc:key="DOMAIN" pc:value="**"/>
+		<pc:property pc:key="USER" pc:value="**"/>
+		<pc:property pc:key="PASS" pc:value="**"/>
+		<pc:property pc:key="DCOM_NATIVE" pc:value="TRUE"/>
+		<pc:property pc:key="ARCOBJECTSJAR" pc:value="**"/>
+	</pc:processor>
+	<pc:processor pc:id="de.tudresden.gis.geoprocessing.movingcode.processors.java.JavaJARProcessor">
+		<pc:supportedContainer>http://gis.geo.tu-dresden.de/movingcode/containerregistry/java-jar</pc:supportedContainer>
+	</pc:processor>
+	<pc:defaults>
+		<pc:tempWorkspace>C:/tmp</pc:tempWorkspace>
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</pc:availablePlatform>
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.6</pc:availablePlatform>
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.6</pc:availablePlatform>
+		
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/arcgis-10.0</pc:availablePlatform>
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/arcgis-10.0-spatialanalyst/</pc:availablePlatform>
+		
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/platform/arcgis-10.0-analysis</pc:availablePlatform>
+		<pc:availablePlatform>http://gis.geo.tu-dresden.de/movingcode/platformregistry/platform/java-1.6</pc:availablePlatform>
+	</pc:defaults>
+</pc:processors>
