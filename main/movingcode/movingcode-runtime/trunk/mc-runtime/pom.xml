@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>org.n52.movingcode</groupId>
 			<artifactId>mc-runtime-arcservercontroller</artifactId>
-			<version>0.5</version>
+			<version>0.5-SNAPSHOT</version>
 		</dependency>
 
 
