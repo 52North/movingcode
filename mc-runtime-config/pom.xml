@@ -29,6 +29,7 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
+	<inceptionYear>2012</inceptionYear>
 	<build>
 		<plugins>
 			<plugin>
