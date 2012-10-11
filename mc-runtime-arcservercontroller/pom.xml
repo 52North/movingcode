@@ -34,19 +34,27 @@
 	<build>
 		<plugins>
 			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
 				<executions>
 					<execution>
+					  <id>package-all</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attached</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
+				  <!-- 
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					-->
+					<descriptors>
+            <descriptor>src/main/lib/all-jar.xml</descriptor>
+          </descriptors>
 				</configuration>
 			</plugin>
 
