@@ -7,7 +7,7 @@
  
     <!-- Use the "namespace" element to map a namespace to the Java package
         name that should be generated. -->
-    <xb:namespace uri="http://52north.org/movingcode-runtime/processorconfig">
+    <xb:namespace uri="http://52north.org/movingcode/runtime/processorconfig">
         <xb:package>org.n52.movingcode.runtime.processorconfig</xb:package>
     </xb:namespace>
     
