@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.n52.movingcode</groupId>
-	<artifactId>mc-runtime-parent</artifactId>
+	<artifactId>mc-runtime</artifactId>
 	<version>0.5-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>movingcode-runtime-parent</name>
+	<packaging>jar</packaging>
+	<name>movingcode-runtime</name>
 
 	<issueManagement>
 		<system>Bugzilla</system>
@@ -42,12 +42,99 @@
 		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
 		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
 	</scm>
+	
+	<dependencies>
+				<!-- junit for the unit tests -->
+    <dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>2.4.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-bundle</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.nuiton.thirdparty</groupId>
+			<artifactId>REngine</artifactId>
+			<version>0.6-1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.nuiton.thirdparty</groupId>
+			<artifactId>Rserve</artifactId>
+			<version>0.6-1</version>
+		</dependency>
+		
+	</dependencies>
 
 	<build>
 		<plugins>
-
-			<!-- Assembly pluginto aggregate project into single JAR -->
+		  
+      <!-- XML beans plugin to generate JAVA from XSDs -->
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xmlbeans-maven-plugin</artifactId>
+				<version>2.3.3</version>
+				<executions>
+					<execution>
+						<id>sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xmlbeans</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<download>true</download>
+					<javaSource>1.6</javaSource>
+					<sourceGenerationDirectory>src/main/java</sourceGenerationDirectory>
+				</configuration>
+			</plugin>
+      
+			<!-- Assembly pluginto aggregate project into single JAR -->
+			<!--
+      <plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptorRefs>
@@ -55,8 +142,9 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
-
-			<!-- Deploy Plugin - adds artifact to remote repository -->
+      -->
+      
+			<!-- Deploy Plugin - adds artifact to repository -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
@@ -90,26 +178,6 @@
 		</plugins>
 	</build>
 
-	<modules>
-		<module>mc-runtime-config</module>
-		<module>mc-runtime</module>
-	</modules>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>mc-runtime-config</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>mc-runtime</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<profiles>
 		<profile>
 			<id>release</id>
@@ -124,7 +192,7 @@
                             </connectionUrl>
 							<preparationGoals>clean</preparationGoals>
 							<!-- make use of system prop set by hudson -->
-							<tag>mc-runtime-parent-${project.rel.org.n52.movingcode:mc-runtime-parent}</tag>
+							<tag>movingcode-runtime-${project.rel.org.n52.movingcode:movingcode-runtime}</tag>
 						</configuration>
 					</plugin>
 				</plugins>
