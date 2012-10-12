@@ -42,10 +42,10 @@
 		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
 		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
 	</scm>
-	
+
 	<dependencies>
-				<!-- junit for the unit tests -->
-    <dependency>
+		<!-- junit for the unit tests -->
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
@@ -105,20 +105,20 @@
 			<artifactId>Rserve</artifactId>
 			<version>0.6-1</version>
 		</dependency>
-		
+
 		<!-- Movingcode schema project -->
 		<dependency>
 			<groupId>org.n52.mc</groupId>
 			<artifactId>mc-schema</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>
 		<plugins>
-		  
-      <!-- XML beans plugin to generate JAVA from XSDs -->
+
+			<!-- XML beans plugin to generate JAVA from XSDs -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>xmlbeans-maven-plugin</artifactId>
@@ -138,19 +138,12 @@
 					<sourceGenerationDirectory>src/main/java</sourceGenerationDirectory>
 				</configuration>
 			</plugin>
-      
+
 			<!-- Assembly pluginto aggregate project into single JAR -->
-			<!--
-      <plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
-      -->
-      
+			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
+				<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
+				</configuration> </plugin> -->
+
 			<!-- Deploy Plugin - adds artifact to repository -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -180,6 +173,17 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
+			</plugin>
+			
+			<!-- Compiler plugin for Java 1.6 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
 			</plugin>
 
 		</plugins>
