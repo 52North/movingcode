@@ -51,13 +51,13 @@ public class MovingCodeRepository {
 		Collection<File> zipFiles = scanForZipFiles(sourceDirectory);
 		
 		for (File currentFile : zipFiles){
-			MovingCodePackage mvcPackage = new MovingCodePackage(currentFile);
+			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
 			
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map 
-			if (mvcPackage.isValid()){
-				this.packages.put(mvcPackage.getIdentifier(), mvcPackage);
+			if (mcPackage.isValid()){
+				this.packages.put(mcPackage.getIdentifier(), mcPackage);
 			} else {
 				System.out.println("Info: " + currentFile.getAbsolutePath() + " is an invalid package.");
 			}
@@ -120,7 +120,18 @@ public class MovingCodeRepository {
 	 * If you need up-to-date information call this method again.
 	 * 
 	 */
-	public String[] getRegisteredIdentifiers(){
+	public String[] getRegisteredProcessIDs(){
+		return this.packages.keySet().toArray(new String[packages.size()]);
+	}
+	
+	/**
+	 * 
+	 * @param identifier
+	 * @return
+	 */
+	public String[] getRegisteredPackageIDs(){
+		//TODO: refactor to use real package IDS
+		// Right now we are using processIDs which forbids identical processes in one feed
 		return this.packages.keySet().toArray(new String[packages.size()]);
 	}
 	

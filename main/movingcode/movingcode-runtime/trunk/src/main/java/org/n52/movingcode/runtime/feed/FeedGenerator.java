@@ -62,7 +62,7 @@ public class FeedGenerator {
 		
 		Map<String,GeoprocessingFeedEntry> candidateFeedEntries = new HashMap<String,GeoprocessingFeedEntry>();
 		MovingCodeRepository localRepo = new MovingCodeRepository(new File(repositoryFolder));
-		for (String currentID : localRepo.getRegisteredIdentifiers()){
+		for (String currentID : localRepo.getRegisteredPackageIDs()){
 			
 			String dumpLocation = webFolder + File.separator + currentID + File.separator;
 			String webLocation = rootURL + currentID + "/";
