@@ -62,25 +62,27 @@ public class FeedGenerator {
 		
 		Map<String,GeoprocessingFeedEntry> candidateFeedEntries = new HashMap<String,GeoprocessingFeedEntry>();
 		MovingCodeRepository localRepo = new MovingCodeRepository(new File(repositoryFolder));
-		for (String currentID : localRepo.getRegisteredPackageIDs()){
+		for (String currentLocalPackageID : localRepo.getPackageIDs()){
 			
-			String dumpLocation = webFolder + File.separator + currentID + File.separator;
-			String webLocation = rootURL + currentID + "/";
+			String dumpLocation = webFolder + File.separator + currentLocalPackageID + File.separator;
+			String webLocation = rootURL + currentLocalPackageID + "/";
 			
 			// dump package to new web location
-			localRepo.getPackage(currentID).dumpPackage(new File(dumpLocation + "package.zip"));
+			localRepo.getPackage(currentLocalPackageID).dumpPackage(new File(dumpLocation + "package.zip"));
 			
 			// dump description to new web location
-			localRepo.getPackage(currentID).dumpDescription(new File(dumpLocation + "packagedescription.xml"));
+			localRepo.getPackage(currentLocalPackageID).dumpDescription(new File(dumpLocation + "packagedescription.xml"));
 			
 			GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(
-					localRepo.getPackageDescription(currentID),
-					localRepo.getPackageTimestamp(currentID),
+					localRepo.getPackageDescription(currentLocalPackageID),
+					localRepo.getPackageTimestamp(currentLocalPackageID),
 					webLocation + "package.zip",
 					webLocation + "packagedescription.xml"
 			);
 			
-			candidateFeedEntries.put(currentID, entry);
+			// public package ID is the published URL
+			String publicPackageID = webLocation + "package.zip";
+			candidateFeedEntries.put(publicPackageID, entry);
 		}
 		
 		feed.updateFeed(candidateFeedEntries);

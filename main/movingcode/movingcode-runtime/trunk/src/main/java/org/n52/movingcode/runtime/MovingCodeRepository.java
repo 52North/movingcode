@@ -15,8 +15,12 @@ import java.util.Map;
 import org.apache.abdera.model.Entry;
 import org.apache.commons.io.FileUtils;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.DefaultPackageRepository;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeedEntry;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -30,11 +34,9 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * @author Matthias Mueller, TU Dresden
  *
  */
-public class MovingCodeRepository {
+public class MovingCodeRepository extends DefaultPackageRepository{
 	
 	private static final String[] zipExtension = {"zip"};
-	
-	private final Map<String, MovingCodePackage> packages;
 	
 	/**
 	 * 
@@ -44,20 +46,18 @@ public class MovingCodeRepository {
 	 * Zipfiles that do not validate will be ignored
 	 *  
 	 */
-	public MovingCodeRepository(File sourceDirectory){
-		this.packages = new HashMap<String, MovingCodePackage>();
-		
+	public MovingCodeRepository(File sourceDirectory){		
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> zipFiles = scanForZipFiles(sourceDirectory);
 		
 		for (File currentFile : zipFiles){
-			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
+			MovingCodePackage mcPackage = new MovingCodePackage(currentFile, sourceDirectory.getAbsolutePath());
 			
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map 
 			if (mcPackage.isValid()){
-				this.packages.put(mcPackage.getIdentifier(), mcPackage);
+				register(mcPackage);
 			} else {
 				System.out.println("Info: " + currentFile.getAbsolutePath() + " is an invalid package.");
 			}
@@ -73,23 +73,21 @@ public class MovingCodeRepository {
 	 * 
 	 */
 	public MovingCodeRepository(URL atomFeedURL){
-		this.packages = new HashMap<String, MovingCodePackage>();
-		
 		try {
 			InputStream stream = atomFeedURL.openStream();
 			GeoprocessingFeed feed = new GeoprocessingFeed(stream);
 			
 			for (Entry entry : feed.getEntries()){
 				// create new moving code package from the entry
-				MovingCodePackage mvcPackage = new MovingCodePackage(new GeoprocessingFeedEntry(entry));
+				MovingCodePackage mcPackage = new MovingCodePackage(new GeoprocessingFeedEntry(entry));
 				
 				// validate
 				// and add to package map
 				// and add current file to zipFiles map 
-				if (mvcPackage.isValid()){
-					this.packages.put(mvcPackage.getIdentifier(), mvcPackage);
+				if (mcPackage.isValid()){
+					register(mcPackage);
 				} else {
-					System.out.println("Info: " + atomFeedURL.toString() + " contains an invalid package: " + mvcPackage.getIdentifier());
+					System.out.println("Info: " + atomFeedURL.toString() + " contains an invalid package: " + mcPackage.getPackageIdentifier());
 				}
 			}
 			
@@ -106,54 +104,23 @@ public class MovingCodeRepository {
 	 * @param {@link String} packageIdentifier - the (unique) ID of the package
 	 * 
 	 */
-	public MovingCodePackage getPackage(String identifier){
-		if (this.packages.containsKey(identifier)){
-			return this.packages.get(identifier);
-		}
-		return null;
+	public MovingCodePackage getPackage(String functionalID){
+		return retrievePackage(functionalID);
 	}
 	
-	/*
-	 * Returns a snapshot of all currently used identifiers.
-	 * Later changes in the MovingCodeRepository (new or deleted packages)
-	 * are not propagated to the returned array.
-	 * If you need up-to-date information call this method again.
-	 * 
-	 */
-	public String[] getRegisteredProcessIDs(){
-		return this.packages.keySet().toArray(new String[packages.size()]);
-	}
-	
-	/**
-	 * 
-	 * @param identifier
-	 * @return
-	 */
-	public String[] getRegisteredPackageIDs(){
-		//TODO: refactor to use real package IDS
-		// Right now we are using processIDs which forbids identical processes in one feed
-		return this.packages.keySet().toArray(new String[packages.size()]);
-	}
-	
-	/*
-	 * returns package description for a given ID 
-	 */
-	public boolean containsPackage(String identifier){
-		return this.packages.containsKey(identifier);
-	}
 	
 	/*
 	 * returns the last known update of a MovingCodePackage
 	 */
-	public Date getPackageTimestamp(String identifier){
-		return this.packages.get(identifier).getTimestamp();
+	public Date getPackageTimestamp(String packageID){
+		return retrievePackage(packageID).getTimestamp();
 	}
 	
 	/*
-	 * returns package description for a given ID 
+	 * returns package description for a given functional ID 
 	 */
-	public PackageDescriptionDocument getPackageDescription(String identifier){
-		return this.packages.get(identifier).getDescription();
+	public PackageDescriptionDocument getPackageDescription(String functionalID){
+		return retrievePackage(functionalID).getDescription();
 	}
 	
 	/*
@@ -163,4 +130,5 @@ public class MovingCodeRepository {
 	private Collection<File> scanForZipFiles(File directory){
 		return FileUtils.listFiles(directory, zipExtension, true);	
 	}
+	
 }

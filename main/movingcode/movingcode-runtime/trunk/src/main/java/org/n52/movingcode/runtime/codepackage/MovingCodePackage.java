@@ -40,7 +40,8 @@ public class MovingCodePackage {
 	
 	private final ZippedPackage archive;
 	private PackageDescriptionDocument packageDescription = null;
-	private final String identifier;
+	private final String functionalIdentifier;
+	private final String packageIdentifier;
 	private final Date timeStamp;
 	private final List<FunctionalType> supportedFuncTypes;
 	
@@ -50,19 +51,20 @@ public class MovingCodePackage {
 	 * 
 	 * @param {@link File} zipFile - a zip file with a valid package structure
 	 */
-	public MovingCodePackage (final File zipFile)  {
+	public MovingCodePackage (final File zipFile, String packageIdentifier)  {
 		
 		archive = new ZippedPackage(zipFile);
 		packageDescription = archive.extractDescription();
 		
 		if (packageDescription != null && packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()){
-			identifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+			functionalIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
 			supportedFuncTypes = getFunctionalTypes(packageDescription);
 		} else {
-			identifier = null;
+			functionalIdentifier = null;
 			supportedFuncTypes = null;
 		}
 		timeStamp = getTimestamp(zipFile);
+		this.packageIdentifier = packageIdentifier;
 	}
 	
 	/**
@@ -99,10 +101,17 @@ public class MovingCodePackage {
 		this.packageDescription = packageDescription;
 		// TODO: Information from the feed might lag during updates
 		// how can deal with that?
-		this.identifier = atomFeedEntry.getIdentifier();
+		if (packageDescription != null && packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()){
+			functionalIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+			supportedFuncTypes = getFunctionalTypes(packageDescription);
+		} else {
+			functionalIdentifier = null;
+			supportedFuncTypes = null;
+		}
+		
+		this.packageIdentifier = atomFeedEntry.getIdentifier();
 		this.timeStamp = atomFeedEntry.getUpdated();
 		this.archive = archive;
-		this.supportedFuncTypes = getFunctionalTypes(packageDescription);
 		
 	}
 	
@@ -114,15 +123,15 @@ public class MovingCodePackage {
 	 * @param {@link PackageDescriptionDocument} packageDescription - the XML document that contains the description of the provided logic
 	 * @param {@link Date} lastModified - the date of latest modification. This value is optional. If NULL, the lastModified date is obtained from the workspace's content.
 	 */
-	public MovingCodePackage(File workspace, PackageDescriptionDocument packageDescription, Date timestamp){
+	public MovingCodePackage(File workspace, PackageDescriptionDocument packageDescription, Date timestamp, String packageIdentifier){
 		
 		this.packageDescription = packageDescription;
 		
 		if (packageDescription != null && packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()){
-			identifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+			functionalIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
 			supportedFuncTypes = getFunctionalTypes(packageDescription);
 		} else {
-			identifier = null;
+			functionalIdentifier = null;
 			supportedFuncTypes = null;
 		}
 		
@@ -133,6 +142,7 @@ public class MovingCodePackage {
 			this.timeStamp = getLastModified(workspace);
 		}
 		
+		this.packageIdentifier = packageIdentifier;
 		this.archive = new ZippedPackage(workspace, packageDescription);
 		
 	}
@@ -203,7 +213,7 @@ public class MovingCodePackage {
 	public boolean isValid(){
 		
 		// a valid MovingCodePackage MUST have an identifier
-		if (this.identifier == null){
+		if (this.functionalIdentifier == null){
 			return false;
 		}
 		
@@ -226,8 +236,20 @@ public class MovingCodePackage {
 	 * 
 	 * @return String
 	 */
-	public String getIdentifier(){
-		return this.identifier;
+	public final String getFunctionalIdentifier(){
+		return this.functionalIdentifier;
+	}
+	
+	/**
+	 * Returns the unique *package* identifier of this package.
+	 * This identifier refers to the actual implementation of the functional
+	 * contract. The implementation complies to the functionality indicated
+	 * by the functional ID.
+	 * 
+	 * @return String
+	 */
+	public final String getPackageIdentifier(){
+		return this.packageIdentifier;
 	}
 	
 	/**
