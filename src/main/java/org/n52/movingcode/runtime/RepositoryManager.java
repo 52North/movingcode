@@ -11,7 +11,6 @@ import java.util.Map;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 
-
 /**
  * The Repository Manager is a singleton instance that manages all
  * active Moving Code Repositories.
@@ -19,7 +18,7 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
  * Considered thread safe.
  * 
  * 
- * @author Matthias Mueller
+ * @author Matthias Mueller, TU Dresden
  *
  */
 public class RepositoryManager {
@@ -59,20 +58,20 @@ public class RepositoryManager {
 	 * Package matching this identifier. To check for multiple occurrences of the same
 	 * identifier call {@link RepositoryManager#checkMultiplicityOfPackage(String)}  
 	 * 
-	 * @param identifier
+	 * @param functionalIdentifier
 	 * @return {@link MovingCodePackage}
 	 */
-	public MovingCodePackage getPackage(String identifier){
+	public MovingCodePackage getPackage(String functionalIdentifier){
 		for (MovingCodeRepository repo : repositories.values()){
-			if (repo.containsPackage(identifier)){
-				return repo.getPackage(identifier);
+			if (repo.containsPackage(functionalIdentifier)){
+				return repo.getPackage(functionalIdentifier);
 			}
 		}
 		return null;
 	}
 	
 	/**
-	 * Method used for checking multiple occurences of the same process ID.
+	 * Method used for checking multiple occurrences of the same process ID.
 	 * 
 	 * @param identifier
 	 * @return int - multiplicity
@@ -90,14 +89,14 @@ public class RepositoryManager {
 	}
 	
 	/**
-	 * Contains check: Is a package with a given ID registered?
+	 * Contains check: Is a there a package registered for a given functional ID?
 	 * 
 	 * @param identifier
 	 * @return boolean
 	 */
-	public boolean containsPackage(String identifier){
+	public boolean providesFunction(String functionalID){
 		for (MovingCodeRepository repo : repositories.values()){
-			if (repo.containsPackage(identifier)){
+			if (repo.providesFunction(functionalID)){
 				return true;
 			}
 		}
@@ -107,7 +106,7 @@ public class RepositoryManager {
 	public String[] getProcessIDs(){
 		ArrayList<String> retval= new ArrayList<String>();
 		for (MovingCodeRepository repo : repositories.values()){
-			retval.addAll(Arrays.asList(repo.getRegisteredProcessIDs()));
+			retval.addAll(Arrays.asList(repo.getFunctionalIDs()));
 		}
 		return retval.toArray(new String[retval.size()]);
 	}
