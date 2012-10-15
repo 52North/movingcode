@@ -2,6 +2,8 @@ package org.n52.movingcode.runtime;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,8 +104,15 @@ public class RepositoryManager {
 		return false;
 	}
 	
+	public String[] getProcessIDs(){
+		ArrayList<String> retval= new ArrayList<String>();
+		for (MovingCodeRepository repo : repositories.values()){
+			retval.addAll(Arrays.asList(repo.getRegisteredProcessIDs()));
+		}
+		return retval.toArray(new String[retval.size()]);
+	}
 	
-	public String[] getRegisteredIdentifiers(){
+	public String[] getRegisteredRepositories(){
 		return repositories.keySet().toArray(new String[repositories.size()]);
 	}
 	
