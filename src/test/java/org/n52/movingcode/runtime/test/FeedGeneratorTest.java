@@ -18,7 +18,7 @@ public class FeedGeneratorTest {
 	
 	private static final String feedTitle = "FeedTitle";
 	private static final String feedSubtitle = "FeedSubTitle";
-	private static final String feedAuthor = "Matthias Müller";
+	private static final String feedAuthor = "Matthias Mueller";
 	
 	@Test
 	public void makeFeed() {
