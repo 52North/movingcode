@@ -14,10 +14,11 @@ public class ValidatePackage {
 
 		// Arrange
 		File packageFile = new File("src/test/resources/testpackages/ztransform.zip");
-		System.out.println(packageFile.getAbsolutePath());
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 
 		// Assert
 		Assert.assertTrue(mcPackage.isValid());
@@ -28,10 +29,11 @@ public class ValidatePackage {
 
 		// Arrange
 		File packageFile = new File("src/test/resources/testpackages/py_copy.zip");
-		System.out.println(packageFile.getAbsolutePath());
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 
 		// Assert
 		Assert.assertTrue(mcPackage.isValid());
@@ -43,10 +45,11 @@ public class ValidatePackage {
 
 		// Arrange
 		File packageFile = new File("src/test/resources/testpackages/bad_package_structure.zip");
-		System.out.println(packageFile.getAbsolutePath());
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 
 		// Assert
 		Assert.assertFalse(mcPackage.isValid());
