@@ -17,7 +17,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 
 public class MovingCodeRepositoryTests {
 	
-	private static final String identifier = "de.tu-dresden.geo.gis.algorithms.raster.ztransform";
+	private static final String zTransformID = "de.tu-dresden.geo.gis.algorithms.raster.ztransform";
 	private static final String packageFolderName = "src/test/resources/testpackages";
 	
 	private static final String workspace = packageFolderName + File.separator + "ztransform/ztransform";
@@ -35,12 +35,12 @@ public class MovingCodeRepositoryTests {
 		MovingCodeRepository mcRep = new MovingCodeRepository(packageFolder);
 
 		// Assert
-		Assert.assertTrue(mcRep.containsPackage(identifier));
-		System.out.println("Information for package: " + identifier);
-		System.out.println("Package Timestamp is: " + mcRep.getPackageTimestamp(identifier));
+		Assert.assertTrue(mcRep.containsPackage(zTransformID));
+		System.out.println("Information for package: " + zTransformID);
+		System.out.println("Package Timestamp is: " + mcRep.getPackageTimestamp(zTransformID));
 		
 		
-		MovingCodePackage pack = mcRep.getPackage(identifier); //get the test package
+		MovingCodePackage pack = mcRep.getPackage(zTransformID); //get the test package
 		Assert.assertFalse(pack == null); // make sure it is not null
 		
 		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); //get an empty parameter Map
@@ -74,7 +74,7 @@ public class MovingCodeRepositoryTests {
 		repoMan.addRepository(packageFolderName);
 		
 		// Assert
-		Assert.assertTrue(repoMan.containsPackage(identifier));
+		Assert.assertTrue(repoMan.providesFunction(zTransformID));
 	}
 	
 	@Test
@@ -85,12 +85,16 @@ public class MovingCodeRepositoryTests {
 		
 		// Act
 		// create a new zipped package
-		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null);
 		File tempFile = new File(tempFolder + File.separator + UUID.randomUUID().toString() + ".zip");
+		String packageIdentifier = tempFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
+		
+		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null, packageIdentifier);
+		
 		mcp.dumpPackage(tempFile);
 		// close package and reopen
 		mcp = null;
-		mcp = new MovingCodePackage(tempFile);
+		mcp = new MovingCodePackage(tempFile, packageIdentifier);
 		
 		// Assert
 		Assert.assertTrue(mcp.isValid());

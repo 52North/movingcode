@@ -38,10 +38,11 @@ public class ArcToolboxPackageTest {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		System.out.println(packageFile.getAbsolutePath());
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 		
 		// Assert
 		Assert.assertTrue(mcPackage.isValid());
@@ -57,10 +58,11 @@ public class ArcToolboxPackageTest {
 		
 		// Arrange
 		File packageFile = new File(packageFileName);
-		System.out.println(packageFile.getAbsolutePath());
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); //get a processor
 		
 		// add NIR
