@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Description for ArcToolbox NDVI process Author: Matthias Mueller, TU 
 	Dresden Website: http://tu-dresden.de/fgh/geo/gis -->
-<mvc:packageDescription xmlns:mvc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
+<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
 	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.0.0
 						http://gis.geo.tu-dresden.de/movingcode/1.0.0/descriptions/MovingCodePackage.xsd">
-	<mvc:contractedFunctionality>
-		<mvc:wpsProcessDescription
+	<mc:contractedFunctionality>
+		<mc:wpsProcessDescription
 			wps:processVersion="1">
 			<ows:Identifier>de.tu-dresden.geo.gis.algorithms.test.ndvi</ows:Identifier>
 			<ows:Title>NDVI process</ows:Title>
@@ -74,38 +74,38 @@
 					</ComplexOutput>
 				</Output>
 			</ProcessOutputs>
-		</mvc:wpsProcessDescription>
-	</mvc:contractedFunctionality>
-	<mvc:contractedPlatform mvc:platformId="http://gis.geo.tu-dresden.de/movingcode/platformregistry/platform/arcgis-10.0-analysis"/>
-	<mvc:contractedInfrastructure/>
-	<mvc:exploitationRights>
-		<mvc:creativeCommonsLicense>
-			<mvc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mvc:cc.license>
-			<mvc:dct.title>de.tu-dresden.geo.gis.algorithms.test.ndvi</mvc:dct.title>
-			<mvc:cc.attributionName>Matthias Mueller</mvc:cc.attributionName>
-			<mvc:cc.attributionURL>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mitarbeiter/mueller.m</mvc:cc.attributionURL>
-		</mvc:creativeCommonsLicense>
-	</mvc:exploitationRights>
-	<mvc:workspace>
-		<mvc:workspaceRoot>./arcgis_ndvi_tbx</mvc:workspaceRoot>
-		<mvc:executableLocation>ndvi.tbx</mvc:executableLocation>
-		<mvc:executableMethodCall>ndvi</mvc:executableMethodCall>
-		<mvc:containerType>http://gis.geo.tu-dresden.de/movingcode/containerregistry/arctoolbox-10.0</mvc:containerType>
-		<mvc:executionParameters>
+		</mc:wpsProcessDescription>
+	</mc:contractedFunctionality>
+	<mc:contractedPlatform mc:platformId="http://gis.geo.tu-dresden.de/movingcode/platformregistry/platform/arcgis-10.0-analysis"/>
+	<mc:contractedInfrastructure/>
+	<mc:exploitationRights>
+		<mc:creativeCommonsLicense>
+			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>
+			<mc:dct.title>de.tu-dresden.geo.gis.algorithms.test.ndvi</mc:dct.title>
+			<mc:cc.attributionName>Matthias Mueller</mc:cc.attributionName>
+			<mc:cc.attributionURL>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mitarbeiter/mueller.m</mc:cc.attributionURL>
+		</mc:creativeCommonsLicense>
+	</mc:exploitationRights>
+	<mc:workspace>
+		<mc:workspaceRoot>./arcgis_ndvi_tbx</mc:workspaceRoot>
+		<mc:executableLocation>ndvi.tbx</mc:executableLocation>
+		<mc:executableMethodCall>ndvi</mc:executableMethodCall>
+		<mc:containerType>http://gis.geo.tu-dresden.de/movingcode/containerregistry/arctoolbox-10.0</mc:containerType>
+		<mc:executionParameters>
 			<!-- Inputs -->
-			<mvc:parameter>
-				<mvc:positionID>1</mvc:positionID>
-				<mvc:functionalInputID>NIR</mvc:functionalInputID>
-			</mvc:parameter>
-			<mvc:parameter>
-				<mvc:positionID>2</mvc:positionID>
-				<mvc:functionalInputID>RED</mvc:functionalInputID>
-			</mvc:parameter>
+			<mc:parameter>
+				<mc:positionID>1</mc:positionID>
+				<mc:functionalInputID>NIR</mc:functionalInputID>
+			</mc:parameter>
+			<mc:parameter>
+				<mc:positionID>2</mc:positionID>
+				<mc:functionalInputID>RED</mc:functionalInputID>
+			</mc:parameter>
 			<!-- Outputs -->
-			<mvc:parameter>
-				<mvc:positionID>3</mvc:positionID>
-				<mvc:functionalOutputID>NDVI</mvc:functionalOutputID>
-			</mvc:parameter>
-		</mvc:executionParameters>
-	</mvc:workspace>
-</mvc:packageDescription>
+			<mc:parameter>
+				<mc:positionID>3</mc:positionID>
+				<mc:functionalOutputID>NDVI</mc:functionalOutputID>
+			</mc:parameter>
+		</mc:executionParameters>
+	</mc:workspace>
+</mc:packageDescription>
