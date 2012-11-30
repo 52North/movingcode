@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Description for zTransformation process Author: Matthias Mueller, TU 
-	Dresden Website: http://tu-dresden.de/fgh/geo/gis -->
-<mvc:packageDescription xmlns:mvc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
+	Dresden; Website: http://tu-dresden.de/fgh/geo/gis -->
+<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
 	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.0.0
 						http://gis.geo.tu-dresden.de/movingcode/1.0.0/descriptions/MovingCodePackage.xsd">
-	<mvc:contractedFunctionality>
-		<mvc:wpsProcessDescription
-			wps:processVersion="1">
+	<mc:contractedFunctionality>
+		<mc:wpsProcessDescription wps:processVersion="1">
 			<ows:Identifier>de.tu-dresden.geo.gis.algorithms.raster.ztransform</ows:Identifier>
 			<ows:Title>z-Transformation for raster data (cell wise)</ows:Title>
 			<ows:Abstract>Computes a z-transform cell by cell</ows:Abstract>
@@ -74,62 +73,62 @@
 					</ComplexOutput>
 				</Output>
 			</ProcessOutputs>
-		</mvc:wpsProcessDescription>
-	</mvc:contractedFunctionality>
-	<mvc:contractedPlatform>
-		<mvc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.6</mvc:requiredRuntimeComponent>
-		<mvc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</mvc:requiredRuntimeComponent>
-		<mvc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.6</mvc:requiredRuntimeComponent>
-	</mvc:contractedPlatform>
-	<mvc:contractedPlatform>
-		<mvc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.7</mvc:requiredRuntimeComponent>
-		<mvc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</mvc:requiredRuntimeComponent>
-		<mvc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.7</mvc:requiredRuntimeComponent>
-	</mvc:contractedPlatform>
-	<mvc:contractedInfrastructure>
-		<mvc:occi.compute.memory>0.1</mvc:occi.compute.memory>
-		<mvc:occi.storage.size>0.01</mvc:occi.storage.size>
-	</mvc:contractedInfrastructure>
-	<mvc:exploitationRights>
-		<mvc:creativeCommonsLicense>
-			<mvc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mvc:cc.license>
-			<mvc:dct.title>de.tu-dresden.geo.gis.algorithms.raster.ztransform</mvc:dct.title>
-			<mvc:cc.attributionName>Matthias Mueller</mvc:cc.attributionName>
-			<mvc:cc.attributionURL>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mitarbeiter/mueller.m</mvc:cc.attributionURL>
-		</mvc:creativeCommonsLicense>
-	</mvc:exploitationRights>
-	<mvc:workspace>
-		<mvc:workspaceRoot>./ztransform</mvc:workspaceRoot>
-		<mvc:executableLocation>./ztransform.py</mvc:executableLocation>
-		<mvc:containerType>http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.5</mvc:containerType>
-		<mvc:executionParameters>
+		</mc:wpsProcessDescription>
+	</mc:contractedFunctionality>
+	<mc:contractedPlatform>
+		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.6</mc:requiredRuntimeComponent>
+		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</mc:requiredRuntimeComponent>
+		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.6</mc:requiredRuntimeComponent>
+	</mc:contractedPlatform>
+	<mc:contractedPlatform>
+		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.7</mc:requiredRuntimeComponent>
+		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</mc:requiredRuntimeComponent>
+		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.7</mc:requiredRuntimeComponent>
+	</mc:contractedPlatform>
+	<mc:contractedInfrastructure>
+		<mc:occi.compute.cores>1</mc:occi.compute.cores>
+		<mc:occi.compute.memory>0.1</mc:occi.compute.memory>
+		<mc:occi.storage.size>0.1</mc:occi.storage.size>
+	</mc:contractedInfrastructure>
+	<mc:exploitationRights>
+		<mc:creativeCommonsLicense>
+			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>
+			<mc:dct.title>de.tu-dresden.geo.gis.algorithms.raster.ztransform</mc:dct.title>
+			<mc:cc.attributionName>Matthias Mueller</mc:cc.attributionName>
+			<mc:cc.attributionURL>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mitarbeiter/mueller.m</mc:cc.attributionURL>
+		</mc:creativeCommonsLicense>
+	</mc:exploitationRights>
+	<mc:workspace>
+		<mc:workspaceRoot>./ztransform</mc:workspaceRoot>
+		<mc:executableLocation>./ztransform.py</mc:executableLocation>
+		<mc:containerType>http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.5</mc:containerType>
+		<mc:executionParameters>
 			<!-- Inputs -->
-			<mvc:parameter>
-				<mvc:prefixString />
-				<mvc:suffixString />
-				<mvc:separatorString>
-				</mvc:separatorString>
-				<mvc:positionID>3</mvc:positionID>
-				<mvc:functionalInputID>STATS_RASTER</mvc:functionalInputID>
-				<mvc:functionalOutputID />
-			</mvc:parameter>
-			<mvc:parameter>
-				<mvc:prefixString />
-				<mvc:suffixString />
-				<mvc:separatorString />
-				<mvc:positionID>2</mvc:positionID>
-				<mvc:functionalInputID>REFERENCE_RASTER</mvc:functionalInputID>
-				<mvc:functionalOutputID />
-			</mvc:parameter>
+			<mc:parameter>
+				<mc:prefixString/>
+				<mc:suffixString/>
+				<mc:separatorString/>
+				<mc:positionID>3</mc:positionID>
+				<mc:functionalInputID>STATS_RASTER</mc:functionalInputID>
+				<mc:functionalOutputID />
+			</mc:parameter>
+			<mc:parameter>
+				<mc:prefixString/>
+				<mc:suffixString/>
+				<mc:separatorString/>
+				<mc:positionID>2</mc:positionID>
+				<mc:functionalInputID>REFERENCE_RASTER</mc:functionalInputID>
+				<mc:functionalOutputID/>
+			</mc:parameter>
 			<!-- Outputs -->
-			<mvc:parameter>
-				<mvc:prefixString />
-				<mvc:suffixString />
-				<mvc:separatorString />
-				<mvc:positionID>1</mvc:positionID>
-				<mvc:functionalInputID />
-				<mvc:functionalOutputID>ZTRANSFORM</mvc:functionalOutputID>
-			</mvc:parameter>
-		</mvc:executionParameters>
-	</mvc:workspace>
-</mvc:packageDescription>
+			<mc:parameter>
+				<mc:prefixString/>
+				<mc:suffixString/>
+				<mc:separatorString/>
+				<mc:positionID>1</mc:positionID>
+				<mc:functionalInputID/>
+				<mc:functionalOutputID>ZTRANSFORM</mc:functionalOutputID>
+			</mc:parameter>
+		</mc:executionParameters>
+	</mc:workspace>
+</mc:packageDescription>
