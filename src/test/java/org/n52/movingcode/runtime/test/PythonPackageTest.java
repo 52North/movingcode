@@ -14,7 +14,7 @@ import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
-public class PythonPackageTest {
+public class PythonPackageTest extends GlobalTestConfig{
 	
 	private static final String packageFileName = "src/test/resources/testpackages/py_copy.zip";
 	private static final String dataFileName = "src/test/resources/testpackages/py_copy/testdata/test_null.tif";
@@ -29,6 +29,7 @@ public class PythonPackageTest {
 	@Test
 	public void loadPyCopyPackage() {
 
+		
 		// Arrange
 		File packageFile = new File(packageFileName);
 		String packageIdentifier = packageFile.getAbsolutePath();

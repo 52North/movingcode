@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
@@ -14,7 +13,7 @@ import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
-public class ArcToolboxPackageTest {
+public class ArcToolboxPackageTest extends GlobalTestConfig{
 	
 	private static final String packageFileName = "src/test/resources/testpackages/arcgis_ndvi_tbx.zip";
 	
@@ -35,7 +34,8 @@ public class ArcToolboxPackageTest {
 	
 	@Test
 	public void loadNDVIPackage() {
-
+		
+		
 		// Arrange
 		File packageFile = new File(packageFileName);
 		String packageIdentifier = packageFile.getAbsolutePath();
@@ -54,7 +54,6 @@ public class ArcToolboxPackageTest {
 	@Test
 	public void executeNDVIPackage() throws IllegalArgumentException, FileNotFoundException {
 		
-		BasicConfigurator.configure();
 		
 		// Arrange
 		File packageFile = new File(packageFileName);

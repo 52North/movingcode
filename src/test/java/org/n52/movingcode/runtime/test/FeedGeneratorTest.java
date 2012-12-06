@@ -1,12 +1,11 @@
 package org.n52.movingcode.runtime.test;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Test;
 
 import org.n52.movingcode.runtime.feed.FeedGenerator;
 import org.n52.movingcode.runtime.feed.FeedTemplate;
 
-public class FeedGeneratorTest {
+public class FeedGeneratorTest extends GlobalTestConfig{
 	
 	// the source folder where the packages currently reside 
 	private static final String repositoryFolder = "src/test/resources/testpackages";
@@ -20,14 +19,16 @@ public class FeedGeneratorTest {
 	private static final String feedSubtitle = "FeedSubTitle";
 	private static final String feedAuthor = "Matthias Mueller";
 	
+
+
 	@Test
 	public void makeFeed() {
-		BasicConfigurator.configure();
 		FeedGenerator.generate(feedFileName, webFolder, baseURL, repositoryFolder, staticFeedTemplate());
 	}
 	
 	
 	private static final FeedTemplate staticFeedTemplate(){
+		
 		FeedTemplate ft = new FeedTemplate(baseURL + feedFileName);
 		ft.setFeedTitle(feedTitle);
 		ft.setFeedSubtitle(feedSubtitle);

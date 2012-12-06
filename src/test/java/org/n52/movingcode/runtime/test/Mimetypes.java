@@ -9,9 +9,12 @@ import org.n52.movingcode.runtime.iodata.MimeTypeDatabase;
 
 
 
-public class Mimetypes {
+public class Mimetypes extends GlobalTestConfig{
+
 	private static final String MT_NETCDF = "application/netcdf";
 	private static final String MT_XNETCDF = "application/x-netcdf";
+	
+	
 	
 	@Test
 	public void loadMimeFile(){

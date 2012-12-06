@@ -15,7 +15,7 @@ import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
-public class MovingCodeRepositoryTests {
+public class MovingCodeRepositoryTests extends GlobalTestConfig{
 	
 	private static final String zTransformID = "de.tu-dresden.geo.gis.algorithms.raster.ztransform";
 	private static final String packageFolderName = "src/test/resources/testpackages";
@@ -25,8 +25,10 @@ public class MovingCodeRepositoryTests {
 	
 	private static final String tempFolder = "C:\\tmp";
 	
+	
 	@Test
 	public void testDirectoryRepository (){
+		
 		// Arrange
 		File packageFolder = new File(packageFolderName);
 		System.out.println(packageFolder.getAbsolutePath());
@@ -65,6 +67,7 @@ public class MovingCodeRepositoryTests {
 	
 	@Test
 	public void testRepoManager(){
+		
 		// Arrange
 		File packageFolder = new File(packageFolderName);
 		System.out.println(packageFolder.getAbsolutePath());
@@ -79,6 +82,7 @@ public class MovingCodeRepositoryTests {
 	
 	@Test
 	public void testPackageZipping() throws Exception{
+		
 		// Arrange
 		File wsFolder = new File(workspace);
 		PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(new File(descriptionXML)); 

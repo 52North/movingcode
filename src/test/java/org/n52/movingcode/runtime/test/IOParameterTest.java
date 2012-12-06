@@ -10,9 +10,10 @@ import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
 
-public class IOParameterTest {
+public class IOParameterTest extends GlobalTestConfig{
 	@Test
 	public void createParameterValues(){
+		
 		//Arrange
 		IOParameter data = new IOParameter(
 				new IIOParameter.ParameterID(new BigInteger("1")),
