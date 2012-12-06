@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pc:processors xmlns:pc="http://52north.org/movingcode/runtime/processorconfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://52north.org/movingcode/runtime/processorconfig processors.xsd">
-	<processor id="de.tudresden.gis.geoprocessing.movingcode.processors.python.PythonCLIProcessor">
+	<processor id="org.n52.movingcode.runtime.processors.python.PythonCLIProcessor">
 		<supportedContainer>http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.5</supportedContainer>
 	</processor> 
-	<processor id="de.tudresden.gis.geoprocessing.movingcode.processors.arctoolbox.ArcServerProcessor">
+	<processor id="org.n52.movingcode.runtime.processors.arctoolbox.ArcServerProcessor">
 		<supportedContainer>http://gis.geo.tu-dresden.de/movingcode/containerregistry/arctoolbox-10.0</supportedContainer>
 		<property key="IP" value="**"/>
 		<property key="DOMAIN" value="**"/>
@@ -12,7 +12,7 @@
 		<property key="DCOM_NATIVE" value="TRUE"/>
 		<property key="ARCOBJECTSJAR" value="**"/>
 	</processor>
-	<processor id="de.tudresden.gis.geoprocessing.movingcode.processors.java.JavaJARProcessor">
+	<processor id="org.n52.movingcode.runtime.processors.java.JavaJARProcessor">
 		<supportedContainer>http://gis.geo.tu-dresden.de/movingcode/containerregistry/java-jar</supportedContainer>
 	</processor>
 	<defaults>

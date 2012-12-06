@@ -3,14 +3,16 @@
  */
 package org.n52.movingcode.runtime.processors;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.n52.movingcode.runtime.ProcessorConfig;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processorconfig.ProcessorType;
 import org.n52.movingcode.runtime.processorconfig.ProcessorsDocument;
@@ -28,23 +30,23 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PlatformType;
  *
  */
 public class ProcessorFactory {
-	
+
 	private static ProcessorFactory instance;
-	
+
 	private Map<String,String[]> supportedContainers;
 	private String[] availablePlatforms = null;
 	private Map<String,File> scratchworkspaceMap;
 	private Map<String,PropertyMap> processorProperties;
-	private final String PROCESSOR_CONFIG_FILE = "processors.xml";
+
 	private String defaultWorkspace = null;
-	
+
 	Logger logger = Logger.getLogger(ProcessorFactory.class);
-	
+
 	private ProcessorFactory (){
 		super();
 		initConfig();
 	}
-	
+
 	/**
 	 * Delivers a new {@link AbstractProcessor} that is able to handle the mcPackage
 	 * passed in the method call.
@@ -54,9 +56,9 @@ public class ProcessorFactory {
 	 * 
 	 */
 	public AbstractProcessor newProcessor(final MovingCodePackage mcPackage){
-		
+
 		String processorID = findCompatibleProcessor(mcPackage.getDescription().getPackageDescription());
-		
+
 		if (processorID != null){
 			return loadProcessor(processorID,
 					getScratchworkspace(processorID),
@@ -65,16 +67,16 @@ public class ProcessorFactory {
 		} else {
 			return null; // if no suitable processor was found
 		}
-		
+
 	}
-	
+
 	public static synchronized ProcessorFactory getInstance(){
 		if (instance == null){
 			instance = new ProcessorFactory();
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Load configuration from the config file.
 	 */
@@ -82,15 +84,14 @@ public class ProcessorFactory {
 		supportedContainers = new HashMap<String,String[]>();
 		scratchworkspaceMap = new HashMap<String,File>();
 		processorProperties = new HashMap<String, PropertyMap>();
-		
+
 		try{
-			InputStream is = ProcessorFactory.class.getResourceAsStream(PROCESSOR_CONFIG_FILE);
-			ProcessorsDocument processors = ProcessorsDocument.Factory.parse(is);
-			
+			ProcessorsDocument processors = ProcessorConfig.getInstance().getConfig();
+
 			//deal with defaults
 			defaultWorkspace = processors.getProcessors().getDefaults().getTempWorkspace();
 			availablePlatforms = processors.getProcessors().getDefaults().getAvailablePlatformArray();
-			
+
 			// deal with individual processors
 			for (ProcessorType processor : processors.getProcessors().getProcessorArray()){
 				supportedContainers.put(processor.getId(), processor.getSupportedContainerArray());
@@ -102,22 +103,29 @@ public class ProcessorFactory {
 					File scratchWS = new File(defaultWorkspace);
 					scratchworkspaceMap.put(processor.getId(), scratchWS);
 				}
-				
+
 				PropertyMap pMap = new PropertyMap();
-				
+
 				for (PropertyType property : processor.getPropertyArray()){
 					pMap.put(property.getKey(), property.getValue());
 				}
-				
+
 				processorProperties.put(processor.getId(), pMap);
 			}
-			
+
 		} catch (Exception e){
 			System.out.println(e.getMessage());
 		}
-		
+
+		ProcessorConfig.getInstance().addPropertyChangeListener(ProcessorConfig.PROCESSORCONFIG_UPDATE_EVENT_NAME, new PropertyChangeListener() {
+			public void propertyChange(
+					final PropertyChangeEvent propertyChangeEvent) {
+				initConfig();
+			}
+		});
+
 	}
-	
+
 	/**
 	 * Loader for processor classes. Uses dynamic class loading and returns {@link AbstractProcessor}.
 	 * If the class loading and instantiation should fail for some reason NULL is returned.
@@ -129,7 +137,7 @@ public class ProcessorFactory {
 	 * @return {@link AbstractProcessor}
 	 */
 	private AbstractProcessor loadProcessor(String processorClassName, final File scratchworkspace, final MovingCodePackage mcp, final PropertyMap properties) {
-		
+
 		try {
 			// load class
 			Class<?> processorClass = ProcessorFactory.class.getClassLoader().loadClass(processorClassName);
@@ -137,7 +145,7 @@ public class ProcessorFactory {
 			Constructor<?> processorConstructor = processorClass.getDeclaredConstructor(File.class, MovingCodePackage.class, PropertyMap.class);
 			// return new Object
 			return (AbstractProcessor)processorConstructor.newInstance(scratchworkspace, mcp, properties);
-			
+
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -164,7 +172,7 @@ public class ProcessorFactory {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Getter for registered processors.
 	 * 
@@ -173,7 +181,7 @@ public class ProcessorFactory {
 	public String[] registeredProcessors(){
 		return supportedContainers.keySet().toArray(new String[supportedContainers.keySet().size()]);
 	}
-	
+
 	/**
 	 * Getter for registered platforms.
 	 * 
@@ -182,7 +190,7 @@ public class ProcessorFactory {
 	public String[] getAvailablePlatforms(){
 		return availablePlatforms;
 	}
-	
+
 	/**
 	 * @param {@link String} processorID
 	 * @return {@link File} scatchworkspace assigned to a processor class 
@@ -190,7 +198,7 @@ public class ProcessorFactory {
 	public File getScratchworkspace(String processorID){
 		return scratchworkspaceMap.get(processorID);
 	}
-	
+
 	/**
 	 * Getter for properties arrays. Currently for informative use only. 
 	 * 
@@ -200,7 +208,7 @@ public class ProcessorFactory {
 	public PropertyMap getProcessorProperties(String processorID){
 		return processorProperties.get(processorID);
 	}
-	
+
 	/**
 	 * Helper method: Does an array of Strings contain a particular String?
 	 * Comparison is case-insensitive.
@@ -217,7 +225,7 @@ public class ProcessorFactory {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Helper method: Does an array of Strings contain a particular set of Strings?
 	 * Comparison is case-insensitive.
@@ -235,7 +243,7 @@ public class ProcessorFactory {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Lookup method that returns the first processor's ID that is compatible with the
 	 * description. If no appropriate processor is found NULL is returned.
@@ -244,13 +252,13 @@ public class ProcessorFactory {
 	 * @return {@link String} processorID
 	 */
 	private String findCompatibleProcessor(final PackageDescription description){
-		
+
 		PlatformType[] validPlatforms = description.getContractedPlatformArray();
-		
+
 		// 1. Do we have some required platforms in place?
 		boolean inPlace = false;
 		for (PlatformType currentPlatform : validPlatforms){
-			
+
 			// platforms defined using attribute syntax
 			if (currentPlatform.isSetPlatformId()){
 				if (needleInHaystack(availablePlatforms,currentPlatform.getPlatformId())){
@@ -258,20 +266,20 @@ public class ProcessorFactory {
 					break;
 				}
 			}			
-			
+
 			// platforms defined by the array
 			if (allNeedlesInHaystack(availablePlatforms,currentPlatform.getRequiredRuntimeComponentArray())){
 				inPlace = true;
 				break;
 			}
-			
+
 		}
 		if (!inPlace){
 			return null;
 		}
-		
+
 		String requiredContainer = description.getWorkspace().getContainerType();
-		
+
 		// 2. return a processor that supports the particular container
 		//    if no processor supports this container return null
 		for (String currentID : supportedContainers.keySet()){
@@ -282,5 +290,5 @@ public class ProcessorFactory {
 		}
 		return null;
 	}
-	
+
 }

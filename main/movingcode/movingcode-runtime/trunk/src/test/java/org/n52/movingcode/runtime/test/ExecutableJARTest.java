@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
@@ -15,7 +17,7 @@ import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 
-public class ExecutableJARTest {
+public class ExecutableJARTest extends GlobalTestConfig{
 	
 	private static final String packageFileName = "src/test/resources/testpackages/jar_copy.zip";
 	private static final String dataFileName = "src/test/resources/testpackages/jar_copy/testdata/test_null.tif";
@@ -25,10 +27,12 @@ public class ExecutableJARTest {
 	private static final int outPosition = 2;
 	private static final String mimeType = "application/geotiff";
 	
+	Logger logger = Logger.getLogger(ExecutableJARTest.class);
+	
 	
 	@Test
 	public void getClasspath(){
-		System.out.println(System.getProperties().getProperty("java.class.path", null));
+		logger.info(System.getProperties().getProperty("java.class.path", null));
 	}
 	
 	@Test
@@ -37,7 +41,7 @@ public class ExecutableJARTest {
 		// Arrange
 		File packageFile = new File(packageFileName);
 		String packageIdentifier = packageFile.getAbsolutePath();
-		System.out.println(packageIdentifier);
+		logger.info(packageIdentifier);
 
 		// Act
 		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
@@ -54,7 +58,7 @@ public class ExecutableJARTest {
 		// Arrange
 		File packageFile = new File(packageFileName);
 		String packageIdentifier = packageFile.getAbsolutePath();
-		System.out.println(packageIdentifier);
+		logger.info(packageIdentifier);
 
 		// Act
 		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
@@ -86,7 +90,8 @@ public class ExecutableJARTest {
 	 * Same test as above but parameters are set by their public (functional) ID
 	 * 
 	 * @throws IllegalArgumentException
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException 
+	 * @throws XmlException 
 	 */
 	@Test
 	public void executeJarCopyPackage2() throws IllegalArgumentException, FileNotFoundException {
@@ -94,7 +99,7 @@ public class ExecutableJARTest {
 		// Arrange
 		File packageFile = new File(packageFileName);
 		String packageIdentifier = packageFile.getAbsolutePath();
-		System.out.println(packageIdentifier);
+		logger.info(packageIdentifier);
 
 		// Act
 		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
