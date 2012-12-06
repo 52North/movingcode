@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.abdera.model.Entry;
 import org.apache.commons.io.FileUtils;
@@ -18,9 +16,6 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.DefaultPackageRepository;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeedEntry;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
