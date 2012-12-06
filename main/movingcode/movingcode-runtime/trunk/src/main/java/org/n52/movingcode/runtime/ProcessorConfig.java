@@ -30,7 +30,7 @@ public class ProcessorConfig implements Serializable {
 	public static final String PROCESSORCONFIG_UPDATE_EVENT_NAME = "ProcessorConfigUpdate";
 
 
-	private static transient Logger LOGGER = Logger.getLogger(ProcessorConfig.class);
+	private static transient Logger logger = Logger.getLogger(ProcessorConfig.class);
 
 	// private constructor for a blank config
 	private ProcessorConfig(ProcessorsDocument blankConfig){
@@ -40,16 +40,34 @@ public class ProcessorConfig implements Serializable {
 
 	public static final ProcessorConfig EMPTY_RUNTIME_CONFIG = new ProcessorConfig(blankConfig);
 
-	public void setConfig (File processorConfigXML) throws XmlException, IOException{
+	public boolean setConfig (File processorConfigXML) {
 		synchronized (procConfigXMLBeans) {
-			procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXML);
+			try {
+				procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXML);
+				return true;
+			} catch (XmlException e) {
+				logger.error("Reading new processor configuration failed! " + e.getMessage());
+				return false;
+			} catch (IOException e) {
+				logger.error("Reading new processor configuration failed! " + e.getMessage());
+				return false;
+			}
 		}
 		
 	}
 
-	public void setConfig (InputStream processorConfigXMLStream) throws XmlException, IOException{
+	public boolean setConfig (InputStream processorConfigXMLStream){
 		synchronized (procConfigXMLBeans) {
-			procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXMLStream);
+			try {
+				procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXMLStream);
+				return true;
+			} catch (XmlException e) {
+				logger.error("Reading new processor configuration failed! " + e.getMessage());
+				return false;
+			} catch (IOException e) {
+				logger.error("Reading new processor configuration failed! " + e.getMessage());
+				return false;
+			}
 		}
 		
 	}
@@ -110,7 +128,7 @@ public class ProcessorConfig implements Serializable {
 			this.setConfig(new ByteArrayInputStream(configurationDocument.xmlText().getBytes()));
 		}
 		catch (XmlException e) {
-			LOGGER.error(e.getMessage());
+			logger.error(e.getMessage());
 			throw new IOException(e.getMessage());
 		}
 	}
