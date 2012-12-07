@@ -12,6 +12,7 @@ import java.util.Date;
 
 import org.apache.abdera.model.Entry;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.DefaultPackageRepository;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
@@ -31,6 +32,8 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 public class MovingCodeRepository extends DefaultPackageRepository{
 	
+	static Logger logger = Logger.getLogger(MovingCodeRepository.class);
+	
 	private static final String[] zipExtension = {"zip"};
 	
 	/**
@@ -45,8 +48,13 @@ public class MovingCodeRepository extends DefaultPackageRepository{
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> zipFiles = scanForZipFiles(sourceDirectory);
 		
+		logger.info("Scanning directory: " + sourceDirectory.getAbsolutePath());
+		
 		for (File currentFile : zipFiles){
-			MovingCodePackage mcPackage = new MovingCodePackage(currentFile, sourceDirectory.getAbsolutePath());
+			String id = generateIDFromFilePath(currentFile.getPath());
+			logger.info("Found package: " + currentFile + "; using ID: " + id);
+			
+			MovingCodePackage mcPackage = new MovingCodePackage(currentFile, id);
 			
 			// validate
 			// and add to package map
@@ -54,7 +62,7 @@ public class MovingCodeRepository extends DefaultPackageRepository{
 			if (mcPackage.isValid()){
 				register(mcPackage);
 			} else {
-				System.out.println("Info: " + currentFile.getAbsolutePath() + " is an invalid package.");
+				logger.error(currentFile.getAbsolutePath() + " is an invalid package.");
 			}
 		}
 	}
@@ -99,8 +107,8 @@ public class MovingCodeRepository extends DefaultPackageRepository{
 	 * @param {@link String} packageIdentifier - the (unique) ID of the package
 	 * 
 	 */
-	public MovingCodePackage getPackage(String functionalID){
-		return retrievePackage(functionalID);
+	public MovingCodePackage getPackage(String packageID){
+		return retrievePackage(packageID);
 	}
 	
 	
@@ -114,8 +122,8 @@ public class MovingCodeRepository extends DefaultPackageRepository{
 	/*
 	 * returns package description for a given functional ID 
 	 */
-	public PackageDescriptionDocument getPackageDescription(String functionalID){
-		return retrievePackage(functionalID).getDescription();
+	public PackageDescriptionDocument getPackageDescription(String packageID){
+		return retrievePackage(packageID).getDescription();
 	}
 	
 	/*
@@ -126,4 +134,19 @@ public class MovingCodeRepository extends DefaultPackageRepository{
 		return FileUtils.listFiles(directory, zipExtension, true);	
 	}
 	
+	private static final String generateIDFromFilePath(String filePath){
+		String id = "";
+		
+		// trim ".zip"
+		for (String extension : zipExtension){
+			if (filePath.endsWith(extension)){
+				id = filePath.substring(0,filePath.lastIndexOf(extension));
+			}
+		}
+		
+		// substitute \ with /
+		id = id.replace("\\", "/");
+		
+		return id;
+	}
 }

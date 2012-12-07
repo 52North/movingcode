@@ -1,17 +1,18 @@
 package org.n52.movingcode.runtime.feed;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.MovingCodeRepository;
+import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 
 public class FeedGenerator {
 
-
+	static Logger logger = Logger.getLogger(FeedGenerator.class);
 	
 	/**
 	 * 
@@ -26,21 +27,20 @@ public class FeedGenerator {
 			FeedTemplate template
 			){
 		try {
-	    	System.out.println("Building new Feed ...");
+	    	logger.info("Building new Feed ...");
 	    	if (template != null){
 	    		GeoprocessingFeed feed = new GeoprocessingFeed(template);
-	    		updateFeedFile(feed, baseURL, feedFileName, repositoryFolder, webFolder);
+	    		updateFeedFile(feed, baseURL, feedFileName, repositoryFolder, webFolder, null);
 	    	} else {
-	    		updateFeedFile(null,baseURL, feedFileName, repositoryFolder, webFolder);
+	    		updateFeedFile(null,baseURL, feedFileName, repositoryFolder, webFolder, template);
 	    	}
-			System.out.println("Writing new Feed to disk.");
-			System.out.println("Finished.");
+	    	logger.info("Finished.");
 	    } catch (Exception e) {
-	    	System.out.println(e.getMessage());
+	    	logger.error("Feed generation failed!" + e.getMessage());
 	    }
 	}
 	
-	private static void updateFeedFile (GeoprocessingFeed feed, String rootURL, String targetFeedFileName, String repositoryFolder, String webFolder) throws Exception{
+	private static void updateFeedFile (GeoprocessingFeed feed, String rootURL, String targetFeedFileName, String repositoryFolder, String webFolder, FeedTemplate template) throws Exception{
 		
 		
 		// REMOVE trailing "/" from base folder if necessary
@@ -55,23 +55,26 @@ public class FeedGenerator {
 		
 		File feedFile = new File(webFolder + File.separator + targetFeedFileName);
 		
-		// if no template is provided run the update on an existing feed
+		// if a template is provided run the update on an existing feed
 		if (feed == null){
-			feed = new GeoprocessingFeed(new FileInputStream(feedFile));
+			feed = new GeoprocessingFeed(template);
 		}
 		
 		Map<String,GeoprocessingFeedEntry> candidateFeedEntries = new HashMap<String,GeoprocessingFeedEntry>();
 		MovingCodeRepository localRepo = new MovingCodeRepository(new File(repositoryFolder));
 		for (String currentLocalPackageID : localRepo.getPackageIDs()){
+			logger.info("Processing package: " + currentLocalPackageID);
 			
 			String dumpLocation = webFolder + File.separator + currentLocalPackageID + File.separator;
 			String webLocation = rootURL + currentLocalPackageID + "/";
 			
 			// dump package to new web location
-			localRepo.getPackage(currentLocalPackageID).dumpPackage(new File(dumpLocation + "package.zip"));
+			File newLocation = new File(dumpLocation + "package.zip");
+			MovingCodePackage packageToDump = localRepo.getPackage(currentLocalPackageID);
+			packageToDump.dumpPackage(newLocation);
 			
 			// dump description to new web location
-			localRepo.getPackage(currentLocalPackageID).dumpDescription(new File(dumpLocation + "packagedescription.xml"));
+			packageToDump.dumpDescription(new File(dumpLocation + "packagedescription.xml"));
 			
 			GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(
 					localRepo.getPackageDescription(currentLocalPackageID),
@@ -87,44 +90,10 @@ public class FeedGenerator {
 		
 		feed.updateFeed(candidateFeedEntries);
 		
+		logger.info("Writing new Feed to disk.");
 		feed.write(new FileOutputStream(feedFile));
 	}
 	
-//	/**
-//	 * @param args
-//	 * @author Matthias Mueller
-//	 * 
-//	 * Creates and updates atom feed from a number of Moving Code packages
-//	 * 
-//	 */
-//	public static void main(String[] args) {
-//		
-//		String feedFileName = null;
-//		String webFolder = null;
-//		String baseURL = null;
-//		String repositoryFolder = null;
-//		
-//		if (args.length == 4) {
-//		    try {
-//		    	repositoryFolder = args[0];
-//		    	webFolder = args[1];
-//		    	baseURL = args[2];
-//		    	feedFileName = args[3];
-//		    	
-//		    	System.out.println("Building new Feed ...");
-//		    	updateFeedFile(baseURL, feedFileName, repositoryFolder, webFolder);
-//				System.out.println("Writing new Feed to disk.");
-//				System.out.println("Finished.");
-//		    } catch (Exception e) {
-//		        System.err.println("Wrong arguments given.");
-//		        System.out.println("Usage: FeedGenerator [repositoryFolder] [webFolder] [webRootURL] [feedFileName]");
-//		        System.exit(1);
-//		    }
-//		} else {
-//			System.err.println("Wrong arguments given.");
-//			System.out.println("Usage: FeedGenerator [repositoryFolder] [webFolder] [webRootURL] [feedFileName]");
-//			System.exit(1);
-//		}
-//		
-//	}
+	
+	
 }
