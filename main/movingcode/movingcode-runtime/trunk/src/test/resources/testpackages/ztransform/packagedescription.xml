@@ -21,13 +21,11 @@
 						<Default>
 							<Format>
 								<MimeType>application/geotiff</MimeType>
-								<Schema></Schema>
 							</Format>
 						</Default>
 						<Supported>
 							<Format>
 								<MimeType>application/geotiff</MimeType>
-								<Schema></Schema>
 							</Format>
 						</Supported>
 					</ComplexData>
