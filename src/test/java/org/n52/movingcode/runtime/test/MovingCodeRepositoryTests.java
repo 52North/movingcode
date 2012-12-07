@@ -90,7 +90,7 @@ public class MovingCodeRepositoryTests extends GlobalTestConfig{
 		// Act
 		// create a new zipped package
 		File tempFile = new File(tempFolder + File.separator + UUID.randomUUID().toString() + ".zip");
-		String packageIdentifier = tempFile.getAbsolutePath();
+		String packageIdentifier = tempFile.getPath();
 		System.out.println(packageIdentifier);
 		
 		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null, packageIdentifier);
