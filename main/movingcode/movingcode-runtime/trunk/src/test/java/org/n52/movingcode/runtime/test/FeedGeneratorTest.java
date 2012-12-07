@@ -15,8 +15,8 @@ public class FeedGeneratorTest extends GlobalTestConfig{
 	private static final String baseURL = "http://gis.geo.tu-dresden.de/gpfeed/";
 	private static final String feedFileName = "gpfeed.xml";
 	
-	private static final String feedTitle = "FeedTitle";
-	private static final String feedSubtitle = "FeedSubTitle";
+	private static final String feedTitle = "GeoprocessingAlgorithms";
+	private static final String feedSubtitle = "A random collection of processing algorithms for various purposes.";
 	private static final String feedAuthor = "Matthias Mueller";
 	
 
