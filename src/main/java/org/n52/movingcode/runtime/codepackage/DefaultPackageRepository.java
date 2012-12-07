@@ -1,8 +1,9 @@
 package org.n52.movingcode.runtime.codepackage;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -24,6 +25,8 @@ public class DefaultPackageRepository {
 	private Map<String, MovingCodePackage> packages = new HashMap<String, MovingCodePackage>();
 	private Multimap<String, String> fIDpID_Lookup = ArrayListMultimap.create();
 	
+	static Logger logger = Logger.getLogger(DefaultPackageRepository.class);
+	
 	/**
 	 * private method for registering packages
 	 * @param mcPackage
@@ -38,14 +41,8 @@ public class DefaultPackageRepository {
 	 * @param functionalID
 	 * @return
 	 */
-	protected MovingCodePackage retrievePackage(String functionalID){
-		Collection<String> allPackages = fIDpID_Lookup.get(functionalID);
-		if (allPackages != null && allPackages.size() > 0){
-			String firstPackage = allPackages.iterator().next();
-			return packages.get(firstPackage);
-		} else {
-			return null;
-		}
+	protected MovingCodePackage retrievePackage(String packageID){
+		return packages.get(packageID);
 	}
 	
 	/*

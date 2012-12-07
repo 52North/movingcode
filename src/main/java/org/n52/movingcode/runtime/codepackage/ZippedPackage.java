@@ -264,7 +264,7 @@ final class ZippedPackage {
 			try {
 				FileUtils.copyFile(zipFile, targetFile);
 				return true;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				return false;
 			}
 		// in case there is no file on disk and but a valid url to a zipped package
