@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -22,6 +21,7 @@ import org.n52.movingcode.runtime.iodata.MimeTypeDatabase;
 import org.n52.movingcode.runtime.iodata.IIOParameter.Direction;
 import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.PropertyMap;
 
@@ -67,7 +67,7 @@ public class RServerProcessor extends AbstractProcessor {
 		
 		File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath()
 				+ File.separator
-				+ UUID.randomUUID().toString());
+				+ AUID.randomAUID());
 		
 		if (!tmpWorkspace.mkdir()){
 			logger.error("Could not create instance workspace!");
@@ -277,7 +277,7 @@ public class RServerProcessor extends AbstractProcessor {
 					}
 					String path = this.clonedWorkspace
 						+ File.separator
-						+ UUID.randomUUID().toString()
+						+ AUID.randomAUID()
 						+ "."
 						+ fileExt;
 					
@@ -305,7 +305,7 @@ public class RServerProcessor extends AbstractProcessor {
 						
 						String path = this.clonedWorkspace
 							+ File.separator
-							+ UUID.randomUUID().toString()
+							+ AUID.randomAUID()
 							+ "."
 							+ fileExt;
 						
