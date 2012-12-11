@@ -36,6 +36,8 @@ public class MimeTypeDatabase {
 	private String fname = null;
 	private Multimap<String,String> mimeToExtMap = ArrayListMultimap.create();
 	private Multimap<String,String> extToMimeMap = ArrayListMultimap.create();
+	
+	private static final String[] defaultFileExt = {"dat"};
 
 	/**
 	 * The construtor that takes a filename as an argument.
@@ -119,7 +121,9 @@ public class MimeTypeDatabase {
 		if (mimeToExtMap.containsKey(mime_type)){
 			return mimeToExtMap.get(mime_type).toArray(new String[mimeToExtMap.get(mime_type).size()]);
 		}
-		else return null;
+		else {
+			return defaultFileExt;
+		}
 	}
 
 	/**
