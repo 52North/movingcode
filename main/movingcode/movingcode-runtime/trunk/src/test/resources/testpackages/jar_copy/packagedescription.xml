@@ -21,12 +21,12 @@
 					<ComplexData>
 						<Default>
 							<Format>
-								<MimeType>application/geotiff</MimeType>
+								<MimeType>text/plain</MimeType>
 							</Format>
 						</Default>
 						<Supported>
 							<Format>
-								<MimeType>application/geotiff</MimeType>
+								<MimeType>text/plain</MimeType>
 							</Format>
 						</Supported>
 					</ComplexData>
@@ -40,14 +40,12 @@
 					<ComplexOutput>
 						<Default>
 							<Format>
-								<MimeType>application/geotiff</MimeType>
-								<Schema></Schema>
+								<MimeType>text/plain</MimeType>
 							</Format>
 						</Default>
 						<Supported>
 							<Format>
-								<MimeType>application/geotiff</MimeType>
-								<Schema></Schema>
+								<MimeType>text/plain</MimeType>
 							</Format>
 						</Supported>
 					</ComplexOutput>
