@@ -294,10 +294,13 @@ public class PythonCLIProcessor extends AbstractProcessor{
 				for (int i = 0; i < stringValues.length; i++){
 					// get suitable file extension for the mime type
 					// trow an exception if it cannot be resolved
-					String fileExt = mimeRegistry.getExtensionStrings(mediaValues.get(i).getMimeType())[0];
-					if (fileExt == null){
-						throw new IllegalArgumentException("MimeType '" + mediaValues.get(i).getMimeType() + "' could not be resolved to a file extension.");
+					String fileExt = null;
+					try{
+						fileExt = mimeRegistry.getExtensionStrings(mediaValues.get(i).getMimeType())[0];
+					} catch (Exception e){
+						// just ignore it
 					}
+					
 					String path = this.clonedWorkspace
 						+ File.separator
 						+ UUID.randomUUID().toString()
@@ -321,9 +324,11 @@ public class PythonCLIProcessor extends AbstractProcessor{
 					List<MediaData> mediaValues = (List<MediaData>)data;
 					String[] stringValues = new String[mediaValues.size()];
 					for (int i = 0; i < stringValues.length; i++){
-						String fileExt = mimeRegistry.getExtensionStrings(mediaValues.get(i).getMimeType())[0];
-						if (fileExt == null){
-							throw new IllegalArgumentException("MimeType '" + mediaValues.get(i).getMimeType() + "' could not be resolved to a file extension.");
+						String fileExt = null;
+						try{
+							fileExt = mimeRegistry.getExtensionStrings(mediaValues.get(i).getMimeType())[0];
+						} catch (Exception e){
+							// just ignore it
 						}
 						
 						String path = this.clonedWorkspace
