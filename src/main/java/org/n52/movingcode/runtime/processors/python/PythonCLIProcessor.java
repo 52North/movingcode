@@ -16,6 +16,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -342,4 +343,14 @@ public class PythonCLIProcessor extends AbstractProcessor{
 		}
 		
 	}
+	
+	//delete the current workspace
+	protected void finalize() throws IOException{
+		try {
+			FileUtils.deleteDirectory(clonedWorkspace.getParentFile());
+		} catch (IOException e) {
+			System.out.println("Could not delete dead workspace:\n" + clonedWorkspace.getParentFile().getAbsolutePath());
+		}
+	}
+	
 }
