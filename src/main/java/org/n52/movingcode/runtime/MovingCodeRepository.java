@@ -60,13 +60,15 @@ public class MovingCodeRepository extends DefaultPackageRepository {
 
     static Logger logger = Logger.getLogger(MovingCodeRepository.class);
 
-    private static final String[] zipExtension = {"zip"};
+    private static final String[] ZIP_EXTENSION = {"zip"};
 
     /**
      * 
      * Constructor for file system based repositories. Scans all sub-directories of a given sourceDirectory
      * for zip-Files and attempts to interpret them as MovingCodePackages. Zipfiles that do not validate will
      * be ignored
+     * 
+     * @param sourceDirectory {@link File} - the directory to be scanned for Moving Code Packages.
      * 
      */
     public MovingCodeRepository(File sourceDirectory) {
@@ -98,6 +100,8 @@ public class MovingCodeRepository extends DefaultPackageRepository {
      * Constructor for atom feed repositories. Tries to access the atom feed at the given URL and scans its
      * entries. Then attempts to interpret the entries as MovingCodePackages. Packages that do not validate
      * will be ignored
+     * 
+     * @param atomFeedURL {@link URL} - Direct HTTP link to the Geoprocessing Feed.
      * 
      */
     public MovingCodeRepository(URL atomFeedURL) {
@@ -138,32 +142,32 @@ public class MovingCodeRepository extends DefaultPackageRepository {
         return retrievePackage(packageID);
     }
 
-    /*
+    /**
      * returns the last known update of a MovingCodePackage
      */
     public Date getPackageTimestamp(String packageID) {
         return retrievePackage(packageID).getTimestamp();
     }
 
-    /*
+    /**
      * returns package description for a given functional ID
      */
     public PackageDescriptionDocument getPackageDescription(String packageID) {
         return retrievePackage(packageID).getDescription();
     }
 
-    /*
+    /**
      * Scans a directory recursively for zipFiles and adds them to the global Collection "zipFiles".
      */
     private Collection<File> scanForZipFiles(File directory) {
-        return FileUtils.listFiles(directory, zipExtension, true);
+        return FileUtils.listFiles(directory, ZIP_EXTENSION, true);
     }
-
+    
     private static final String generateIDFromFilePath(String filePath) {
         String id = "";
 
         // trim ".zip"
-        for (String extension : zipExtension) {
+        for (String extension : ZIP_EXTENSION) {
             if (filePath.endsWith(extension)) {
                 id = filePath.substring(0, filePath.lastIndexOf(extension));
             }

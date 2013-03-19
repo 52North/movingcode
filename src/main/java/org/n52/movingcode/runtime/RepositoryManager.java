@@ -48,17 +48,35 @@ public class RepositoryManager {
     private static RepositoryManager instance;
     private Map<String, MovingCodeRepository> repositories = Collections.synchronizedMap(new HashMap<String, MovingCodeRepository>());
 
+    /**
+     * private constructor
+     */
     private RepositoryManager() {
         super();
     }
-
+    
+    /**
+     * Static method to access the {@link RepositoryManager} instance.
+     * 
+     * @return {@link RepositoryManager}
+     */
     public static synchronized RepositoryManager getInstance() {
         if (instance == null) {
             instance = new RepositoryManager();
         }
         return instance;
     }
-
+    
+    /**
+     * Creates a new {@link MovingCodeRepository} for the given directory and tries to add this repository to
+     * the internal repositories Map. 
+     * 1) If the directory was already loaded/registered, this method returns false.
+     * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
+     * 3) If the new Repository was successfully added, this method returns true.
+     * 
+     * @param directory {@link String} - A directory that contains a collection of {@link MovingCodePackage}.
+     * @return boolean - indicates that the new Repository was added.
+     */
     public boolean addRepository(String directory) {
         if ( !repositories.containsKey(directory)) {
             return repositories.put(directory, new MovingCodeRepository(new File(directory))) != null;
@@ -67,7 +85,17 @@ public class RepositoryManager {
             return false;
         }
     }
-
+    
+    /**
+     * Creates a new {@link MovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
+     * repository to the internal repositories Map. 
+     * 1) If the feed URL was already loaded/registered, this method returns false.
+     * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
+     * 3) If the new Repository was successfully added, this method returns true.
+     * 
+     * @param atomFeedURL {@link URL} - A directory that contains a collection of {@link MovingCodePackage}.
+     * @return boolean - indicates that the new Repository was added.
+     */
     public boolean addRepository(URL atomFeedURL) {
         if ( !repositories.containsKey(atomFeedURL.toString())) {
             return repositories.put(atomFeedURL.toString(), new MovingCodeRepository(atomFeedURL)) != null;

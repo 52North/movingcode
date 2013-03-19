@@ -55,14 +55,23 @@ public class ProcessorConfig implements Serializable {
 
     private static transient Logger logger = Logger.getLogger(ProcessorConfig.class);
 
-    // private constructor for a blank config
-    private ProcessorConfig(ProcessorsDocument blankConfig) {
+    /**
+     * Private constructor to create a blank ProcessorConfig
+     */
+    private ProcessorConfig() {
         procConfigXMLBeans = blankConfig;
         propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
-    public static final ProcessorConfig EMPTY_RUNTIME_CONFIG = new ProcessorConfig(blankConfig);
+    public static final ProcessorConfig EMPTY_RUNTIME_CONFIG = new ProcessorConfig();
 
+    /**
+     * Sets a new ProcessorConfig from {@link File} processorConfigXML.
+     * This will overwrite the old configuration.
+     * 
+     * @param processorConfigXML
+     * @return boolean
+     */
     public boolean setConfig(File processorConfigXML) {
         synchronized (procConfigXMLBeans) {
             try {
@@ -78,7 +87,6 @@ public class ProcessorConfig implements Serializable {
                 return false;
             }
         }
-
     }
 
     public boolean setConfig(InputStream processorConfigXMLStream) {
@@ -100,7 +108,7 @@ public class ProcessorConfig implements Serializable {
     }
 
     /**
-     * Add an Listener to the processorConfig
+     * Adds {@link PropertyChangeListener} to the processorConfig.  
      * 
      * @param propertyName
      * @param listener
@@ -110,7 +118,7 @@ public class ProcessorConfig implements Serializable {
     }
 
     /**
-     * remove a listener from the wpsConfig
+     * Removes a {@link PropertyChangeListener} from the processorConfig.
      * 
      * @param propertyName
      * @param listener
@@ -119,28 +127,35 @@ public class ProcessorConfig implements Serializable {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
-    // For Testing purpose only
+    /**
+     * For Testing purposes only
+     */
     public void notifyListeners() {
         propertyChangeSupport.firePropertyChange(PROCESSORCONFIG_UPDATE_EVENT_NAME, null, null);
     }
 
     /**
-     * 
+     * Static method to access the ProcessorConfig.
      * @return ProcessorConfig object
      */
     public static synchronized ProcessorConfig getInstance() {
 
         if (instance == null) {
-            instance = new ProcessorConfig(blankConfig);
+            instance = new ProcessorConfig();
         }
 
         return instance;
     }
-
+    
+    /**
+     * Get the currently used {@link ProcessorsDocument}
+     * 
+     * @return {@link ProcessorsDocument}
+     */
     public ProcessorsDocument getConfig() {
         return procConfigXMLBeans;
     }
-
+    
     private synchronized void writeObject(java.io.ObjectOutputStream oos) throws IOException {
         oos.writeObject(procConfigXMLBeans.xmlText());
     }
