@@ -242,7 +242,8 @@
 				<configuration>
 					<header>src/main/resources/52N_license.txt</header>
 					<excludes>
-						<exclude>**/test/resources/**</exclude> -->
+						<exclude>**/test/resources/**</exclude>
+						<exclude>**/runtime/processorconfig/**/*.java</exclude>
 					</excludes>
 					<includes>
 						<include>**/*.java</include>
