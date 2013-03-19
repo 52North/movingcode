@@ -26,8 +26,8 @@ package org.n52.movingcode.runtime.test;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-
 import org.n52.movingcode.runtime.processors.python.PythonCLIProbe;
+import org.n52.movingcode.runtime.processors.r.RCLIProbe;
 
 public class ProbeTest extends GlobalTestConfig {
 
@@ -35,10 +35,24 @@ public class ProbeTest extends GlobalTestConfig {
 
     @Test
     public void probePythonCLI() {
-
-        String retVal = new PythonCLIProbe().probe();
+        PythonCLIProbe p = new PythonCLIProbe();
+        String retVal = p.probe();
 
         logger.info("Python Probe reported: " + retVal);
+    }
 
+    @Test
+    public void probeRCLI() {
+        RCLIProbe p = new RCLIProbe();
+        String retVal = p.probe();
+
+        logger.info("R CLI Probe reported: " + retVal);
+    }
+
+    @Test
+    public void probeR_RServe() {
+
+        // String retVal = new R_RserveProbe().probe();
+        // logger.info("R RServe Probe reported: " + retVal);
     }
 }
