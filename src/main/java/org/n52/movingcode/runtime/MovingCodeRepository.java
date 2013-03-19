@@ -47,8 +47,11 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 /**
  * A repository that contains MovingCode packages.
  * 
- * Two constructors allow: 1. MovingCode Repositories from directories in the file system 2. MovingCode
- * Repositories from a remote location (URL)
+ * Two constructors allow:
+ * 
+ * 1. MovingCode Repositories from directories in the file system
+ * 
+ * 2. MovingCode Repositories from a remote location (URL)
  * 
  * @author Matthias Mueller, TU Dresden
  * 
@@ -104,7 +107,8 @@ public class MovingCodeRepository extends DefaultPackageRepository {
 
             for (Entry entry : feed.getEntries()) {
                 // create new moving code package from the entry
-                MovingCodePackage mcPackage = new MovingCodePackage(new GeoprocessingFeedEntry(entry));
+                GeoprocessingFeedEntry gpfe = new GeoprocessingFeedEntry(entry);
+                MovingCodePackage mcPackage = new MovingCodePackage(gpfe);
 
                 // validate
                 // and add to package map
