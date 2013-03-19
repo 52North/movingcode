@@ -57,6 +57,9 @@ import org.n52.movingcode.runtime.processors.PropertyMap;
  * 
  */
 public class RServerProcessor extends AbstractProcessor {
+
+    private static final long serialVersionUID = 365036617414065260L;
+
     private static Logger logger = Logger.getLogger(RServerProcessor.class);
 
     private static MimeTypeDatabase mimeRegistry = getMimeRegistry();
