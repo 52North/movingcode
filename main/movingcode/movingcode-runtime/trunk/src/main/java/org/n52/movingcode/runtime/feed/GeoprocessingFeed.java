@@ -1,6 +1,30 @@
 /**
+ * ﻿Copyright (C) 2012
+ * by 52 North Initiative for Geospatial Open Source Software GmbH
+ *
+ * Contact: Andreas Wytzisk
+ * 52 North Initiative for Geospatial Open Source Software GmbH
+ * Martin-Luther-King-Weg 24
+ * 48155 Muenster, Germany
+ * info@52north.org
+ *
+ * This program is free software; you can redistribute and/or modify it under
+ * the terms of the GNU General Public License version 2 as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; even without the implied
+ * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program (see gnu-gpl v2.txt). If not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
+ * visit the Free Software Foundation web page, http://www.fsf.org.
+ */
+/**
  * 
  */
+
 package org.n52.movingcode.runtime.feed;
 
 import java.io.IOException;
@@ -20,109 +44,107 @@ import org.apache.abdera.writer.Writer;
 
 /**
  * @author Matthias Mueller, TU Dresden
- *
+ * 
  */
 public final class GeoprocessingFeed {
-	
-	private final Feed feed;
-	
-	public GeoprocessingFeed(InputStream atomStream){
-		Parser parser = Abdera.getInstance().getParser();
-		Document<Feed> doc = parser.parse(atomStream);
-		feed = doc.getRoot();
-		System.out.println("Found Feed: " + feed.getTitle());
-	}
-	
-	public GeoprocessingFeed(FeedTemplate template){
-		
-		Abdera abdera = new Abdera();
-		feed = abdera.newFeed();
 
-		// set ID
-		feed.setId(template.getID());
-		// set title and subtitle
-		feed.setTitle(template.getFeedTitle());
-		feed.setSubtitle(template.getFeedSubtitle());
-		// set last update
-		feed.setUpdated(new Date());
-		// set author
-		if (template.getFeedAuthorEmail() != null){
-			feed.addAuthor(template.getFeedAuthorName(), template.getFeedAuthorEmail(), null);
-		} else {
-			feed.addAuthor(template.getFeedAuthorName());
-		}
-		// set link
-		feed.addLink(template.getFeedURL());
-		feed.addLink(template.getFeedURL(),"self");
-		
-	}
-	
-	public void updateFeed(Map<String,GeoprocessingFeedEntry> candidateEntries){
-		// keySet of candidate entries
-		Set<String> candidateIDs = candidateEntries.keySet();
-		// keySet of existing entries; is filled in the loop
-		Set<String> feedIDs = new HashSet<String>();
-		
-		feed.setUpdated(new Date(System.currentTimeMillis()));
-		
-		// MERGE newer entries into old entries 
-		for (Entry entry : feed.getEntries()){
-			GeoprocessingFeedEntry currentEntry = new GeoprocessingFeedEntry(entry);
-			feedIDs.add(currentEntry.getIdentifier());
-			// check if there is a candidate entry with the same ID
-			if (candidateIDs.contains(currentEntry.getIdentifier())){
-				// merge candidate entry into existing entry
-				currentEntry.mergeWith(candidateEntries.get(currentEntry.getIdentifier()));
-			}
-		}
-		
-		// ADD all completely new entries
-		candidateIDs.removeAll(feedIDs);
-		for (String currentID : candidateIDs){
-			GeoprocessingFeedEntry gpEntry = candidateEntries.get(currentID);
-			System.out.println("Adding new feed entry for: " + gpEntry.getIdentifier());
-			feed.addEntry(gpEntry.getAtomEntry());
-		}
-		
-		// set new update timestamp of the feed
-		this.updateFeedTimestamp();
-	}
-	
-	/*
-	 * Returns an Array of Entries. This is a snapshot of the available
-	 * entries present at the time the method was called. Changes in the feed
-	 * are not propagated to this array.
-	 */
-	public Entry[] getEntries(){
-		return feed.getEntries().toArray(new Entry[feed.getEntries().size()]);
-	}
-	
-	/*
-	 * Write this feed to the given output stream.
-	 * Might throw an exception if the output stream 
-	 * signals an IO Exception.
-	 */
-	public void write (OutputStream os) throws IOException{
-		Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
-		writer.writeTo(feed, os);
-		
-		//feed.writeTo(os);
-	}
-	
-	/*
-	 * checks all update timestamps of the feed entries and 
-	 * sets a new update timestamp for the whole feed. 
-	 */
-	private final void updateFeedTimestamp() {
-		Date lastUpdate = this.feed.getUpdated();
-		
-		for (Entry currentEntry : this.getEntries()){
-			if (currentEntry.getUpdated().after(lastUpdate)){
-				lastUpdate = currentEntry.getUpdated();
-			}
-		}
-		
-		this.feed.setUpdated(lastUpdate);
-	}
-	
+    private final Feed feed;
+
+    public GeoprocessingFeed(InputStream atomStream) {
+        Parser parser = Abdera.getInstance().getParser();
+        Document<Feed> doc = parser.parse(atomStream);
+        feed = doc.getRoot();
+        System.out.println("Found Feed: " + feed.getTitle());
+    }
+
+    public GeoprocessingFeed(FeedTemplate template) {
+
+        Abdera abdera = new Abdera();
+        feed = abdera.newFeed();
+
+        // set ID
+        feed.setId(template.getID());
+        // set title and subtitle
+        feed.setTitle(template.getFeedTitle());
+        feed.setSubtitle(template.getFeedSubtitle());
+        // set last update
+        feed.setUpdated(new Date());
+        // set author
+        if (template.getFeedAuthorEmail() != null) {
+            feed.addAuthor(template.getFeedAuthorName(), template.getFeedAuthorEmail(), null);
+        }
+        else {
+            feed.addAuthor(template.getFeedAuthorName());
+        }
+        // set link
+        feed.addLink(template.getFeedURL());
+        feed.addLink(template.getFeedURL(), "self");
+
+    }
+
+    public void updateFeed(Map<String, GeoprocessingFeedEntry> candidateEntries) {
+        // keySet of candidate entries
+        Set<String> candidateIDs = candidateEntries.keySet();
+        // keySet of existing entries; is filled in the loop
+        Set<String> feedIDs = new HashSet<String>();
+
+        feed.setUpdated(new Date(System.currentTimeMillis()));
+
+        // MERGE newer entries into old entries
+        for (Entry entry : feed.getEntries()) {
+            GeoprocessingFeedEntry currentEntry = new GeoprocessingFeedEntry(entry);
+            feedIDs.add(currentEntry.getIdentifier());
+            // check if there is a candidate entry with the same ID
+            if (candidateIDs.contains(currentEntry.getIdentifier())) {
+                // merge candidate entry into existing entry
+                currentEntry.mergeWith(candidateEntries.get(currentEntry.getIdentifier()));
+            }
+        }
+
+        // ADD all completely new entries
+        candidateIDs.removeAll(feedIDs);
+        for (String currentID : candidateIDs) {
+            GeoprocessingFeedEntry gpEntry = candidateEntries.get(currentID);
+            System.out.println("Adding new feed entry for: " + gpEntry.getIdentifier());
+            feed.addEntry(gpEntry.getAtomEntry());
+        }
+
+        // set new update timestamp of the feed
+        this.updateFeedTimestamp();
+    }
+
+    /*
+     * Returns an Array of Entries. This is a snapshot of the available entries present at the time the method
+     * was called. Changes in the feed are not propagated to this array.
+     */
+    public Entry[] getEntries() {
+        return feed.getEntries().toArray(new Entry[feed.getEntries().size()]);
+    }
+
+    /*
+     * Write this feed to the given output stream. Might throw an exception if the output stream signals an IO
+     * Exception.
+     */
+    public void write(OutputStream os) throws IOException {
+        Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
+        writer.writeTo(feed, os);
+
+        // feed.writeTo(os);
+    }
+
+    /*
+     * checks all update timestamps of the feed entries and sets a new update timestamp for the whole feed.
+     */
+    private final void updateFeedTimestamp() {
+        Date lastUpdate = this.feed.getUpdated();
+
+        for (Entry currentEntry : this.getEntries()) {
+            if (currentEntry.getUpdated().after(lastUpdate)) {
+                lastUpdate = currentEntry.getUpdated();
+            }
+        }
+
+        this.feed.setUpdated(lastUpdate);
+    }
+
 }

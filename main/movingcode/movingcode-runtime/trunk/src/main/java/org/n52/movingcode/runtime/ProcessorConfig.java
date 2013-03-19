@@ -1,3 +1,27 @@
+/**
+ * ﻿Copyright (C) 2012
+ * by 52 North Initiative for Geospatial Open Source Software GmbH
+ *
+ * Contact: Andreas Wytzisk
+ * 52 North Initiative for Geospatial Open Source Software GmbH
+ * Martin-Luther-King-Weg 24
+ * 48155 Muenster, Germany
+ * info@52north.org
+ *
+ * This program is free software; you can redistribute and/or modify it under
+ * the terms of the GNU General Public License version 2 as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; even without the implied
+ * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program (see gnu-gpl v2.txt). If not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
+ * visit the Free Software Foundation web page, http://www.fsf.org.
+ */
+
 package org.n52.movingcode.runtime;
 
 import java.beans.PropertyChangeListener;
@@ -17,120 +41,122 @@ import org.n52.movingcode.runtime.processorconfig.ProcessorsDocument;
  * Config Object for Code Processors.
  * 
  * @author Matthias Mueller, TU Dresden
- *
+ * 
  */
 public class ProcessorConfig implements Serializable {
 
-	private static final long serialVersionUID = 3112343084611936675L;
-	private static transient ProcessorConfig instance;
-	private static transient ProcessorsDocument procConfigXMLBeans;
-	private static final ProcessorsDocument blankConfig = ProcessorsDocument.Factory.newInstance();
-	
-	protected final PropertyChangeSupport propertyChangeSupport;
-	public static final String PROCESSORCONFIG_UPDATE_EVENT_NAME = "ProcessorConfigUpdate";
+    private static final long serialVersionUID = 3112343084611936675L;
+    private static transient ProcessorConfig instance;
+    private static transient ProcessorsDocument procConfigXMLBeans;
+    private static final ProcessorsDocument blankConfig = ProcessorsDocument.Factory.newInstance();
 
+    protected final PropertyChangeSupport propertyChangeSupport;
+    public static final String PROCESSORCONFIG_UPDATE_EVENT_NAME = "ProcessorConfigUpdate";
 
-	private static transient Logger logger = Logger.getLogger(ProcessorConfig.class);
+    private static transient Logger logger = Logger.getLogger(ProcessorConfig.class);
 
-	// private constructor for a blank config
-	private ProcessorConfig(ProcessorsDocument blankConfig){
-		procConfigXMLBeans = blankConfig;
-		propertyChangeSupport = new PropertyChangeSupport(this);
-	}
+    // private constructor for a blank config
+    private ProcessorConfig(ProcessorsDocument blankConfig) {
+        procConfigXMLBeans = blankConfig;
+        propertyChangeSupport = new PropertyChangeSupport(this);
+    }
 
-	public static final ProcessorConfig EMPTY_RUNTIME_CONFIG = new ProcessorConfig(blankConfig);
+    public static final ProcessorConfig EMPTY_RUNTIME_CONFIG = new ProcessorConfig(blankConfig);
 
-	public boolean setConfig (File processorConfigXML) {
-		synchronized (procConfigXMLBeans) {
-			try {
-				procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXML);
-				return true;
-			} catch (XmlException e) {
-				logger.error("Reading new processor configuration failed! " + e.getMessage());
-				return false;
-			} catch (IOException e) {
-				logger.error("Reading new processor configuration failed! " + e.getMessage());
-				return false;
-			}
-		}
-		
-	}
+    public boolean setConfig(File processorConfigXML) {
+        synchronized (procConfigXMLBeans) {
+            try {
+                procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXML);
+                return true;
+            }
+            catch (XmlException e) {
+                logger.error("Reading new processor configuration failed! " + e.getMessage());
+                return false;
+            }
+            catch (IOException e) {
+                logger.error("Reading new processor configuration failed! " + e.getMessage());
+                return false;
+            }
+        }
 
-	public boolean setConfig (InputStream processorConfigXMLStream){
-		synchronized (procConfigXMLBeans) {
-			try {
-				procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXMLStream);
-				return true;
-			} catch (XmlException e) {
-				logger.error("Reading new processor configuration failed! " + e.getMessage());
-				return false;
-			} catch (IOException e) {
-				logger.error("Reading new processor configuration failed! " + e.getMessage());
-				return false;
-			}
-		}
-		
-	}
+    }
 
-	
-	/**
-	 * Add an Listener to the processorConfig
-	 * 
-	 * @param propertyName
-	 * @param listener
-	 */
-	public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
-		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-	}
+    public boolean setConfig(InputStream processorConfigXMLStream) {
+        synchronized (procConfigXMLBeans) {
+            try {
+                procConfigXMLBeans = ProcessorsDocument.Factory.parse(processorConfigXMLStream);
+                return true;
+            }
+            catch (XmlException e) {
+                logger.error("Reading new processor configuration failed! " + e.getMessage());
+                return false;
+            }
+            catch (IOException e) {
+                logger.error("Reading new processor configuration failed! " + e.getMessage());
+                return false;
+            }
+        }
 
-	/**
-	 * remove a listener from the wpsConfig
-	 * 
-	 * @param propertyName
-	 * @param listener
-	 */
-	public void removePropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
-		propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
-	}
+    }
 
-	// For Testing purpose only
-	public void notifyListeners() {
-		propertyChangeSupport.firePropertyChange(PROCESSORCONFIG_UPDATE_EVENT_NAME, null, null);
-	}
+    /**
+     * Add an Listener to the processorConfig
+     * 
+     * @param propertyName
+     * @param listener
+     */
+    public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
 
-	/**
-	 * 
-	 * @return ProcessorConfig object
-	 */
-	public static synchronized ProcessorConfig getInstance() {
-		
-		if (instance == null){
-			instance = new ProcessorConfig(blankConfig);
-		}
-		
-		return instance;
-	}
-	
-	public ProcessorsDocument getConfig(){
-		return procConfigXMLBeans;
-	}
-	
-	private synchronized void writeObject(java.io.ObjectOutputStream oos) throws IOException {
-		oos.writeObject(procConfigXMLBeans.xmlText());
-	}
+    /**
+     * remove a listener from the wpsConfig
+     * 
+     * @param propertyName
+     * @param listener
+     */
+    public void removePropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
 
-	private synchronized void readObject(java.io.ObjectInputStream oos) throws IOException, ClassNotFoundException {
-		try {
-			String processorConfigXMLBeansAsXml = (String) oos.readObject();
-			XmlObject configXmlObject = XmlObject.Factory.parse(processorConfigXMLBeansAsXml);
-			ProcessorsDocument configurationDocument = ProcessorsDocument.Factory.newInstance();
-			configurationDocument.addNewProcessors().set(configXmlObject);
-			this.setConfig(new ByteArrayInputStream(configurationDocument.xmlText().getBytes()));
-		}
-		catch (XmlException e) {
-			logger.error(e.getMessage());
-			throw new IOException(e.getMessage());
-		}
-	}
+    // For Testing purpose only
+    public void notifyListeners() {
+        propertyChangeSupport.firePropertyChange(PROCESSORCONFIG_UPDATE_EVENT_NAME, null, null);
+    }
+
+    /**
+     * 
+     * @return ProcessorConfig object
+     */
+    public static synchronized ProcessorConfig getInstance() {
+
+        if (instance == null) {
+            instance = new ProcessorConfig(blankConfig);
+        }
+
+        return instance;
+    }
+
+    public ProcessorsDocument getConfig() {
+        return procConfigXMLBeans;
+    }
+
+    private synchronized void writeObject(java.io.ObjectOutputStream oos) throws IOException {
+        oos.writeObject(procConfigXMLBeans.xmlText());
+    }
+
+    private synchronized void readObject(java.io.ObjectInputStream oos) throws IOException, ClassNotFoundException {
+        try {
+            String processorConfigXMLBeansAsXml = (String) oos.readObject();
+            XmlObject configXmlObject = XmlObject.Factory.parse(processorConfigXMLBeansAsXml);
+            ProcessorsDocument configurationDocument = ProcessorsDocument.Factory.newInstance();
+            configurationDocument.addNewProcessors().set(configXmlObject);
+            this.setConfig(new ByteArrayInputStream(configurationDocument.xmlText().getBytes()));
+        }
+        catch (XmlException e) {
+            logger.error(e.getMessage());
+            throw new IOException(e.getMessage());
+        }
+    }
 
 }
