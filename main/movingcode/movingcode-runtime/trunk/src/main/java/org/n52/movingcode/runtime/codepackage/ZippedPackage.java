@@ -40,6 +40,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
@@ -49,6 +50,8 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  */
 final class ZippedPackage {
+
+    private static Logger log = Logger.getLogger(ZippedPackage.class);
 
     private final File zipFile;
     private final URL zipURL;
@@ -122,9 +125,10 @@ final class ZippedPackage {
         assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
         String archiveName = null;
 
+        ZipInputStream zis = null;
+        PackageDescriptionDocument doc = null;
+        
         try {
-
-            ZipInputStream zis = null;
             if (archive.zipFile != null) {
                 zis = new ZipInputStream(new FileInputStream(archive.zipFile));
                 archiveName = archive.zipFile.getAbsolutePath();
@@ -134,15 +138,21 @@ final class ZippedPackage {
                 archiveName = archive.zipURL.toString();
             }
 
+            if (zis == null) {
+                log.error("ZipInputStream is null, returning...");
+                return null;
+            }
+
             ZipEntry entry;
 
             while ( (entry = zis.getNextEntry()) != null) {
                 if (entry.getName().equalsIgnoreCase(MovingCodePackage.descriptionFileName)) {
-                    return PackageDescriptionDocument.Factory.parse(zis);
+                    doc = PackageDescriptionDocument.Factory.parse(zis);
+                    break;
                 }
-                zis.closeEntry();
             }
 
+            zis.close();
         }
         catch (ZipException e) {
             System.err.println("Error! Could read from archive: " + archiveName);
@@ -153,7 +163,8 @@ final class ZippedPackage {
         catch (XmlException e) {
             System.err.println("Error! Could not parse package description from archive: " + archiveName);
         }
-        return null;
+
+        return doc;
     }
 
     /*
