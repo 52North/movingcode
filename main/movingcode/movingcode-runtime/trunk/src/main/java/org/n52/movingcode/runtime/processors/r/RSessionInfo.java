@@ -22,39 +22,23 @@
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
 
-package org.n52.movingcode.runtime.test;
+package org.n52.movingcode.runtime.processors.r;
 
-import org.apache.log4j.Logger;
-import org.junit.Test;
-import org.n52.movingcode.runtime.processors.python.PythonCLIProbe;
-import org.n52.movingcode.runtime.processors.r.RCLIProbe;
-import org.n52.movingcode.runtime.processors.r.R_RServeProbe;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 
-public class ProbeTest extends GlobalTestConfig {
+public class RSessionInfo {
 
-    private static Logger log = Logger.getLogger(ProbeTest.class);
-
-    @Test
-    public void probePythonCLI() {
-        PythonCLIProbe p = new PythonCLIProbe();
-        String retVal = p.probe();
-
-        log.info("Python Probe reported: " + retVal);
+    public static String getVersion(RConnection rCon) throws RserveException, REXPMismatchException {
+        return getConsoleOutput(rCon, "R.version[[\"version.string\"]]");
     }
 
-    @Test
-    public void probeRCLI() {
-        RCLIProbe p = new RCLIProbe();
-        String retVal = p.probe();
-
-        log.info("R CLI Probe reported: " + retVal);
+    public String getSessionInfo(RConnection rCon) throws RserveException, REXPMismatchException {
+        return getConsoleOutput(rCon, "sessionInfo()");
     }
 
-    @Test
-    public void probeR_RServe() {
-        R_RServeProbe p = new R_RServeProbe();
-        String retVal = p.probe();
-
-        log.info("R RServe Probe reported: " + retVal);
+    private static String getConsoleOutput(RConnection rCon, String cmd) throws RserveException, REXPMismatchException {
+        return rCon.eval("paste(capture.output(print(" + cmd + ")),collapse='\\n')").asString();
     }
 }
