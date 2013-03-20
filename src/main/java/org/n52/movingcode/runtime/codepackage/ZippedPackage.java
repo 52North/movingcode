@@ -46,339 +46,396 @@ import org.apache.xmlbeans.XmlException;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 /**
+ * This class provides reading and writing capabilities for zipped Moving Code packages.
+ * 
  * @author Matthias Mueller, TU Dresden
  * 
  */
 final class ZippedPackage {
 
-    private static Logger log = Logger.getLogger(ZippedPackage.class);
+	// local copy of the zipped package
+	private final File zipFile;
 
-    private final File zipFile;
-    private final URL zipURL;
+	// Web location (URL) of the zipped package
+	private final URL zipURL;
+	
+	// Two elements for a plain (unzipped) package
+	private final File plainWorkspace;
+	private final PackageDescriptionDocument plainDescription;
+	
+	static Logger logger = Logger.getLogger(ZippedPackage.class);
 
-    private final File rawWorkspace;
-    private final PackageDescriptionDocument rawDescription;
+	/**
+	 * Constructor to create a {@link ZippedPackage} from a local zipfile (i.e. a zipped package).
+	 * 
+	 * @param zipURL
+	 */
+	protected ZippedPackage(final File zipFile) {
+		this.zipFile = zipFile;
+		this.zipURL = null;
+		this.plainWorkspace = null;
+		this.plainDescription = null;
+	}
+	
+	/**
+	 * Constructor to create a {@link ZippedPackage} from a Web location.
+	 * (Which points to a zipped package)
+	 * 
+	 * @param zipURL
+	 */
+	protected ZippedPackage(final URL zipURL) {
+		this.zipURL = zipURL;
+		this.zipFile = null;
+		this.plainWorkspace = null;
+		this.plainDescription = null;
+	}
+	
+	/**
+	 * Constructor to create a {@link ZippedPackage} from a plain workspace and process description XML.
+	 * 
+	 * @param workspace {@link File} - plain package workspace
+	 * @param descriptionXML {@link PackageDescriptionDocument} - process description XML
+	 */
+	protected ZippedPackage(final File workspace, final PackageDescriptionDocument descriptionXML) {
+		this.zipURL = null;
+		this.zipFile = null;
 
-    protected ZippedPackage(final File zipFile) {
-        this.zipFile = zipFile;
-        this.zipURL = null;
-        this.rawWorkspace = null;
-        this.rawDescription = null;
-    }
+		this.plainWorkspace = workspace;
+		this.plainDescription = descriptionXML;
+	}
+	
+	/**
+	 * Getter for the ProcessDescription.
+	 * 
+	 * @return {@link PackageDescriptionDocument}
+	 */
+	protected final PackageDescriptionDocument getDescription() {
+		if (isPlain()) {
+			return plainDescription;
+		}
+		else {
+			return extractDescription(this);
+		}
+	}
+	
+	/**
+	 * Writes the content of this {@link ZippedPackage} Object to a plain workspace. 
+	 * 
+	 * @param workspaceDirName {@link String)
+	 * @param targetDirectory {@link File}
+	 */
+	protected final void dumpPackage(String workspaceDirName, File targetDirectory) {
+		
+		// if plain (unzipped) package
+		if (isPlain()) {
+			try {
+				Collection<File> files = FileUtils.listFiles(plainWorkspace, null, false);
+				for (File file : files) {
+					if (file.isDirectory()) {
+						FileUtils.copyDirectory(file, targetDirectory);
+					}
+					else {
+						FileUtils.copyFileToDirectory(file, targetDirectory);
+					}
+				}
+			}
+			catch (IOException e) {
+				logger.error("Error! Could copy from " + plainWorkspace.getAbsolutePath() + " to "
+						+ targetDirectory.getAbsolutePath());
+			}
+		}
+		// if zipped package
+		else {
+			unzipWorkspace(this, workspaceDirName, targetDirectory);
+		}
 
-    protected ZippedPackage(final URL zipURL) {
-        this.zipURL = zipURL;
-        this.zipFile = null;
-        this.rawWorkspace = null;
-        this.rawDescription = null;
-    }
+	}
 
-    protected ZippedPackage(final File workspace, final PackageDescriptionDocument descriptionXML) {
-        this.zipURL = null;
-        this.zipFile = null;
+	/**
+	 * Static private method to extract the description from a package
+	 * 
+	 * @param archive {@link ZippedPackage}
+	 * @return {@link PackageDescriptionDocument}
+	 */
+	private static PackageDescriptionDocument extractDescription(ZippedPackage archive) {
 
-        this.rawWorkspace = workspace;
-        this.rawDescription = descriptionXML;
-    }
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
+		String archiveName = null;
 
-    protected final PackageDescriptionDocument extractDescription() {
-        if (isRaw()) {
-            return rawDescription;
-        }
-        else {
-            return extractDescription(this);
-        }
-    }
+		try {
 
-    protected final void dumpWorkspace(String workspaceDirName, File targetDirectory) {
+			ZipInputStream zis = null;
+			if (archive.zipFile != null) {
+				zis = new ZipInputStream(new FileInputStream(archive.zipFile));
+				archiveName = archive.zipFile.getAbsolutePath();
+			}
+			else if (archive.zipURL != null) {
+				zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
+				archiveName = archive.zipURL.toString();
+			}
 
-        if (isRaw()) {
-            try {
-                Collection<File> files = FileUtils.listFiles(rawWorkspace, null, false);
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        FileUtils.copyDirectory(file, targetDirectory);
-                    }
-                    else {
-                        FileUtils.copyFileToDirectory(file, targetDirectory);
-                    }
-                }
-            }
-            catch (IOException e) {
-                System.err.println("Error! Could copy from " + rawWorkspace.getAbsolutePath() + " to "
-                        + targetDirectory.getAbsolutePath());
-            }
+			ZipEntry entry;
 
-        }
-        else {
-            unzipWorkspace(this, workspaceDirName, targetDirectory);
-        }
+			while ( (entry = zis.getNextEntry()) != null) {
+				if (entry.getName().equalsIgnoreCase(MovingCodePackage.descriptionFileName)) {
+					return PackageDescriptionDocument.Factory.parse(zis);
+				}
+				zis.closeEntry();
+			}
 
-    }
+		}
+		catch (ZipException e) {
+			logger.error("Error! Could read from archive: " + archiveName);
+		}
+		catch (IOException e) {
+			logger.error("Error! Could not open archive: " + archiveName);
+		}
+		catch (XmlException e) {
+			logger.error("Error! Could not parse package description from archive: " + archiveName);
+		}
+		return null;
+	}
 
-    /*
-     * static method to extract the description from a package
-     */
-    private static PackageDescriptionDocument extractDescription(ZippedPackage archive) {
+	//    /*
+	//     * creates an unzipped copy of the archive
+	//     */
+	//    private static void unzipPackage(ZippedPackage archive, File targetDirectory) {
+	//
+	//        // zipFile and zip url MUST not be null at the same time
+	//        assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
+	//        String archiveName = null;
+	//
+	//        try {
+	//
+	//            ZipInputStream zis = null;
+	//            if (archive.zipFile != null) {
+	//                zis = new ZipInputStream(new FileInputStream(archive.zipFile));
+	//                archiveName = archive.zipFile.getAbsolutePath();
+	//            }
+	//            else if (archive.zipURL != null) {
+	//                zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
+	//                archiveName = archive.zipURL.toString();
+	//            }
+	//
+	//            ZipEntry entry;
+	//            while ( (entry = zis.getNextEntry()) != null) {
+	//                String fileName = entry.getName();
+	//                File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
+	//
+	//                // create all required directories
+	//                new File(newFile.getParent()).mkdirs();
+	//
+	//                // if current zip entry is not a directory, do unzip
+	//                if ( !entry.isDirectory()) {
+	//                    FileOutputStream fos = new FileOutputStream(newFile);
+	//                    IOUtils.copy(zis, fos);
+	//                    zis.close();
+	//                    fos.close();
+	//                }
+	//                zis.closeEntry();
+	//            }
+	//
+	//            // Enumeration<? extends ZipEntry> entries = zis.entries();
+	//            // while (entries.hasMoreElements()){
+	//            // ZipEntry entry = entries.nextElement();
+	//            // String fileName = entry.getName();
+	//            // File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
+	//            //
+	//            // // create all required directories
+	//            // new File(newFile.getParent()).mkdirs();
+	//            //
+	//            // // if current zip entry is not a directory, do unzip
+	//            // if(!entry.isDirectory()){
+	//            // FileOutputStream fos = new FileOutputStream(newFile);
+	//            // InputStream is = zif.getInputStream(entry);
+	//            // IOUtils.copy(is, fos);
+	//            // is.close();
+	//            // fos.close();
+	//            // }
+	//            // }
+	//        }
+	//        catch (ZipException e) {
+	//            System.err.println("Error! Could read from archive: " + archiveName);
+	//        }
+	//        catch (IOException e) {
+	//            System.err.println("Error! Could not open archive: " + archiveName);
+	//        }
+	//        catch (NullPointerException e) {
+	//            System.err.println("No archive has been declared. This should not happen ...");
+	//        }
+	//    }
 
-        // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
-        String archiveName = null;
+	/**
+	 * Static private method that creates an unzipped copy of the archive.
+	 * 
+	 * @param archive {@link ZippedPackage}
+	 * @param workspaceDirName {@link String}
+	 * @param targetDirectory {@link File}
+	 */
+	private static void unzipWorkspace(ZippedPackage archive, String workspaceDirName, File targetDirectory) {
 
-        ZipInputStream zis = null;
-        PackageDescriptionDocument doc = null;
-        
-        try {
-            if (archive.zipFile != null) {
-                zis = new ZipInputStream(new FileInputStream(archive.zipFile));
-                archiveName = archive.zipFile.getAbsolutePath();
-            }
-            else if (archive.zipURL != null) {
-                zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
-                archiveName = archive.zipURL.toString();
-            }
+		// zipFile and zip url and isRaw() MUST not be null at the same time
+		assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
+		String archiveName = null;
 
-            if (zis == null) {
-                log.error("ZipInputStream is null, returning...");
-                return null;
-            }
+		if (workspaceDirName.startsWith("./")) {
+			workspaceDirName = workspaceDirName.substring(2);
+		}
 
-            ZipEntry entry;
+		if (workspaceDirName.startsWith(".\\")) {
+			workspaceDirName = workspaceDirName.substring(2);
+		}
 
-            while ( (entry = zis.getNextEntry()) != null) {
-                if (entry.getName().equalsIgnoreCase(MovingCodePackage.descriptionFileName)) {
-                    doc = PackageDescriptionDocument.Factory.parse(zis);
-                    break;
-                }
-            }
+		try {
 
-            zis.close();
-        }
-        catch (ZipException e) {
-            System.err.println("Error! Could read from archive: " + archiveName);
-        }
-        catch (IOException e) {
-            System.err.println("Error! Could not open archive: " + archiveName);
-        }
-        catch (XmlException e) {
-            System.err.println("Error! Could not parse package description from archive: " + archiveName);
-        }
+			ZipInputStream zis = null;
+			if (archive.zipFile != null) {
+				zis = new ZipInputStream(new FileInputStream(archive.zipFile));
+				archiveName = archive.zipFile.getAbsolutePath();
+			}
+			else if (archive.zipURL != null) {
+				zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
+				archiveName = archive.zipURL.toString();
+			}
 
-        return doc;
-    }
+			ZipEntry entry;
+			while ( (entry = zis.getNextEntry()) != null) {
+				if (entry.getName().startsWith(workspaceDirName)) {
 
-    /*
-     * creates an unzipped copy of the archive
-     */
-    private static void unzipPackage(ZippedPackage archive, File targetDirectory) {
+					String fileName = entry.getName();
+					File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
 
-        // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
-        String archiveName = null;
+					// create all required directories
+					new File(newFile.getParent()).mkdirs();
 
-        try {
+					// if current zip entry is not a directory, do unzip
+					if ( !entry.isDirectory()) {
+						FileOutputStream fos = new FileOutputStream(newFile);
+						IOUtils.copy(zis, fos);
+						fos.close();
+					}
+				}
+				zis.closeEntry();
+			}
+			if (zis != null) {
+				zis.close();
+			}
+		}
+		catch (ZipException e) {
+			logger.error("Error! Could read from archive: " + archiveName);
+		}
+		catch (IOException e) {
+			logger.error("Error! Could not open archive: " + archiveName);
+		}
+		catch (NullPointerException e) {
+			logger.error("No archive has been declared. This should not happen ...");
+		}
+	}
 
-            ZipInputStream zis = null;
-            if (archive.zipFile != null) {
-                zis = new ZipInputStream(new FileInputStream(archive.zipFile));
-                archiveName = archive.zipFile.getAbsolutePath();
-            }
-            else if (archive.zipURL != null) {
-                zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
-                archiveName = archive.zipURL.toString();
-            }
+	/**
+	 * Writes the content of this {@link ZippedPackage} Object to a zipfile. 
+	 * 
+	 * @param targetZipFile {@link File}
+	 * @return boolean - true if the package was successfully dumped, false otherwise
+	 */
+	protected boolean dumpPackage(File targetZipFile) {
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (zipFile == null) || (zipURL == null)) || (this.isPlain()));
 
-            ZipEntry entry;
-            while ( (entry = zis.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
+		// in case there is a zipped package file on disk
+		if (zipFile != null) {
+			try {
+				FileUtils.copyFile(zipFile, targetZipFile);
+				return true;
+			}
+			catch (Exception e) {
+				return false;
+			}
+			// in case there is no file on disk and but a valid url to a zipped package
+		}
+		else if (zipURL != null) {
+			try {
+				FileUtils.copyURLToFile(zipURL, targetZipFile);
+				return true;
+			}
+			catch (IOException e) {
+				return false;
+			}
+		}
+		// in case there is a plain (non-zipped) package with separate workspace and description
+		else if (isPlain()) {
+			try {
+				ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZipFile));
+				// add package description to zipFile
+				zos.putNextEntry(new ZipEntry(MovingCodePackage.descriptionFileName));
+				IOUtils.copy(plainDescription.newInputStream(), zos);
+				zos.closeEntry();
 
-                // create all required directories
-                new File(newFile.getParent()).mkdirs();
+				// add workspace recursively, with relative pathnames
+				File base = plainWorkspace.getAbsoluteFile().getParentFile();
+				addDir(plainWorkspace, base, zos);
 
-                // if current zip entry is not a directory, do unzip
-                if ( !entry.isDirectory()) {
-                    FileOutputStream fos = new FileOutputStream(newFile);
-                    IOUtils.copy(zis, fos);
-                    zis.close();
-                    fos.close();
-                }
-                zis.closeEntry();
-            }
+				zos.close();
 
-            // Enumeration<? extends ZipEntry> entries = zis.entries();
-            // while (entries.hasMoreElements()){
-            // ZipEntry entry = entries.nextElement();
-            // String fileName = entry.getName();
-            // File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
-            //
-            // // create all required directories
-            // new File(newFile.getParent()).mkdirs();
-            //
-            // // if current zip entry is not a directory, do unzip
-            // if(!entry.isDirectory()){
-            // FileOutputStream fos = new FileOutputStream(newFile);
-            // InputStream is = zif.getInputStream(entry);
-            // IOUtils.copy(is, fos);
-            // is.close();
-            // fos.close();
-            // }
-            // }
-        }
-        catch (ZipException e) {
-            System.err.println("Error! Could read from archive: " + archiveName);
-        }
-        catch (IOException e) {
-            System.err.println("Error! Could not open archive: " + archiveName);
-        }
-        catch (NullPointerException e) {
-            System.err.println("No archive has been declared. This should not happen ...");
-        }
-    }
+				return true;
+			}
+			catch (IOException e) {
+				return false;
+			}
+		}
 
-    /*
-     * creates an unzipped copy of the archive
-     */
-    private static void unzipWorkspace(ZippedPackage archive, String workspaceDirName, File targetDirectory) {
+		return false;
+	}
+	
+	/**
+	 * Is this a plain (unzipped) workspace?
+	 * 
+	 * @return boolean - true if it is a plain (unzipped) package, false otherwise
+	 */
+	private boolean isPlain() {
+		return (plainWorkspace != null && plainDescription != null);
+	}
 
-        // zipFile and zip url and isRaw() MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
-        String archiveName = null;
+	/**
+	 * Static private helper method that writes contents of a directory (e.g. a workspace)
+	 * to a {@link ZipOutputStream}.
+	 * 
+	 * @param contentDirectory {@link File} - the directory that shall be zipped
+	 * @param baseDirectory {@link File} - the part of the @param contentDirectory path that shall be truncated from the zip-Entry
+	 * @param zos {@link ZipOutputStream} - the stream to write the directory contents to
+	 * @throws IOException - if writing to the stream (zos) fails
+	 */
+	private static void addDir(File contentDirectory, File baseDirectory, ZipOutputStream zos) throws IOException {
+		File[] files = contentDirectory.listFiles();
 
-        if (workspaceDirName.startsWith("./")) {
-            workspaceDirName = workspaceDirName.substring(2);
-        }
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isDirectory()) {
+				addDir(files[i], baseDirectory, zos);
+				continue;
+			}
+			FileInputStream in = new FileInputStream(files[i].getAbsolutePath());
+			// construct relative path
+			zos.putNextEntry(new ZipEntry(relative(baseDirectory, files[i])));
+			// do copy
+			IOUtils.copy(in, zos);
 
-        if (workspaceDirName.startsWith(".\\")) {
-            workspaceDirName = workspaceDirName.substring(2);
-        }
+			zos.closeEntry();
+			in.close();
+		}
+	}
 
-        try {
-
-            ZipInputStream zis = null;
-            if (archive.zipFile != null) {
-                zis = new ZipInputStream(new FileInputStream(archive.zipFile));
-                archiveName = archive.zipFile.getAbsolutePath();
-            }
-            else if (archive.zipURL != null) {
-                zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
-                archiveName = archive.zipURL.toString();
-            }
-
-            ZipEntry entry;
-            while ( (entry = zis.getNextEntry()) != null) {
-                if (entry.getName().startsWith(workspaceDirName)) {
-
-                    String fileName = entry.getName();
-                    File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
-
-                    // create all required directories
-                    new File(newFile.getParent()).mkdirs();
-
-                    // if current zip entry is not a directory, do unzip
-                    if ( !entry.isDirectory()) {
-                        FileOutputStream fos = new FileOutputStream(newFile);
-                        IOUtils.copy(zis, fos);
-                        fos.close();
-                    }
-                }
-                zis.closeEntry();
-            }
-            if (zis != null) {
-                zis.close();
-            }
-        }
-        catch (ZipException e) {
-            System.err.println("Error! Could read from archive: " + archiveName);
-        }
-        catch (IOException e) {
-            System.err.println("Error! Could not open archive: " + archiveName);
-        }
-        catch (NullPointerException e) {
-            System.err.println("No archive has been declared. This should not happen ...");
-        }
-    }
-
-    /*
-     * writes a copy of the package (zipfile) to a given directory
-     */
-    protected boolean dumpPackage(File targetFile) {
-        // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (zipFile == null) || (zipURL == null)) || (this.isRaw()));
-
-        // in case there is a zipped package file on disk
-        if (zipFile != null) {
-            try {
-                FileUtils.copyFile(zipFile, targetFile);
-                return true;
-            }
-            catch (Exception e) {
-                return false;
-            }
-            // in case there is no file on disk and but a valid url to a zipped package
-        }
-        else if (zipURL != null) {
-            try {
-                FileUtils.copyURLToFile(zipURL, targetFile);
-                return true;
-            }
-            catch (IOException e) {
-                return false;
-            }
-        }
-        // in case there is a raw package with separate workspace and description
-        else if (isRaw()) {
-            try {
-                ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetFile));
-                // add package description to zipFile
-                zos.putNextEntry(new ZipEntry(MovingCodePackage.descriptionFileName));
-                IOUtils.copy(rawDescription.newInputStream(), zos);
-                zos.closeEntry();
-
-                // add workspace recursively, with relative pathnames
-                File base = rawWorkspace.getAbsoluteFile().getParentFile();
-                addDir(rawWorkspace, zos, base);
-
-                zos.close();
-
-                return true;
-            }
-            catch (IOException e) {
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isRaw() {
-        return (rawWorkspace != null && rawDescription != null);
-    }
-
-    // helper method, adds contents of a directory to Zipped Output Stream
-    private static void addDir(File dirObj, ZipOutputStream out, File base) throws IOException {
-        File[] files = dirObj.listFiles();
-
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                addDir(files[i], out, base);
-                continue;
-            }
-            FileInputStream in = new FileInputStream(files[i].getAbsolutePath());
-            // construct relative path
-            out.putNextEntry(new ZipEntry(relative(base, files[i])));
-            // do copy
-            IOUtils.copy(in, out);
-
-            out.closeEntry();
-            in.close();
-        }
-    }
-
-    private static String relative(final File base, final File file) {
-        final int rootLength = base.getAbsolutePath().length();
-        final String absFileName = file.getAbsolutePath();
-        final String relFileName = absFileName.substring(rootLength + 1);
-        return relFileName;
-    }
+	/**
+	 * Static private method that removes the <base> part from an absolute path.
+	 * 
+	 * @param base {@link File} - the <base> part of a path
+	 * @param file {@link File} - an absolute path of the structure <base><relative> 
+	 * @return {@link String} - the <relative> part of the absolute path 
+	 */
+	private static String relative(final File base, final File file) {
+		final int rootLength = base.getAbsolutePath().length();
+		final String absFileName = file.getAbsolutePath();
+		final String relFileName = absFileName.substring(rootLength + 1);
+		return relFileName;
+	}
 }
