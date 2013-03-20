@@ -85,7 +85,7 @@ public class MovingCodePackage {
 	public MovingCodePackage(final File zipFile, String packageIdentifier) {
 
 		archive = new ZippedPackage(zipFile);
-		packageDescription = archive.extractDescription();
+		packageDescription = archive.getDescription();
 
 		if (packageDescription != null && packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
 			functionalIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
@@ -120,7 +120,7 @@ public class MovingCodePackage {
 				try {
 					URL zipURL = link.getHref().toURL();
 					archive = new ZippedPackage(zipURL);
-					packageDescription = archive.extractDescription();
+					packageDescription = archive.getDescription();
 				} catch (MalformedURLException e) {
 					// do nothing
 				} catch (URISyntaxException e) {
@@ -193,7 +193,7 @@ public class MovingCodePackage {
 	public String dumpWorkspace(File targetDirectory)
 	{
 		String wsRoot = packageDescription.getPackageDescription().getWorkspace().getWorkspaceRoot();
-		archive.dumpWorkspace(wsRoot, targetDirectory);
+		archive.dumpPackage(wsRoot, targetDirectory);
 		if (wsRoot.startsWith("./")) {
 			wsRoot = wsRoot.substring(2);
 		}
