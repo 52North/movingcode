@@ -63,7 +63,9 @@ public class RServerProcessor extends AbstractProcessor {
     private static Logger logger = Logger.getLogger(RServerProcessor.class);
 
     private static MimeTypeDatabase mimeRegistry = getMimeRegistry();
+    
     private static final String mimeTypeFile = "mime.types";
+    
     private File clonedWorkspace;
 
     /**
