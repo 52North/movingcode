@@ -51,16 +51,15 @@ public class RepositoryUtils {
 		
 		// simply split up the ID at path separators
 		
-		// HashMap<sourcePackageID, targetFolder>
-		HashMap<String, File> targetFolders = new HashMap<String, File>();
-		
 		// HashMap<sourcePackageID, targetPackageID> (latter is a short ID)
 		HashMap<String, String> targetIDs = new HashMap<String, String>();
 		
 		
+		// HashMap<sourcePackageID, targetFolder>
+		HashMap<String, File> targetFolders = new HashMap<String, File>();
 		
-		// for each package:
-		// add to the new folder
+
+		// for each package: dump into correct folder
 		for (String currentSourceID : sourcePackageIDs){
 			File targetFolder = targetFolders.get(currentSourceID);
 			if (!targetFolder.exists()){
@@ -68,7 +67,7 @@ public class RepositoryUtils {
 			}
 			
 			File zipFile = new File(targetFolder, targetIDs.get(currentSourceID) + ".zip");
-			// TODO: dump package to zip
+			sourceRepo.getPackage(currentSourceID).dumpPackage(zipFile); // dumpPackage creates the file automatically
 		}
 		
 		// return new Repo for the folder
