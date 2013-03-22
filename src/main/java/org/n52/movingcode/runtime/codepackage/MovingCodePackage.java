@@ -61,17 +61,24 @@ public class MovingCodePackage {
 	public static enum FunctionalType {
 		WPS100, WSDL10, WSDL20
 	};
-
+	
+	// common name of the package description XML file
 	public static final String descriptionFileName = "packagedescription.xml";
 
-	private final ZippedPackage archive;
-
+	// the physical instance of this package
+	private final ICodePackage archive;
+	
+	// package description XML document
 	private PackageDescriptionDocument packageDescription = null;
-
+	
+	// identifier of the provided functionality (e.g. WPS process identifier)
 	private final String functionalIdentifier;
-
+	
+	// unique identifier of this package
+	// TODO: refactor; should be derived from the archive
 	private final String packageIdentifier;
-
+	
+	// Package time stamp, i.e. date of creation or last modification
 	private final Date timeStamp;
 
 	private final List<FunctionalType> supportedFuncTypes;
@@ -179,7 +186,7 @@ public class MovingCodePackage {
 		}
 
 		this.packageIdentifier = packageIdentifier;
-		this.archive = new ZippedPackage(workspace, packageDescription);
+		this.archive = new PlainPackage(workspace, packageDescription);
 
 	}
 
@@ -237,7 +244,7 @@ public class MovingCodePackage {
 	/**
 	 * Returns the PackageDescription
 	 * 
-	 * @return PackageDescriptionDocument
+	 * @return {@link PackageDescriptionDocument}
 	 */
 	public PackageDescriptionDocument getDescription()
 	{
@@ -349,4 +356,5 @@ public class MovingCodePackage {
 		Collections.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
 		return new Date(files.get(0).lastModified());
 	}
+	
 }
