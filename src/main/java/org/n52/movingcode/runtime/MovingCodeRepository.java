@@ -55,7 +55,11 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * @author Matthias Mueller, TU Dresden
  * 
+ * Deprecation warning: This class will be deleted in the near future. It's logic has been migrated to
+ * {@link org.n52.movingcode.runtime.coderepository.IMovingCodeRepository}
+ * 
  */
+@Deprecated
 public class MovingCodeRepository extends DefaultPackageRepository {
 
     static Logger logger = Logger.getLogger(MovingCodeRepository.class);
