@@ -1,40 +1,20 @@
-/**
- * ﻿Copyright (C) 2012
- * by 52 North Initiative for Geospatial Open Source Software GmbH
- *
- * Contact: Andreas Wytzisk
- * 52 North Initiative for Geospatial Open Source Software GmbH
- * Martin-Luther-King-Weg 24
- * 48155 Muenster, Germany
- * info@52north.org
- *
- * This program is free software; you can redistribute and/or modify it under
- * the terms of the GNU General Public License version 2 as published by the
- * Free Software Foundation.
- *
- * This program is distributed WITHOUT ANY WARRANTY; even without the implied
- * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program (see gnu-gpl v2.txt). If not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
- * visit the Free Software Foundation web page, http://www.fsf.org.
- */
+package org.n52.movingcode.runtime.coderepository;
 
-package org.n52.movingcode.runtime.codepackage;
-
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.n52.movingcode.runtime.MovingCodeRepository;
+import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
+
+
 /**
- * A simple default package repository. May store multiple packages per functional ID (i.e. multiple
+ * Basic class for a package repository. May store multiple packages per functional ID (i.e. multiple
  * implementations of the same functional contract). When requested by their functional ID, it will return
  * only the first registered package (this is the "default"). There is no guarantee about the internal order
  * of the registered packages so the default package is an arbitrary item. If you need guaranteed access to a
@@ -45,22 +25,16 @@ import com.google.common.collect.Multimap;
  * @author Matthias Mueller, TU Dresden
  * 
  * 
- * Deprecation warning: This class will be deleted in the near future. It's logic has been migrated to
- * {@link org.n52.movingcode.runtime.coderepository.AbstractRepository}
- * 
- * 
  */
-@Deprecated
-public class DefaultPackageRepository {
-	
+public abstract class AbstractRepository implements IMovingCodeRepository{
 	// registered packages - KVP (packageID, mPackage)
 	private Map<String, MovingCodePackage> packages = new HashMap<String, MovingCodePackage>();
 	
 	// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
 	private Multimap<String, String> fIDpID_Lookup = ArrayListMultimap.create();
 
-	static Logger logger = Logger.getLogger(DefaultPackageRepository.class);
-
+	static Logger logger = Logger.getLogger(AbstractRepository.class);
+	
 	/**
 	 * Private method for registering packages with this repository instance.
 	 * Puts a new KVP (packageID, mPackage) into the packages Map.
@@ -72,7 +46,7 @@ public class DefaultPackageRepository {
 		this.packages.put(mcPackage.getPackageIdentifier(), mcPackage);
 		this.fIDpID_Lookup.put(mcPackage.getFunctionalIdentifier(), mcPackage.getPackageIdentifier());
 	}
-
+	
 	/**
 	 * Protected method for package retrieval. Returns a package for a given ID.
 	 * 
@@ -123,4 +97,19 @@ public class DefaultPackageRepository {
 	public String[] getPackageIDs() {
 		return packages.keySet().toArray(new String[packages.keySet().size()]);
 	}
+	
+    @Override
+    public MovingCodePackage getPackage(String packageID) {
+        return retrievePackage(packageID);
+    }
+
+    @Override
+    public Date getPackageTimestamp(String packageID) {
+        return retrievePackage(packageID).getTimestamp();
+    }
+
+    @Override
+    public PackageDescriptionDocument getPackageDescription(String packageID) {
+        return retrievePackage(packageID).getDescription();
+    }
 }
