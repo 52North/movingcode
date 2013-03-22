@@ -32,11 +32,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,7 +49,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * @author Matthias Mueller, TU Dresden
  * 
  */
-final class ZippedPackage {
+final class ZippedPackage implements ICodePackage{
 
 	// local copy of the zipped package
 	private final File zipFile;
@@ -59,9 +57,6 @@ final class ZippedPackage {
 	// Web location (URL) of the zipped package
 	private final URL zipURL;
 	
-	// Two elements for a plain (unzipped) package
-	private final File plainWorkspace;
-	private final PackageDescriptionDocument plainDescription;
 	
 	static Logger logger = Logger.getLogger(ZippedPackage.class);
 
@@ -73,8 +68,6 @@ final class ZippedPackage {
 	protected ZippedPackage(final File zipFile) {
 		this.zipFile = zipFile;
 		this.zipURL = null;
-		this.plainWorkspace = null;
-		this.plainDescription = null;
 	}
 	
 	/**
@@ -86,69 +79,17 @@ final class ZippedPackage {
 	protected ZippedPackage(final URL zipURL) {
 		this.zipURL = zipURL;
 		this.zipFile = null;
-		this.plainWorkspace = null;
-		this.plainDescription = null;
 	}
 	
-	/**
-	 * Constructor to create a {@link ZippedPackage} from a plain workspace and process description XML.
-	 * 
-	 * @param workspace {@link File} - plain package workspace
-	 * @param descriptionXML {@link PackageDescriptionDocument} - process description XML
-	 */
-	protected ZippedPackage(final File workspace, final PackageDescriptionDocument descriptionXML) {
-		this.zipURL = null;
-		this.zipFile = null;
-
-		this.plainWorkspace = workspace;
-		this.plainDescription = descriptionXML;
+	
+	@Override
+	public final PackageDescriptionDocument getDescription() {
+		return extractDescription(this);
 	}
 	
-	/**
-	 * Getter for the ProcessDescription.
-	 * 
-	 * @return {@link PackageDescriptionDocument}
-	 */
-	protected final PackageDescriptionDocument getDescription() {
-		if (isPlain()) {
-			return plainDescription;
-		}
-		else {
-			return extractDescription(this);
-		}
-	}
-	
-	/**
-	 * Writes the content of this {@link ZippedPackage} Object to a plain workspace. 
-	 * 
-	 * @param workspaceDirName {@link String)
-	 * @param targetDirectory {@link File}
-	 */
-	protected final void dumpPackage(String workspaceDirName, File targetDirectory) {
-		
-		// if plain (unzipped) package
-		if (isPlain()) {
-			try {
-				Collection<File> files = FileUtils.listFiles(plainWorkspace, null, false);
-				for (File file : files) {
-					if (file.isDirectory()) {
-						FileUtils.copyDirectory(file, targetDirectory);
-					}
-					else {
-						FileUtils.copyFileToDirectory(file, targetDirectory);
-					}
-				}
-			}
-			catch (IOException e) {
-				logger.error("Error! Could copy from " + plainWorkspace.getAbsolutePath() + " to "
-						+ targetDirectory.getAbsolutePath());
-			}
-		}
-		// if zipped package
-		else {
-			unzipWorkspace(this, workspaceDirName, targetDirectory);
-		}
-
+	@Override
+	public final void dumpPackage(String workspaceDirName, File targetDirectory) {
+		unzipWorkspace(this, workspaceDirName, targetDirectory);
 	}
 
 	/**
@@ -333,15 +274,10 @@ final class ZippedPackage {
 		}
 	}
 
-	/**
-	 * Writes the content of this {@link ZippedPackage} Object to a zipfile. 
-	 * 
-	 * @param targetZipFile {@link File}
-	 * @return boolean - true if the package was successfully dumped, false otherwise
-	 */
-	protected boolean dumpPackage(File targetZipFile) {
+	@Override
+	public boolean dumpPackage(File targetZipFile) {
 		// zipFile and zip url MUST not be null at the same time
-		assert ( ! ( (zipFile == null) || (zipURL == null)) || (this.isPlain()));
+		assert ( ! ( (zipFile == null) || (zipURL == null)));
 
 		// in case there is a zipped package file on disk
 		if (zipFile != null) {
@@ -363,79 +299,8 @@ final class ZippedPackage {
 				return false;
 			}
 		}
-		// in case there is a plain (non-zipped) package with separate workspace and description
-		else if (isPlain()) {
-			try {
-				ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZipFile));
-				// add package description to zipFile
-				zos.putNextEntry(new ZipEntry(MovingCodePackage.descriptionFileName));
-				IOUtils.copy(plainDescription.newInputStream(), zos);
-				zos.closeEntry();
-
-				// add workspace recursively, with relative pathnames
-				File base = plainWorkspace.getAbsoluteFile().getParentFile();
-				addDir(plainWorkspace, base, zos);
-
-				zos.close();
-
-				return true;
-			}
-			catch (IOException e) {
-				return false;
-			}
-		}
 
 		return false;
 	}
 	
-	/**
-	 * Is this a plain (unzipped) workspace?
-	 * 
-	 * @return boolean - true if it is a plain (unzipped) package, false otherwise
-	 */
-	private boolean isPlain() {
-		return (plainWorkspace != null && plainDescription != null);
-	}
-
-	/**
-	 * Static private helper method that writes contents of a directory (e.g. a workspace)
-	 * to a {@link ZipOutputStream}.
-	 * 
-	 * @param contentDirectory {@link File} - the directory that shall be zipped
-	 * @param baseDirectory {@link File} - the part of the @param contentDirectory path that shall be truncated from the zip-Entry
-	 * @param zos {@link ZipOutputStream} - the stream to write the directory contents to
-	 * @throws IOException - if writing to the stream (zos) fails
-	 */
-	private static void addDir(File contentDirectory, File baseDirectory, ZipOutputStream zos) throws IOException {
-		File[] files = contentDirectory.listFiles();
-
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isDirectory()) {
-				addDir(files[i], baseDirectory, zos);
-				continue;
-			}
-			FileInputStream in = new FileInputStream(files[i].getAbsolutePath());
-			// construct relative path
-			zos.putNextEntry(new ZipEntry(relative(baseDirectory, files[i])));
-			// do copy
-			IOUtils.copy(in, zos);
-
-			zos.closeEntry();
-			in.close();
-		}
-	}
-
-	/**
-	 * Static private method that removes the <base> part from an absolute path.
-	 * 
-	 * @param base {@link File} - the <base> part of a path
-	 * @param file {@link File} - an absolute path of the structure <base><relative> 
-	 * @return {@link String} - the <relative> part of the absolute path 
-	 */
-	private static String relative(final File base, final File file) {
-		final int rootLength = base.getAbsolutePath().length();
-		final String absFileName = file.getAbsolutePath();
-		final String relFileName = absFileName.substring(rootLength + 1);
-		return relFileName;
-	}
 }
