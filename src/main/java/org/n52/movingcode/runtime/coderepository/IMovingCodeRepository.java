@@ -17,17 +17,43 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 
 public interface IMovingCodeRepository {
-
+	
 	/**
-	 * returns a package matching a given identifier
+	 * Returns the IDs of all registered packages.
 	 * 
-	 * @param {@link String} packageIdentifier - the (unique) ID of the package
+	 * @return Array of packageIDs {@link String}
+	 */
+	public String[] getPackageIDs();
+	
+	/**
+	 * method to determine whether a package with the given ID is provided by this repository
+	 * 
+	 * @param packageID {@link String} - the internal (unique) identifier of package. 
+	 * @return boolean - true if a package with the given ID is provided by this repository.
+	 */
+	public boolean containsPackage(String packageID);
+	
+	/**
+	 * returns a package matching a given packageID
+	 * 
+	 * @param {@link String} packageID - the (unique) ID of the package
 	 * 
 	 */
 	public MovingCodePackage getPackage(String packageID);
+	
+	/**
+	 * Returns a package matching a given functionID.
+	 * If there a multiple packages that provide the same function, this method could return any
+	 * of them. If you need fine-grained control about the selection process, you have to implement
+	 * your own logic and request the package directly by calling {@link IMovingCodeRepository#getPackage(String)}
+	 * 
+	 * @param {@link String} functionID - the (unique) ID of the package
+	 * 
+	 */
+	public MovingCodePackage getPackageByFunction(String functionID);
 
 	/**
-	 * returns the last known update of a MovingCodePackage
+	 * returns the last known update timestamp of a MovingCodePackage
 	 */
 	public Date getPackageTimestamp(String packageID);
 
@@ -35,14 +61,34 @@ public interface IMovingCodeRepository {
 	 * returns package description for a given package ID
 	 */
 	public PackageDescriptionDocument getPackageDescription(String packageID);
-
+	
+	/**
+	 * Public method to determine whether this repository instance provides a certain functionality
+	 * (i.e. ProcessIdentifier in WPS 1.0). 
+	 * 
+	 * @param functionalID {@link String}
+	 * @return boolean - returns true if this repository instance contains a suitable package for a given functional ID, false otherwise.
+	 */
+	public boolean providesFunction(String functionID);
+	
+	/**
+	 * Returns the function IDs (i.e. WPS processIdentifiers) of all registered packages
+	 * 
+	 * Returns a snapshot of all currently used identifiers. Later changes in the MovingCodeRepository (new or
+	 * deleted packages) are not propagated to the returned array. If you need up-to-date information call
+	 * this method again.
+	 */
+	public String[] getFunctionIDs();
+	
+	
+	//###########################################################################//
 	/**
 	 * Static Factory method to create MovingCodeRepositories from various sources
 	 * 
 	 * @author Matthias Mueller, TU Dresden
 	 *
 	 */
-	static class Factory{
+	static class Factory {
 		
 		/**
 		 * Creates a {@link IMovingCodeRepository} from a remote feed URL.
