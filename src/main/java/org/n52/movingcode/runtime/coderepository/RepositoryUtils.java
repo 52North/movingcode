@@ -8,7 +8,7 @@ import java.util.HashMap;
  * This class contains static utility methods to convert between different
  * {@link IMovingCodeRepository} implementations.
  * 
- * @author Matthias Mueller
+ * @author Matthias Mueller, TU Dresden
  *
  */
 public class RepositoryUtils {
@@ -79,16 +79,11 @@ public class RepositoryUtils {
 
 		// for each package: dump into correct folder
 		for (String currentSourceID : sourcePackageIDs){
-			
-			// assemble absolute directory path for the package 
-			String absTargetPath = targetDirectory.getAbsolutePath() + File.separator + targetIDs.get(currentSourceID);
-			File targetFolder = new File (absTargetPath);
-			
-			if (!targetFolder.exists()){
-				targetFolder.createNewFile();
-			}
-			
-			File zipFile = new File(targetFolder, targetIDs.get(currentSourceID) + ".zip");
+			// build location for package zipFile
+			File zipFile = new File(targetDirectory, targetIDs.get(currentSourceID) + ".zip");
+			// create necessary directories
+			zipFile.mkdirs();
+			// dump package as zipFile
 			sourceRepo.getPackage(currentSourceID).dumpPackage(zipFile); // dumpPackage creates the file automatically
 		}
 		
@@ -102,7 +97,7 @@ public class RepositoryUtils {
 	 * @param s the string to parse.
 	 * @return s without consecutive occurrences of file separator character
 	 */
-	private static String removeConsecutiveFileSeparator(String s) {
+	private static String removeConsecutiveFileSeparator(final String s) {
 		StringBuffer res = new StringBuffer();
 		boolean previousWasFileSep = false;
 		for (int i = 0; i < s.length(); i++) {
