@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+
 /**
  * This class contains static utility methods to convert between different
  * {@link IMovingCodeRepository} implementations.
@@ -17,7 +18,7 @@ public class RepositoryUtils {
 	private static final String httpPrefix = "http://";
 	
 	// strings that shall be replaces by File.separator
-	private static final String[] separatorReplacements = {":/", ":\\", "\\"};
+	private static final String[] separatorReplacements = {":/", ":\\\\", "\\\\"};
 	
 	/**
 	 * Conversion method that creates a new {@link LocalZipPackageRepository} repository from any given {@link IMovingCodeRepository}.
@@ -30,13 +31,15 @@ public class RepositoryUtils {
 	 */
 	public static final LocalZipPackageRepository materializeAsLocalZipRepo(IMovingCodeRepository sourceRepo, File targetDirectory) throws IOException{
 		
-		// check if directory exists, create if necessary
-		if (!targetDirectory.exists()){
-			targetDirectory.createNewFile();
-		}
-		
-		// check if directory is empty
-		if (targetDirectory.list().length > 0){
+		// check if directory exists and is empty, create new one if necessary
+		// using #list instead of #exists prevents some issues with directory permissions
+		String[] contents = targetDirectory.list();
+		if (contents == null){
+			boolean success = targetDirectory.mkdirs();
+			if (!success){
+				throw new IOException("Cannot create repository folder. (Probably insufficent file permissions.)");
+			}
+		} else if (contents.length > 0) {
 			throw new IOException("Cannot create repository. Target directory is not empty.");
 		}
 		
@@ -82,7 +85,15 @@ public class RepositoryUtils {
 			// build location for package zipFile
 			File zipFile = new File(targetDirectory, targetIDs.get(currentSourceID) + ".zip");
 			// create necessary directories
-			zipFile.mkdirs();
+			//String relPath = targetIDs.get(currentSourceID) + ".zip";
+			String path = zipFile.getAbsolutePath();
+			if(path.contains(File.separator)){
+				int idx = path.lastIndexOf(File.separator);
+				String dirPart = zipFile.getAbsolutePath().substring(0, idx);
+				File dir = new File (dirPart);
+				dir.mkdirs();
+			}
+
 			// dump package as zipFile
 			sourceRepo.getPackage(currentSourceID).dumpPackage(zipFile); // dumpPackage creates the file automatically
 		}

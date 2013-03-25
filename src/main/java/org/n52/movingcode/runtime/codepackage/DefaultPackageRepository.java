@@ -111,7 +111,7 @@ public class DefaultPackageRepository {
 	 * deleted packages) are not propagated to the returned array. If you need up-to-date information call
 	 * this method again.
 	 */
-	public String[] getFunctionalIDs() {
+	public String[] getFunctionIDs() {
 		return this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
 	}
 

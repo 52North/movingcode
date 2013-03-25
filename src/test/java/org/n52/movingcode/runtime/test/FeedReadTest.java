@@ -66,7 +66,9 @@ public class FeedReadTest extends GlobalTestConfig {
                 }
 
                 else {
-
+                	
+                	logger.info("Compatible Processors: " + processor.getClass().getName());
+                	
                     logger.info("--- Parameters ---");
                     for (IOParameter param : processor.values()) {
                         logger.info("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
