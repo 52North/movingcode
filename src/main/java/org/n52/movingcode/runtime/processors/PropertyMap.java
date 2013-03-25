@@ -36,6 +36,11 @@ import java.util.HashMap;
  */
 public class PropertyMap extends HashMap<String, String> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3104930318249367786L;
+
     public PropertyMap() {
         super();
     }

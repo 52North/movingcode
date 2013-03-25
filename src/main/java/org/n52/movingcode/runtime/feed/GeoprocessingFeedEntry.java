@@ -37,10 +37,10 @@ import org.apache.log4j.Logger;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 /**
- * This class represents an entry in a GeoprocessingFeed. 
+ * This class represents an entry in a GeoprocessingFeed.
  * 
- * TODO: implements {@link Entry} ?
- * TODO: Make use of Atom license extension --> http://tools.ietf.org/html/rfc4946
+ * TODO: implements {@link Entry} ? TODO: Make use of Atom license extension -->
+ * http://tools.ietf.org/html/rfc4946
  * 
  * @author Matthias Mueller, TU Dresden
  * 
@@ -52,27 +52,31 @@ public final class GeoprocessingFeedEntry {
     public static final String PACKAGE_DESCRIPTION_MIMETYPE = "text/xml";
     public static final String PACKAGE_LINK_REL = "enclosure";
     public static final String DETAILED_DESCRIPTION_LINK_REL = "alternate";
-    
+
     static Logger logger = Logger.getLogger(GeoprocessingFeedEntry.class);
-    
+
     /**
-     * Creates a new entry from an existing entry. Both entries share the same content.
-     * If one of them is changed, the changes are propagated to its twin. 
+     * Creates a new entry from an existing entry. Both entries share the same content. If one of them is
+     * changed, the changes are propagated to its twin.
      * 
      * @param entry
      */
     public GeoprocessingFeedEntry(Entry entry) {
         this.entry = entry;
     }
-    
+
     /**
      * Constructor for a brand new GeoprocessingFeedEntry.
      * 
      * 
-     * @param packageDesc {@link PackageDescriptionDocument} - the packageDescription
-     * @param creationDate {@link Date} - the creation Date of the new entry.
-     * @param packageURL {@link String} - a URL from which the zipped content of the package can be retrieved
-     * @param descriptionURL {@link String} - a URL that links to additional documentation of the package contents
+     * @param packageDesc
+     *        {@link PackageDescriptionDocument} - the packageDescription
+     * @param creationDate
+     *        {@link Date} - the creation Date of the new entry.
+     * @param packageURL
+     *        {@link String} - a URL from which the zipped content of the package can be retrieved
+     * @param descriptionURL
+     *        {@link String} - a URL that links to additional documentation of the package contents
      */
     public GeoprocessingFeedEntry(PackageDescriptionDocument packageDesc,
                                   Date creationDate,
@@ -85,7 +89,7 @@ public final class GeoprocessingFeedEntry {
 
             String identifier = wpsDesc.getIdentifier().getStringValue();
 
-            String title = wpsDesc.getTitle().getStringValue();
+            // String title = wpsDesc.getTitle().getStringValue();
 
             // String summary = null;
             // if (wpsDesc.isSetAbstract()){
@@ -123,34 +127,34 @@ public final class GeoprocessingFeedEntry {
         }
 
     }
-    
+
     /**
      * Returns the identifier of this entry.
      * 
      * @return {@link String}
      */
     public String getIdentifier() {
-        return entry.getId().toString();
+        return this.entry.getId().toString();
     }
-    
+
     /**
      * Returns the publication date of this entry.
      * 
      * @return {@link Date}
      */
     public Date getPublished() {
-        return entry.getPublished();
+        return this.entry.getPublished();
     }
-    
+
     /**
      * Returns the last modified date of this entry.
      * 
      * @return {@link Date}
      */
     public Date getUpdated() {
-        return entry.getUpdated();
+        return this.entry.getUpdated();
     }
-    
+
     /**
      * Return the general atom representation of this entry.
      * 
@@ -159,7 +163,7 @@ public final class GeoprocessingFeedEntry {
     public Entry getAtomEntry() {
         return this.entry;
     }
-    
+
     /**
      * private static method to create a blank {@link Entry}
      * 
@@ -168,16 +172,15 @@ public final class GeoprocessingFeedEntry {
     private static Entry makeNewEntry() {
         return Abdera.getInstance().newEntry();
     }
-    
+
     /**
-     * Updates this entry with the contents of a newer one.
-     * Procedure is as follows:
+     * Updates this entry with the contents of a newer one. Procedure is as follows:
      * 
-     * If the otherEntry is newer:
-     * 1. its contents will be copied to this entry
-     * 2. the old publication date will be kept
+     * If the otherEntry is newer: 1. its contents will be copied to this entry 2. the old publication date
+     * will be kept
      * 
-     * @param otherEntry {@link GeoprocessingFeedEntry}
+     * @param otherEntry
+     *        {@link GeoprocessingFeedEntry}
      */
     public void updateWith(GeoprocessingFeedEntry otherEntry) {
         // check if other entry is newer
@@ -197,12 +200,12 @@ public final class GeoprocessingFeedEntry {
     // content.setSrc(packageURL);
     // return content;
     // }
-    
+
     /**
-     * Static helper method that creates an Atom {@link Link} object from
-     * a given package URL. 
+     * Static helper method that creates an Atom {@link Link} object from a given package URL.
      * 
-     * @param packageURL {@link String} - the package URL
+     * @param packageURL
+     *        {@link String} - the package URL
      * @return {@link Link}
      */
     private static final Link makePackageLink(String packageURL) {
@@ -212,12 +215,12 @@ public final class GeoprocessingFeedEntry {
         link.setRel(PACKAGE_LINK_REL);
         return link;
     }
-    
+
     /**
-     * Static helper method that creates an Atom {@link Link} object from
-     * a given description URL. 
+     * Static helper method that creates an Atom {@link Link} object from a given description URL.
      * 
-     * @param descriptionURL {@link String} - the package description URL
+     * @param descriptionURL
+     *        {@link String} - the package description URL
      * @return {@link Link}
      */
     private static Link makePackageDescriptionLink(String descriptionURL) {
@@ -229,10 +232,11 @@ public final class GeoprocessingFeedEntry {
     }
 
     /**
-     * Generates a human-readable description from a PackageDescriptionDocument.
-     * This description is return as an Atom content object.
+     * Generates a human-readable description from a PackageDescriptionDocument. This description is return as
+     * an Atom content object.
      * 
-     * @param wpsDesc {@link ProcessDescriptionType}
+     * @param wpsDesc
+     *        {@link ProcessDescriptionType}
      * @return {@link Content}
      */
     private static Content generateHTMLContent(final ProcessDescriptionType wpsDesc) {

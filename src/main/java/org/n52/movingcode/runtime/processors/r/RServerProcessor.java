@@ -106,7 +106,7 @@ public class RServerProcessor extends AbstractProcessor {
             this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
         }
         catch (Exception e) {
-            logger.error("Cannot write to instance workspace. " + clonedWorkspace.getAbsolutePath());
+            logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
             return false;
         }
 
@@ -165,7 +165,7 @@ public class RServerProcessor extends AbstractProcessor {
                     @SuppressWarnings("unchecked")
                     List<MediaData> mediaValues = (List<MediaData>) this.get(identifier);
                     for (int i = 0; i < mediaValues.size(); i++) {
-                        String fileName = executionValues.get(identifier)[i];
+                        String fileName = this.executionValues.get(identifier)[i];
                         // <-- this is the important line -->
                         mediaValues.get(i).setMediaStream(new FileInputStream(fileName));
                     }
@@ -182,11 +182,11 @@ public class RServerProcessor extends AbstractProcessor {
     private boolean executeRScript(String rFunction, String rScriptPath) {
 
         // build parameters array for ArcGIS
-        String[] paramArray = new String[executionValues.keySet().size()];
+        String[] paramArray = new String[this.executionValues.keySet().size()];
         int i = 0;
-        for (ParameterID identifier : executionValues.keySet()) {
+        for (ParameterID identifier : this.executionValues.keySet()) {
             String valString = "";
-            for (String value : executionValues.get(identifier)) {
+            for (String value : this.executionValues.get(identifier)) {
                 if (valString == "") {
                     valString = value;
                 }
@@ -226,7 +226,7 @@ public class RServerProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = boolValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -247,7 +247,7 @@ public class RServerProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = intValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -268,7 +268,7 @@ public class RServerProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = dblValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -285,7 +285,7 @@ public class RServerProcessor extends AbstractProcessor {
             if (isInput) {
                 @SuppressWarnings("unchecked")
                 String[] stringValues = ((List<String>) data).toArray(new String[data.size()]);
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -321,7 +321,7 @@ public class RServerProcessor extends AbstractProcessor {
                     stringValues[i] = file.getAbsolutePath();
 
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 // special treatment for output-only data
@@ -341,7 +341,7 @@ public class RServerProcessor extends AbstractProcessor {
 
                         stringValues[i] = path;
                     }
-                    executionValues.put(data.getIdentifier(), stringValues);
+                    this.executionValues.put(data.getIdentifier(), stringValues);
                 }
                 else {
                     // TODO: cannot happen (?)

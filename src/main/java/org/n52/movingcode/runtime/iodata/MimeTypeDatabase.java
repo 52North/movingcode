@@ -48,9 +48,9 @@ public class MimeTypeDatabase {
         File mime_file = null;
         FileReader fr = null;
 
-        fname = new_fname; // remember the file name
+        this.fname = new_fname; // remember the file name
 
-        mime_file = new File(fname); // get a file object
+        mime_file = new File(this.fname); // get a file object
 
         fr = new FileReader(mime_file);
 
@@ -81,7 +81,7 @@ public class MimeTypeDatabase {
      * get the MimeTypeEntries based on the file extension
      */
     public MimeTypeEntry[] getMimeTypeEntriesByExt(String file_ext) {
-        Collection<String> mimetypes = mimeToExtMap.get(file_ext);
+        Collection<String> mimetypes = this.mimeToExtMap.get(file_ext);
         MimeTypeEntry[] entries = new MimeTypeEntry[mimetypes.size()];
         int i = 0;
         for (String mt : mimetypes) {
@@ -95,7 +95,7 @@ public class MimeTypeDatabase {
      * get the MimeTypeEntries based on the file extension
      */
     public MimeTypeEntry[] getMimeTypeEntriesByMime(String mime_type) {
-        Collection<String> extensions = extToMimeMap.get(mime_type);
+        Collection<String> extensions = this.extToMimeMap.get(mime_type);
         MimeTypeEntry[] entries = new MimeTypeEntry[extensions.size()];
         int i = 0;
         for (String ext : extensions) {
@@ -109,24 +109,20 @@ public class MimeTypeDatabase {
      * Get the MIME type string array corresponding to the file extension.
      */
     public String[] getMIMETypeStrings(String file_ext) {
-        if (extToMimeMap.containsKey(file_ext)) {
-            return extToMimeMap.get(file_ext).toArray(new String[extToMimeMap.get(file_ext).size()]);
+        if (this.extToMimeMap.containsKey(file_ext)) {
+            return this.extToMimeMap.get(file_ext).toArray(new String[this.extToMimeMap.get(file_ext).size()]);
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**
      * Get the File Extension string array corresponding to the mimeType.
      */
     public String[] getExtensionStrings(String mime_type) {
-        if (mimeToExtMap.containsKey(mime_type)) {
-            return mimeToExtMap.get(mime_type).toArray(new String[mimeToExtMap.get(mime_type).size()]);
+        if (this.mimeToExtMap.containsKey(mime_type)) {
+            return this.mimeToExtMap.get(mime_type).toArray(new String[this.mimeToExtMap.get(mime_type).size()]);
         }
-        else {
-            return defaultFileExt;
-        }
+        return defaultFileExt;
     }
 
     /**
@@ -147,7 +143,7 @@ public class MimeTypeDatabase {
     }
 
     public boolean contains(String mime_type) {
-        return mimeToExtMap.containsKey(mime_type);
+        return this.mimeToExtMap.containsKey(mime_type);
     }
 
     /**
@@ -179,19 +175,19 @@ public class MimeTypeDatabase {
     private void parseEntry(String line) {
         String mime_type = null;
         String file_ext = null;
-        line = line.trim();
+        String currentLine = line.trim();
 
-        if (line.length() == 0) // empty line...
+        if (currentLine.length() == 0) // empty line...
             return; // BAIL!
 
         // check to see if this is a comment line?
-        if (line.charAt(0) == '#')
+        if (currentLine.charAt(0) == '#')
             return; // then we are done!
 
         // is it a new format line or old format?
-        if (line.indexOf('=') > 0) {
+        if (currentLine.indexOf('=') > 0) {
             // new format
-            MimeLineTokenizer lt = new MimeLineTokenizer(line);
+            MimeLineTokenizer lt = new MimeLineTokenizer(currentLine);
             while (lt.hasMoreTokens()) {
                 String name = lt.nextToken();
                 String value = null;
@@ -208,8 +204,8 @@ public class MimeTypeDatabase {
                     while (st.hasMoreTokens()) {
                         file_ext = st.nextToken();
 
-                        extToMimeMap.put(file_ext, mime_type);
-                        mimeToExtMap.put(mime_type, file_ext);
+                        this.extToMimeMap.put(file_ext, mime_type);
+                        this.mimeToExtMap.put(mime_type, file_ext);
                         // System.out.println("Added: " + entry.toString());
                     }
                 }
@@ -218,7 +214,7 @@ public class MimeTypeDatabase {
         else {
             // old format
             // count the tokens
-            StringTokenizer strtok = new StringTokenizer(line);
+            StringTokenizer strtok = new StringTokenizer(currentLine);
             int num_tok = strtok.countTokens();
 
             if (num_tok == 0) // empty line
@@ -227,11 +223,11 @@ public class MimeTypeDatabase {
             mime_type = strtok.nextToken(); // get the MIME type
 
             while (strtok.hasMoreTokens()) {
-                MimeTypeEntry entry = null;
+                // MimeTypeEntry entry = null;
 
                 file_ext = strtok.nextToken();
-                extToMimeMap.put(file_ext, mime_type);
-                mimeToExtMap.put(mime_type, file_ext);
+                this.extToMimeMap.put(file_ext, mime_type);
+                this.mimeToExtMap.put(mime_type, file_ext);
                 // System.out.println("Added: " + entry.toString());
             }
         }
@@ -260,17 +256,18 @@ class MimeLineTokenizer {
      *        a string to be parsed.
      */
     public MimeLineTokenizer(String str) {
-        currentPosition = 0;
+        this.currentPosition = 0;
         this.str = str;
-        maxPosition = str.length();
+        this.maxPosition = str.length();
     }
 
     /**
      * Skips white space.
      */
     private void skipWhiteSpace() {
-        while ( (currentPosition < maxPosition) && Character.isWhitespace(str.charAt(currentPosition))) {
-            currentPosition++;
+        while ( (this.currentPosition < this.maxPosition)
+                && Character.isWhitespace(this.str.charAt(this.currentPosition))) {
+            this.currentPosition++;
         }
     }
 
@@ -281,10 +278,10 @@ class MimeLineTokenizer {
      *         <code>false</code> otherwise.
      */
     public boolean hasMoreTokens() {
-        if (stack.size() > 0)
+        if (this.stack.size() > 0)
             return true;
         skipWhiteSpace();
-        return (currentPosition < maxPosition);
+        return (this.currentPosition < this.maxPosition);
     }
 
     /**
@@ -295,27 +292,27 @@ class MimeLineTokenizer {
      *            if there are no more tokens in this tokenizer's string.
      */
     public String nextToken() {
-        int size = stack.size();
+        int size = this.stack.size();
         if (size > 0) {
-            String t = (String) stack.elementAt(size - 1);
-            stack.removeElementAt(size - 1);
+            String t = (String) this.stack.elementAt(size - 1);
+            this.stack.removeElementAt(size - 1);
             return t;
         }
         skipWhiteSpace();
 
-        if (currentPosition >= maxPosition) {
+        if (this.currentPosition >= this.maxPosition) {
             throw new NoSuchElementException();
         }
 
-        int start = currentPosition;
-        char c = str.charAt(start);
+        int start = this.currentPosition;
+        char c = this.str.charAt(start);
         if (c == '"') {
-            currentPosition++;
+            this.currentPosition++;
             boolean filter = false;
-            while (currentPosition < maxPosition) {
-                c = str.charAt(currentPosition++);
+            while (this.currentPosition < this.maxPosition) {
+                c = this.str.charAt(this.currentPosition++);
                 if (c == '\\') {
-                    currentPosition++;
+                    this.currentPosition++;
                     filter = true;
                 }
                 else if (c == '"') {
@@ -323,32 +320,33 @@ class MimeLineTokenizer {
 
                     if (filter) {
                         StringBuffer sb = new StringBuffer();
-                        for (int i = start + 1; i < currentPosition - 1; i++) {
-                            c = str.charAt(i);
+                        for (int i = start + 1; i < this.currentPosition - 1; i++) {
+                            c = this.str.charAt(i);
                             if (c != '\\')
                                 sb.append(c);
                         }
                         s = sb.toString();
                     }
                     else
-                        s = str.substring(start + 1, currentPosition - 1);
+                        s = this.str.substring(start + 1, this.currentPosition - 1);
                     return s;
                 }
             }
         }
         else if (singles.indexOf(c) >= 0) {
-            currentPosition++;
+            this.currentPosition++;
         }
         else {
-            while ( (currentPosition < maxPosition) && singles.indexOf(str.charAt(currentPosition)) < 0
-                    && !Character.isWhitespace(str.charAt(currentPosition))) {
-                currentPosition++;
+            while ( (this.currentPosition < this.maxPosition)
+                    && singles.indexOf(this.str.charAt(this.currentPosition)) < 0
+                    && !Character.isWhitespace(this.str.charAt(this.currentPosition))) {
+                this.currentPosition++;
             }
         }
-        return str.substring(start, currentPosition);
+        return this.str.substring(start, this.currentPosition);
     }
 
     public void pushToken(String token) {
-        stack.addElement(token);
+        this.stack.addElement(token);
     }
 }

@@ -217,7 +217,7 @@ public class RServerController {
      * @param RData
      *        Name of the RData file, relative to R workspace
      */
-    private static boolean loadRDataWorkspace(RConnection conn, String rData) throws IOException {
+    private static boolean loadRDataWorkspace(RConnection conn, String rData) {
         // load specified RData file from workspace
         try {
             REXP xp = conn.parseAndEval("try(load(paste(getwd(),'" + rData + "',sep='/')))");

@@ -56,7 +56,7 @@ public class RCLIProbe implements IPlatformComponentProbe {
         return getVersion();
     }
 
-    private boolean testExecutable() {
+    private static boolean testExecutable() {
         CommandLine commandLine = CommandLine.parse(RCLIProcessor.rExecutable + " " + VERSION_CALL);
 
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
@@ -73,16 +73,14 @@ public class RCLIProbe implements IPlatformComponentProbe {
             if (exitVal != 0) {
                 return false;
             }
-            else {
                 return true;
-            }
         }
         catch (Exception e) {
             return false;
         }
     }
 
-    private String getVersion() {
+    private static String getVersion() {
         try {
             CommandLine commandLine = CommandLine.parse(RCLIProcessor.rExecutable + " " + VERSION_CALL);
 

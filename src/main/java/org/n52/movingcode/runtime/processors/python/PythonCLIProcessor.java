@@ -84,7 +84,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
         File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath() + File.separator + AUID.randomAUID());
 
         if ( !tmpWorkspace.mkdir()) {
-            logger.error("Could not create instance workspace!");
+            this.logger.error("Could not create instance workspace!");
             return false;
         }
 
@@ -93,7 +93,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
             this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
         }
         catch (Exception e) {
-            logger.error("Cannot write to instance workspace. " + clonedWorkspace.getAbsolutePath());
+            this.logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
             return false;
         }
 
@@ -133,7 +133,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
         }
         executable = "python " + this.clonedWorkspace + File.separator + executable;
 
-        CommandLine cmdLine = buildCommandLine(executable, executionValues, this);
+        CommandLine cmdLine = buildCommandLine(executable, this.executionValues, this);
 
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
         Executor executor = new DefaultExecutor();
@@ -167,7 +167,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
                     @SuppressWarnings("unchecked")
                     List<MediaData> mediaValues = (List<MediaData>) this.get(identifier);
                     for (int i = 0; i < mediaValues.size(); i++) {
-                        String fileName = executionValues.get(identifier)[i];
+                        String fileName = this.executionValues.get(identifier)[i];
                         // <-- this is the important line -->
                         mediaValues.get(i).setMediaStream(new FileInputStream(fileName));
                     }
@@ -246,7 +246,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = boolValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -267,7 +267,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = intValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -288,7 +288,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = dblValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -305,7 +305,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
             if (isInput) {
                 @SuppressWarnings("unchecked")
                 String[] stringValues = ((List<String>) data).toArray(new String[data.size()]);
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -341,7 +341,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
                     stringValues[i] = file.getAbsolutePath();
 
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 // special treatment for output-only data
@@ -361,7 +361,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
 
                         stringValues[i] = path;
                     }
-                    executionValues.put(data.getIdentifier(), stringValues);
+                    this.executionValues.put(data.getIdentifier(), stringValues);
                 }
                 else {
                     // TODO: cannot happen (?)
@@ -374,10 +374,10 @@ public class PythonCLIProcessor extends AbstractProcessor {
     // delete the current workspace
     protected void finalize() throws IOException {
         try {
-            FileUtils.deleteDirectory(clonedWorkspace.getParentFile());
+            FileUtils.deleteDirectory(this.clonedWorkspace.getParentFile());
         }
         catch (IOException e) {
-            System.out.println("Could not delete dead workspace:\n" + clonedWorkspace.getParentFile().getAbsolutePath());
+            System.out.println("Could not delete dead workspace:\n" + this.clonedWorkspace.getParentFile().getAbsolutePath());
         }
     }
 

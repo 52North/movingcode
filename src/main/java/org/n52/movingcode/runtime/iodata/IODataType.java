@@ -81,8 +81,7 @@ public enum IODataType {
             return IODataType.INTEGER;
         }
 
-        else
-            return null;
+        return null;
     }
 
     public static IODataType findType(InputDescriptionType wpsInput) {
@@ -95,17 +94,14 @@ public enum IODataType {
         if (wpsInput.isSetComplexData()) {
             return IODataType.MEDIA;
         }
-        else {
-            if (wpsInput.isSetBoundingBoxData()) {
-                // TODO not implemented
-            }
-            if (wpsInput.isSetLiteralData()) {
-                return findDataType(wpsInput.getLiteralData().getDataType());
-            }
-            else {
-                return null; // should not occur, but who knows ...
-            }
+
+        if (wpsInput.isSetBoundingBoxData()) {
+            // TODO not implemented
         }
+        if (wpsInput.isSetLiteralData()) {
+            return findDataType(wpsInput.getLiteralData().getDataType());
+        }
+        return null; // should not occur, but who knows ...
     }
 
     public static IODataType findType(OutputDescriptionType wpsOutput) {
@@ -118,16 +114,12 @@ public enum IODataType {
         if (wpsOutput.isSetComplexOutput()) {
             return IODataType.MEDIA;
         }
-        else {
-            if (wpsOutput.isSetBoundingBoxOutput()) {
-                // TODO not implemented
-            }
-            if (wpsOutput.isSetLiteralOutput()) {
-                return findDataType(wpsOutput.getLiteralOutput().getDataType());
-            }
-            else {
-                return null; // should not occur, but who knows ...
-            }
+        if (wpsOutput.isSetBoundingBoxOutput()) {
+            // TODO not implemented
         }
+        if (wpsOutput.isSetLiteralOutput()) {
+            return findDataType(wpsOutput.getLiteralOutput().getDataType());
+        }
+        return null; // should not occur, but who knows ...
     }
 }

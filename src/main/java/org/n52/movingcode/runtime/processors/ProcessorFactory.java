@@ -88,10 +88,7 @@ public class ProcessorFactory {
                                  mcPackage,
                                  getProcessorProperties(processorID));
         }
-        else {
-            return null; // if no suitable processor was found
-        }
-
+        return null; // if no suitable processor was found
     }
 
     public static synchronized ProcessorFactory getInstance() {
@@ -105,28 +102,28 @@ public class ProcessorFactory {
      * Load configuration from the config file.
      */
     private void initConfig() {
-        supportedContainers = new HashMap<String, String[]>();
-        scratchworkspaceMap = new HashMap<String, File>();
-        processorProperties = new HashMap<String, PropertyMap>();
+        this.supportedContainers = new HashMap<String, String[]>();
+        this.scratchworkspaceMap = new HashMap<String, File>();
+        this.processorProperties = new HashMap<String, PropertyMap>();
 
         try {
             ProcessorsDocument processors = ProcessorConfig.getInstance().getConfig();
 
             // deal with defaults
-            defaultWorkspace = processors.getProcessors().getDefaults().getTempWorkspace();
-            availablePlatforms = processors.getProcessors().getDefaults().getAvailablePlatformArray();
+            this.defaultWorkspace = processors.getProcessors().getDefaults().getTempWorkspace();
+            this.availablePlatforms = processors.getProcessors().getDefaults().getAvailablePlatformArray();
 
             // deal with individual processors
             for (ProcessorType processor : processors.getProcessors().getProcessorArray()) {
-                supportedContainers.put(processor.getId(), processor.getSupportedContainerArray());
+                this.supportedContainers.put(processor.getId(), processor.getSupportedContainerArray());
                 if (processor.isSetTempWorkspace()) {
                     File scratchWS = new File(processor.getTempWorkspace());
                     scratchWS.mkdirs(); // TODO check retval
-                    scratchworkspaceMap.put(processor.getId(), scratchWS);
+                    this.scratchworkspaceMap.put(processor.getId(), scratchWS);
                 }
                 else {
-                    File scratchWS = new File(defaultWorkspace);
-                    scratchworkspaceMap.put(processor.getId(), scratchWS);
+                    File scratchWS = new File(this.defaultWorkspace);
+                    this.scratchworkspaceMap.put(processor.getId(), scratchWS);
                 }
 
                 PropertyMap pMap = new PropertyMap();
@@ -135,7 +132,7 @@ public class ProcessorFactory {
                     pMap.put(property.getKey(), property.getValue());
                 }
 
-                processorProperties.put(processor.getId(), pMap);
+                this.processorProperties.put(processor.getId(), pMap);
             }
 
         }
@@ -218,7 +215,7 @@ public class ProcessorFactory {
      * @return Array of {@link String} containing the IDs of the registered processors.
      */
     public String[] registeredProcessors() {
-        return supportedContainers.keySet().toArray(new String[supportedContainers.keySet().size()]);
+        return this.supportedContainers.keySet().toArray(new String[this.supportedContainers.keySet().size()]);
     }
 
     /**
@@ -227,7 +224,7 @@ public class ProcessorFactory {
      * @return Array of {@link String} containing the IDs of the registered platforms.
      */
     public String[] getAvailablePlatforms() {
-        return availablePlatforms;
+        return this.availablePlatforms;
     }
 
     /**
@@ -235,7 +232,7 @@ public class ProcessorFactory {
      * @return {@link File} scatchworkspace assigned to a processor class
      */
     public File getScratchworkspace(String processorID) {
-        return scratchworkspaceMap.get(processorID);
+        return this.scratchworkspaceMap.get(processorID);
     }
 
     /**
@@ -245,7 +242,7 @@ public class ProcessorFactory {
      * @return {@link PropertyMap}
      */
     public PropertyMap getProcessorProperties(String processorID) {
-        return processorProperties.get(processorID);
+        return this.processorProperties.get(processorID);
     }
 
     /**
@@ -303,14 +300,14 @@ public class ProcessorFactory {
 
             // platforms defined using attribute syntax
             if (currentPlatform.isSetPlatformId()) {
-                if (needleInHaystack(availablePlatforms, currentPlatform.getPlatformId())) {
+                if (needleInHaystack(this.availablePlatforms, currentPlatform.getPlatformId())) {
                     inPlace = true;
                     break;
                 }
             }
 
             // platforms defined by the array
-            if (allNeedlesInHaystack(availablePlatforms, currentPlatform.getRequiredRuntimeComponentArray())) {
+            if (allNeedlesInHaystack(this.availablePlatforms, currentPlatform.getRequiredRuntimeComponentArray())) {
                 inPlace = true;
                 break;
             }
@@ -324,8 +321,8 @@ public class ProcessorFactory {
 
         // 2. return a processor that supports the particular container
         // if no processor supports this container return null
-        for (String currentID : supportedContainers.keySet()) {
-            if (needleInHaystack(supportedContainers.get(currentID), requiredContainer)) {
+        for (String currentID : this.supportedContainers.keySet()) {
+            if (needleInHaystack(this.supportedContainers.get(currentID), requiredContainer)) {
                 // return first applicable processor
                 return currentID;
             }

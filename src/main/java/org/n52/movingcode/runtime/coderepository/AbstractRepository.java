@@ -50,44 +50,44 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public boolean providesFunction(String functionID) {
-		return fIDpID_Lookup.containsKey(functionID);
+		return this.fIDpID_Lookup.containsKey(functionID);
 	}
 
 	@Override
 	public boolean containsPackage(String packageID) {
-		return packages.containsKey(packageID);
+		return this.packages.containsKey(packageID);
 	}
 
 	@Override
 	public String[] getFunctionIDs() {
-		return fIDpID_Lookup.keySet().toArray(new String[fIDpID_Lookup.keySet().size()]);
+		return this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
 	}
 
 	@Override
 	public String[] getPackageIDs() {
-		return packages.keySet().toArray(new String[packages.keySet().size()]);
+		return this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
 	}
 	
     @Override
     public MovingCodePackage getPackage(String packageID) {
-    	return packages.get(packageID);
+    	return this.packages.get(packageID);
     }
 
     @Override
     public Date getPackageTimestamp(String packageID) {
-    	return packages.get(packageID).getTimestamp();
+    	return this.packages.get(packageID).getTimestamp();
     }
 
     @Override
     public PackageDescriptionDocument getPackageDescription(String packageID) {
-    	return packages.get(packageID).getDescription();
+    	return this.packages.get(packageID).getDescription();
     }
     
     @Override
     public MovingCodePackage getPackageByFunction(String functionID){
-    	Collection<String> packageIDs = fIDpID_Lookup.get(functionID);
+    	Collection<String> packageIDs = this.fIDpID_Lookup.get(functionID);
     	if (packageIDs.size() > 0){
-    		return packages.get(packageIDs.iterator().next());
+    		return this.packages.get(packageIDs.iterator().next());
     	} else {
     		return null;
     	}
