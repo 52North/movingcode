@@ -97,7 +97,7 @@ public final class GeoprocessingFeed {
             // check if there is a candidate entry with the same ID
             if (candidateIDs.contains(currentEntry.getIdentifier())) {
                 // merge candidate entry into existing entry
-                currentEntry.mergeWith(candidateEntries.get(currentEntry.getIdentifier()));
+                currentEntry.updateWith(candidateEntries.get(currentEntry.getIdentifier()));
             }
         }
 
@@ -113,17 +113,23 @@ public final class GeoprocessingFeed {
         this.updateFeedTimestamp();
     }
 
-    /*
-     * Returns an Array of Entries. This is a snapshot of the available entries present at the time the method
+
+    /**
+     * Returns an Array of Feed Entries. This is a snapshot of the available entries present at the time the method
      * was called. Changes in the feed are not propagated to this array.
+     * 
+     * @return Array of {@link Entry}
      */
     public Entry[] getEntries() {
         return feed.getEntries().toArray(new Entry[feed.getEntries().size()]);
     }
 
-    /*
+    /**
      * Write this feed to the given output stream. Might throw an exception if the output stream signals an IO
      * Exception.
+     * 
+     * @param os {@link OutputStream}
+     * @throws IOException {@link IOException}
      */
     public void write(OutputStream os) throws IOException {
         Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
@@ -132,7 +138,7 @@ public final class GeoprocessingFeed {
         // feed.writeTo(os);
     }
 
-    /*
+    /**
      * checks all update timestamps of the feed entries and sets a new update timestamp for the whole feed.
      */
     private final void updateFeedTimestamp() {

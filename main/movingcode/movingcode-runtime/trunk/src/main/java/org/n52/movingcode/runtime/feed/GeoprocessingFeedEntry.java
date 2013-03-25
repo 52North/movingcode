@@ -21,9 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-/**
- * 
- */
 
 package org.n52.movingcode.runtime.feed;
 
@@ -35,10 +32,16 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Link;
+import org.apache.log4j.Logger;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 /**
+ * This class represents an entry in a GeoprocessingFeed. 
+ * 
+ * TODO: implements {@link Entry} ?
+ * TODO: Make use of Atom license extension --> http://tools.ietf.org/html/rfc4946
+ * 
  * @author Matthias Mueller, TU Dresden
  * 
  */
@@ -49,11 +52,28 @@ public final class GeoprocessingFeedEntry {
     public static final String PACKAGE_DESCRIPTION_MIMETYPE = "text/xml";
     public static final String PACKAGE_LINK_REL = "enclosure";
     public static final String DETAILED_DESCRIPTION_LINK_REL = "alternate";
-
+    
+    static Logger logger = Logger.getLogger(GeoprocessingFeedEntry.class);
+    
+    /**
+     * Creates a new entry from an existing entry. Both entries share the same content.
+     * If one of them is changed, the changes are propagated to its twin. 
+     * 
+     * @param entry
+     */
     public GeoprocessingFeedEntry(Entry entry) {
         this.entry = entry;
     }
-
+    
+    /**
+     * Constructor for a brand new GeoprocessingFeedEntry.
+     * 
+     * 
+     * @param packageDesc {@link PackageDescriptionDocument} - the packageDescription
+     * @param creationDate {@link Date} - the creation Date of the new entry.
+     * @param packageURL {@link String} - a URL from which the zipped content of the package can be retrieved
+     * @param descriptionURL {@link String} - a URL that links to additional documentation of the package contents
+     */
     public GeoprocessingFeedEntry(PackageDescriptionDocument packageDesc,
                                   Date creationDate,
                                   String packageURL,
@@ -103,35 +123,70 @@ public final class GeoprocessingFeedEntry {
         }
 
     }
-
+    
+    /**
+     * Returns the identifier of this entry.
+     * 
+     * @return {@link String}
+     */
     public String getIdentifier() {
         return entry.getId().toString();
     }
-
+    
+    /**
+     * Returns the publication date of this entry.
+     * 
+     * @return {@link Date}
+     */
     public Date getPublished() {
         return entry.getPublished();
     }
-
+    
+    /**
+     * Returns the last modified date of this entry.
+     * 
+     * @return {@link Date}
+     */
     public Date getUpdated() {
         return entry.getUpdated();
     }
-
+    
+    /**
+     * Return the general atom representation of this entry.
+     * 
+     * @return {@link Entry}
+     */
     public Entry getAtomEntry() {
         return this.entry;
     }
-
+    
+    /**
+     * private static method to create a blank {@link Entry}
+     * 
+     * @return {@link Entry}
+     */
     private static Entry makeNewEntry() {
         return Abdera.getInstance().newEntry();
     }
-
-    public void mergeWith(GeoprocessingFeedEntry otherEntry) {
+    
+    /**
+     * Updates this entry with the contents of a newer one.
+     * Procedure is as follows:
+     * 
+     * If the otherEntry is newer:
+     * 1. its contents will be copied to this entry
+     * 2. the old publication date will be kept
+     * 
+     * @param otherEntry {@link GeoprocessingFeedEntry}
+     */
+    public void updateWith(GeoprocessingFeedEntry otherEntry) {
         // check if other entry is newer
         if (otherEntry.getUpdated().after(this.entry.getUpdated())) {
             // replace with newer entry but keep old PublishedDate
             Date published = this.getPublished();
             this.entry = otherEntry.getAtomEntry();
             this.entry.setPublished(published);
-            System.out.println("Updating feed entry for: " + this.getIdentifier());
+            logger.info("Updating feed entry for: " + this.getIdentifier());
         }
         // if it is not newer - just keep the old one!
     }
@@ -142,7 +197,14 @@ public final class GeoprocessingFeedEntry {
     // content.setSrc(packageURL);
     // return content;
     // }
-
+    
+    /**
+     * Static helper method that creates an Atom {@link Link} object from
+     * a given package URL. 
+     * 
+     * @param packageURL {@link String} - the package URL
+     * @return {@link Link}
+     */
     private static final Link makePackageLink(String packageURL) {
         Link link = Abdera.getInstance().getFactory().newLink();
         link.setHref(packageURL);
@@ -150,7 +212,14 @@ public final class GeoprocessingFeedEntry {
         link.setRel(PACKAGE_LINK_REL);
         return link;
     }
-
+    
+    /**
+     * Static helper method that creates an Atom {@link Link} object from
+     * a given description URL. 
+     * 
+     * @param descriptionURL {@link String} - the package description URL
+     * @return {@link Link}
+     */
     private static Link makePackageDescriptionLink(String descriptionURL) {
         Link link = Abdera.getInstance().getFactory().newLink();
         link.setHref(descriptionURL);
@@ -159,8 +228,12 @@ public final class GeoprocessingFeedEntry {
         return link;
     }
 
-    /*
-     * generates a human-readable description from a PackageDescriptionDocument TODO: implement!
+    /**
+     * Generates a human-readable description from a PackageDescriptionDocument.
+     * This description is return as an Atom content object.
+     * 
+     * @param wpsDesc {@link ProcessDescriptionType}
+     * @return {@link Content}
      */
     private static Content generateHTMLContent(final ProcessDescriptionType wpsDesc) {
         Content content = Abdera.getInstance().getFactory().newContent(Content.Type.HTML);
