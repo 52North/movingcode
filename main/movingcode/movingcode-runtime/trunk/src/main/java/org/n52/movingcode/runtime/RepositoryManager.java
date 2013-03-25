@@ -106,17 +106,17 @@ public class RepositoryManager {
 	}
 
 	/**
-	 * Finds you a package for a given identifier. This method will return the first Package matching this
+	 * Finds you a package for a given function identifier. This method will return the first Package matching this
 	 * identifier. To check for multiple occurrences of the same identifier call
 	 * {@link RepositoryManager#checkMultiplicityOfPackage(String)}
 	 * 
 	 * @param functionalIdentifier
 	 * @return {@link MovingCodePackage}
 	 */
-	public MovingCodePackage getPackage(String functionalIdentifier) {
+	public MovingCodePackage getPackage(String functionIdentifier) {
 		for (MovingCodeRepository repo : repositories.values()) {
-			if (repo.containsPackage(functionalIdentifier)) {
-				return repo.getPackage(functionalIdentifier);
+			if (repo.containsPackage(functionIdentifier)) {
+				return repo.getPackage(functionIdentifier);
 			}
 		}
 		return null;
@@ -163,7 +163,7 @@ public class RepositoryManager {
 	public String[] getProcessIDs() {
 		ArrayList<String> retval = new ArrayList<String>();
 		for (MovingCodeRepository repo : repositories.values()) {
-			retval.addAll(Arrays.asList(repo.getFunctionalIDs()));
+			retval.addAll(Arrays.asList(repo.getFunctionIDs()));
 		}
 		return retval.toArray(new String[retval.size()]);
 	}
