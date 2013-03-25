@@ -13,6 +13,12 @@ import java.util.HashMap;
  */
 public class RepositoryUtils {
 	
+	// HTTP-URI prefix
+	private static final String httpPrefix = "http://";
+	
+	// strings that shall be replaces by File.separator
+	private static final String[] separatorReplacements = {":/", ":\\", "\\"};
+	
 	/**
 	 * Conversion method that creates a new {@link LocalZipPackageRepository} repository from any given {@link IMovingCodeRepository}.
 	 * Automatically attempts to create the targetDirectory if it does not exist.
@@ -36,32 +42,48 @@ public class RepositoryUtils {
 		
 		// get contents of old repository
 		String[] sourcePackageIDs = sourceRepo.getPackageIDs();
-		
-		// analyze IDs
-		
-		// 1. guess common root
-		
-		// 2. guess folder structure (based on PackageID String)
-		
-		/**
-		 * http://stackoverflow.com/questions/1005551/construct-a-tree-structure-from-list-of-string-paths
-		 */
-		
-		// or:
-		
-		// simply split up the ID at path separators
-		
+				
 		// HashMap<sourcePackageID, targetPackageID> (latter is a short ID)
 		HashMap<String, String> targetIDs = new HashMap<String, String>();
 		
-		
-		// HashMap<sourcePackageID, targetFolder>
-		HashMap<String, File> targetFolders = new HashMap<String, File>();
+		//
+		for (String currentSourceID : sourcePackageIDs){
+			
+			// 1. clone ID
+			String targetID = new String(currentSourceID);
+			
+			
+			// 2. remove http prefix
+			if (targetID.startsWith(httpPrefix)){
+				targetID = targetID.substring(httpPrefix.length());
+			}
+			
+			// 3. replace invalid char sequences with File.separator
+			for (String sequence : separatorReplacements){
+				targetID = targetID.replaceAll(sequence, File.separator);
+			}
+			
+			// 4. remove consecutive occurrences of File.separator
+			targetID = removeConsecutiveFileSeparator(targetID);
+			
+			// 5. remove leading File.separator
+			if (targetID.startsWith(File.separator)){
+				targetID = targetID.substring(File.separator.length());
+			}
+			
+			// 6. store in map
+			targetIDs.put(currentSourceID, targetID);
+			
+		}
 		
 
 		// for each package: dump into correct folder
 		for (String currentSourceID : sourcePackageIDs){
-			File targetFolder = targetFolders.get(currentSourceID);
+			
+			// assemble absolute directory path for the package 
+			String absTargetPath = targetDirectory.getAbsolutePath() + File.separator + targetIDs.get(currentSourceID);
+			File targetFolder = new File (absTargetPath);
+			
 			if (!targetFolder.exists()){
 				targetFolder.createNewFile();
 			}
@@ -70,8 +92,32 @@ public class RepositoryUtils {
 			sourceRepo.getPackage(currentSourceID).dumpPackage(zipFile); // dumpPackage creates the file automatically
 		}
 		
-		// return new Repo for the folder
+		// return new Repo for the @param targetDirectory
 		return new LocalZipPackageRepository(targetDirectory);
+	}
+	
+	/**
+	 * Remove consecutive occurrences of file separator character in s
+	 * 
+	 * @param s the string to parse.
+	 * @return s without consecutive occurrences of file separator character
+	 */
+	private static String removeConsecutiveFileSeparator(String s) {
+		StringBuffer res = new StringBuffer();
+		boolean previousWasFileSep = false;
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if (c == File.separatorChar) {
+				if (!previousWasFileSep) {
+					res.append(c);
+					previousWasFileSep = true;
+				}
+			} else {
+				previousWasFileSep = false;
+				res.append(c);
+			}
+		}
+		return res.toString();
 	}
 	
 }
