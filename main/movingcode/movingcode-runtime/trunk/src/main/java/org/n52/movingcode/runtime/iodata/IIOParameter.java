@@ -209,9 +209,7 @@ public interface IIOParameter extends List {
             if (this.seqVal == -1) {
                 return IDType.NAMED;
             }
-            else {
-                return IDType.SEQUENTIAL;
-            }
+            return IDType.SEQUENTIAL;
         }
 
         public String getHarmonizedValue() {
@@ -242,9 +240,7 @@ public interface IIOParameter extends List {
                 if (id.getHarmonizedValue().equalsIgnoreCase(this.getHarmonizedValue())) {
                     return true;
                 }
-                else {
-                    return false;
-                }
+                return false;
             }
             catch (Exception e) {
                 return false;
@@ -270,10 +266,13 @@ public interface IIOParameter extends List {
             if ( !this.getType().equals(IDType.SEQUENTIAL)) {
                 return compare(this.seqVal, otherID.seqVal);
             }
-            else {
-                return this.stringValue.compareTo(otherID.stringValue);
-            }
 
+            return this.stringValue.compareTo(otherID.stringValue);
+        }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode();
         }
 
         private static int compare(int x, int y) {

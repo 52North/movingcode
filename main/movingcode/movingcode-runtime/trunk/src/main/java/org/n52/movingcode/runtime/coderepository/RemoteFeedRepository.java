@@ -1,3 +1,4 @@
+
 package org.n52.movingcode.runtime.coderepository;
 
 import java.io.IOException;
@@ -5,18 +6,20 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.abdera.model.Entry;
+import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeedEntry;
-
 
 /**
  * This class implements an {@link IMovingCodeRepository} for Remote Geoprocessing Feeds
  * 
  * @author Matthias Mueller, TU Dresden
- *
+ * 
  */
-public final class RemoteFeedRepository extends AbstractRepository implements IMovingCodeRepository{
+public final class RemoteFeedRepository extends AbstractRepository {
+
+    static Logger logger = Logger.getLogger(RemoteFeedRepository.class);
 
     /**
      * 
@@ -24,12 +27,14 @@ public final class RemoteFeedRepository extends AbstractRepository implements IM
      * entries. Then attempts to interpret the entries as MovingCodePackages. Packages that do not validate
      * will be ignored
      * 
-     * @param atomFeedURL {@link URL} - Direct HTTP link to the Geoprocessing Feed.
+     * @param atomFeedURL
+     *        {@link URL} - Direct HTTP link to the Geoprocessing Feed.
      * 
      */
     public RemoteFeedRepository(final URL atomFeedURL) {
+        InputStream stream = null;
         try {
-            InputStream stream = atomFeedURL.openStream();
+            stream = atomFeedURL.openStream();
             GeoprocessingFeed feed = new GeoprocessingFeed(stream);
 
             for (Entry entry : feed.getEntries()) {
@@ -49,11 +54,20 @@ public final class RemoteFeedRepository extends AbstractRepository implements IM
                 }
             }
 
+            stream.close();
         }
         catch (IOException e) {
             System.err.println("Could read feed from URL: " + atomFeedURL);
         }
+        finally {
+            if (stream != null)
+                try {
+                    stream.close();
+                }
+                catch (IOException e) {
+                    logger.error("Could not close GeoprocessingFeed stream.", e);
+                }
+        }
     }
-	
 
 }

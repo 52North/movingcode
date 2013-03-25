@@ -6,6 +6,12 @@
  * Automatically generated - do not modify.
  */
 package org.n52.movingcode.runtime.processorconfig.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.xmlbeans.XmlAnyURI;
+
 /**
  * An XML defaultsType(@http://52north.org/movingcode/runtime/processorconfig).
  *
@@ -137,7 +143,7 @@ public class DefaultsTypeImpl extends org.apache.xmlbeans.impl.values.XmlComplex
         synchronized (monitor())
         {
             check_orphaned();
-            java.util.List targetList = new java.util.ArrayList();
+            List<XmlAnyURI> targetList = new ArrayList<XmlAnyURI>();
             get_store().find_all_element_users(AVAILABLEPLATFORM$2, targetList);
             org.apache.xmlbeans.XmlAnyURI[] result = new org.apache.xmlbeans.XmlAnyURI[targetList.size()];
             targetList.toArray(result);
@@ -159,7 +165,7 @@ public class DefaultsTypeImpl extends org.apache.xmlbeans.impl.values.XmlComplex
             {
                 throw new IndexOutOfBoundsException();
             }
-            return (org.apache.xmlbeans.XmlAnyURI)target;
+            return target;
         }
     }
     

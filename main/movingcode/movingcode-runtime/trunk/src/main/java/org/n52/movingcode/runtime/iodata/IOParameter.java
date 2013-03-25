@@ -85,11 +85,11 @@ public class IOParameter extends ArrayList implements IIOParameter {
 
         // 1. set identifier
         if (exParam.isSetPositionID()) {
-            identifier = new ParameterID(exParam.getPositionID());
+            this.identifier = new ParameterID(exParam.getPositionID());
         }
         else {
             if (exParam.isSetStringID()) {
-                identifier = new ParameterID(exParam.getStringID());
+                this.identifier = new ParameterID(exParam.getStringID());
             }
             else {
                 throw new IllegalArgumentException("Legacy Identifier missing.");
@@ -98,60 +98,60 @@ public class IOParameter extends ArrayList implements IIOParameter {
 
         // 2. set message InputID (without verification)
         if (exParam.isSetFunctionalInputID()) {
-            messageInputID = exParam.getFunctionalInputID();
+            this.messageInputID = exParam.getFunctionalInputID();
         }
         else {
-            messageInputID = null;
+            this.messageInputID = null;
         }
 
         // 3. set message OutputID (without verification)
         if (exParam.isSetFunctionalOutputID()) {
-            messageOutputID = exParam.getFunctionalOutputID();
+            this.messageOutputID = exParam.getFunctionalOutputID();
         }
         else {
-            messageOutputID = null;
+            this.messageOutputID = null;
         }
 
         // 4. set prefix, suffix, separator
         if (exParam.isSetPrefixString()) {
-            prefix = exParam.getPrefixString();
+            this.prefix = exParam.getPrefixString();
         }
         else
-            prefix = "";
+            this.prefix = "";
         if (exParam.isSetSuffixString()) {
-            suffix = exParam.getSuffixString();
+            this.suffix = exParam.getSuffixString();
         }
         else
-            suffix = "";
+            this.suffix = "";
         if (exParam.isSetSeparatorString()) {
-            separator = exParam.getSeparatorString();
+            this.separator = exParam.getSeparatorString();
         }
         else
-            separator = "";
+            this.separator = "";
 
         // 5. set min/max Multiplicity
         // and 6. supported type
         if (wpsInput != null) {
-            minMultiplicity = wpsInput.getMinOccurs().intValue();
-            maxMultiplicity = wpsInput.getMaxOccurs().intValue();
-            supportedType = IODataType.findType(wpsInput);
+            this.minMultiplicity = wpsInput.getMinOccurs().intValue();
+            this.maxMultiplicity = wpsInput.getMaxOccurs().intValue();
+            this.supportedType = IODataType.findType(wpsInput);
         }
         else {
             if (wpsOutput != null) {
-                minMultiplicity = 0;
-                maxMultiplicity = 1;
-                supportedType = IODataType.findType(wpsOutput);
+                this.minMultiplicity = 0;
+                this.maxMultiplicity = 1;
+                this.supportedType = IODataType.findType(wpsOutput);
             }
             else {
                 // should not occur
-                minMultiplicity = 0;
-                maxMultiplicity = 0;
-                supportedType = null;
+                this.minMultiplicity = 0;
+                this.maxMultiplicity = 0;
+                this.supportedType = null;
             }
         }
 
         // 7. set mandatoryExecution
-        mandatoryForExecution = !exParam.isSetOptional();
+        this.mandatoryForExecution = !exParam.isSetOptional();
     }
 
     /*
@@ -160,7 +160,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#getType()
      */
     public IODataType getType() {
-        return supportedType;
+        return this.supportedType;
     }
 
     /*
@@ -171,7 +171,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * movingcode.iodata.IODataType)
      */
     public boolean supportsType(IODataType type) {
-        return supportedType == type;
+        return this.supportedType == type;
     }
 
     /*
@@ -180,7 +180,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#getMinMultiplicity()
      */
     public int getMinMultiplicity() {
-        return minMultiplicity;
+        return this.minMultiplicity;
     }
 
     /*
@@ -189,7 +189,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#getMaxMultiplicity()
      */
     public int getMaxMultiplicity() {
-        return maxMultiplicity;
+        return this.maxMultiplicity;
     }
 
     /*
@@ -198,7 +198,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#getIdentifier()
      */
     public ParameterID getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     /*
@@ -207,7 +207,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#getMessageInputIdentifier()
      */
     public String getMessageInputIdentifier() {
-        return messageInputID;
+        return this.messageInputID;
     }
 
     /*
@@ -216,7 +216,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#getMessageOutputIdentifier()
      */
     public String getMessageOutputIdentifier() {
-        return messageOutputID;
+        return this.messageOutputID;
     }
 
     /*
@@ -225,7 +225,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#isMessageIn()
      */
     public boolean isMessageIn() {
-        return messageInputID != null && !messageInputID.equalsIgnoreCase("");
+        return this.messageInputID != null && !this.messageInputID.equalsIgnoreCase("");
     }
 
     /*
@@ -234,7 +234,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#isMessageOut()
      */
     public boolean isMessageOut() {
-        return messageOutputID != null && !messageOutputID.equalsIgnoreCase("");
+        return this.messageOutputID != null && !this.messageOutputID.equalsIgnoreCase("");
     }
 
     /*
@@ -243,7 +243,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#isMandatoryMessage()
      */
     public boolean isMandatoryMessage() {
-        return minMultiplicity > 0;
+        return this.minMultiplicity > 0;
     }
 
     /*
@@ -252,7 +252,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#isMandatoryForExecution()
      */
     public boolean isMandatoryForExecution() {
-        return mandatoryForExecution;
+        return this.mandatoryForExecution;
     }
 
     /*
@@ -261,7 +261,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * @see de.tudresden.gis.geoprocessing.movingcode.iodata.IData#isSequential()
      */
     public boolean isSequential() {
-        return identifier.getType() == ParameterID.IDType.SEQUENTIAL;
+        return this.identifier.getType() == ParameterID.IDType.SEQUENTIAL;
     }
 
     /*
@@ -271,8 +271,8 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * movingcode.iodata.IODataID)
      */
     public String printPrefix() {
-        if (prefix != null) {
-            return prefix;
+        if (this.prefix != null) {
+            return this.prefix;
         }
         else
             return "";
@@ -285,8 +285,8 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * movingcode.iodata.IODataID)
      */
     public String printSuffix() {
-        if (suffix != null) {
-            return suffix;
+        if (this.suffix != null) {
+            return this.suffix;
         }
         else
             return "";
@@ -300,8 +300,8 @@ public class IOParameter extends ArrayList implements IIOParameter {
      * .movingcode.iodata.IODataID)
      */
     public String printSeparator() {
-        if (separator != null) {
-            return separator;
+        if (this.separator != null) {
+            return this.separator;
         }
         else
             return "";
@@ -322,7 +322,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
         }
 
         // check if multiplicity matches the given constraints
-        return (this.size() >= minMultiplicity && this.size() <= maxMultiplicity);
+        return (this.size() >= this.minMultiplicity && this.size() <= this.maxMultiplicity);
     }
 
     /*
@@ -372,8 +372,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
         if (this.supportsValue(e)) {
             return super.add(e);
         }
-        else
-            return false;
+        return false;
     }
 
     @Override
@@ -384,7 +383,7 @@ public class IOParameter extends ArrayList implements IIOParameter {
         else
             throw new IllegalArgumentException("Adding object of class " + element.getClass().getCanonicalName()
                     + " is not allowed.\nParameter type was defined as "
-                    + supportedType.getSupportedClass().getCanonicalName());
+                    + this.supportedType.getSupportedClass().getCanonicalName());
     }
 
     @Override

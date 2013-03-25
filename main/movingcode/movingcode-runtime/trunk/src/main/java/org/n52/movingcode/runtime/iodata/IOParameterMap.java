@@ -51,7 +51,7 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
 
         // retrieve functional description types
         FunctionalDescriptionsListType funcDescArray = mcp.getDescription().getPackageDescription().getContractedFunctionality();
-        isWPSdescription = funcDescArray.isSetWpsProcessDescription();
+        this.isWPSdescription = funcDescArray.isSetWpsProcessDescription();
 
         // create input index
         Map<String, InputDescriptionType> inputs = new HashMap<String, InputDescriptionType>();
@@ -66,9 +66,9 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
         }
 
         // initialize lookup
-        messageIDparamID_lookup = new HashMap<String, ParameterID>();
+        this.messageIDparamID_lookup = new HashMap<String, ParameterID>();
 
-        if (isWPSdescription) {
+        if (this.isWPSdescription) {
             for (ExecutionParameterType param : mcp.getDescription().getPackageDescription().getWorkspace().getExecutionParameters().getParameterArray()) {
                 IOParameter exItem = new IOParameter(param,
                                                      inputs.get(param.isSetFunctionalInputID() ? param.getFunctionalInputID()
@@ -81,10 +81,10 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
 
                 // create a lookup entry
                 if (exItem.getMessageInputIdentifier() != null) {
-                    messageIDparamID_lookup.put(exItem.getMessageInputIdentifier(), exItem.getIdentifier());
+                    this.messageIDparamID_lookup.put(exItem.getMessageInputIdentifier(), exItem.getIdentifier());
                 }
                 if (exItem.getMessageOutputIdentifier() != null) {
-                    messageIDparamID_lookup.put(exItem.getMessageOutputIdentifier(), exItem.getIdentifier());
+                    this.messageIDparamID_lookup.put(exItem.getMessageOutputIdentifier(), exItem.getIdentifier());
                 }
 
             }
@@ -96,7 +96,7 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
 
     @Override
     public void putAll(Map map) {
-        super.putAll((IOParameterMap) map);
+        super.putAll(map);
     }
 
     /**
@@ -112,8 +112,7 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
         if (this.keySet().contains(identifier)) {
             return (this.get(identifier)).add(data);
         }
-        else
-            return false;
+        return false;
     }
 
     /**
@@ -126,37 +125,31 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
      */
     public boolean removeData(ParameterID identifier, Object data) {
         if (this.keySet().contains(identifier)) {
-            return ((IOParameter) this.get(identifier)).remove(data);
+            return this.get(identifier).remove(data);
         }
-        else
-            return false;
+        return false;
     }
 
     public boolean addData(String messageID, Object data) {
         // lookup paramID for messageID
-        ParameterID id = messageIDparamID_lookup.get(messageID);
+        ParameterID id = this.messageIDparamID_lookup.get(messageID);
 
         // add data
         if (id != null) {
             return addData(id, data);
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     public boolean removeData(String messageID, Object data) {
         // lookup paramID for messageID
-        ParameterID id = messageIDparamID_lookup.get(messageID);
+        ParameterID id = this.messageIDparamID_lookup.get(messageID);
 
         // remove data
         if (id != null) {
             return removeData(id, data);
         }
-        else {
-            return false;
-        }
-
+        return false;
     }
 
 }

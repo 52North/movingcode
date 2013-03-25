@@ -41,7 +41,7 @@ public class FeedTemplate {
     }
 
     public String getFeedTitle() {
-        return feedTitle;
+        return this.feedTitle;
     }
 
     public void setFeedSubtitle(String feedSubtitle) {
@@ -49,7 +49,7 @@ public class FeedTemplate {
     }
 
     public String getFeedSubtitle() {
-        return feedSubtitle;
+        return this.feedSubtitle;
     }
 
     public void setFeedAuthorName(String feedAuthorName) {
@@ -57,7 +57,7 @@ public class FeedTemplate {
     }
 
     public String getFeedAuthorName() {
-        return feedAuthorName;
+        return this.feedAuthorName;
     }
 
     public void setFeedAuthorEmail(String feedAuthorEmail) {
@@ -65,15 +65,15 @@ public class FeedTemplate {
     }
 
     public String getFeedAuthorEmail() {
-        return feedAuthorEmail;
+        return this.feedAuthorEmail;
     }
 
     public String getFeedURL() {
-        return feedURL;
+        return this.feedURL;
     }
 
     public String getID() {
-        return feedURL;
+        return this.feedURL;
     }
 
 }

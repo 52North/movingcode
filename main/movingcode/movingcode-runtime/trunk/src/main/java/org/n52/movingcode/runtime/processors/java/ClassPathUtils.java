@@ -50,9 +50,8 @@ final class ClassPathUtils {
         catch (Throwable t) {
             t.printStackTrace();
             System.err.println("Could not add JAR to system classloader: " + jarPath);
-
         }
-
+        
         Thread.currentThread().setContextClassLoader(sysloader);
 
     }

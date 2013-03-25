@@ -80,7 +80,7 @@ public class DefaultPackageRepository {
 	 * @return a package {@link MovingCodePackage}
 	 */
 	protected MovingCodePackage retrievePackage(String packageID) {
-		return packages.get(packageID);
+		return this.packages.get(packageID);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class DefaultPackageRepository {
 	 * @return boolean - returns true if this repository instance contains a suitable package for a given functional ID, false otherwise.
 	 */
 	public boolean providesFunction(String functionalID) {
-		return fIDpID_Lookup.containsKey(functionalID);
+		return this.fIDpID_Lookup.containsKey(functionalID);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class DefaultPackageRepository {
 	 * @return boolean - true if a package with the given ID is provided by this repository.
 	 */
 	public boolean containsPackage(String packageID) {
-		return packages.containsKey(packageID);
+		return this.packages.containsKey(packageID);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class DefaultPackageRepository {
 	 * this method again.
 	 */
 	public String[] getFunctionalIDs() {
-		return fIDpID_Lookup.keySet().toArray(new String[fIDpID_Lookup.keySet().size()]);
+		return this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
 	}
 
 	/**
@@ -121,6 +121,6 @@ public class DefaultPackageRepository {
 	 * @return Array of packageIDs {@link String}
 	 */
 	public String[] getPackageIDs() {
-		return packages.keySet().toArray(new String[packages.keySet().size()]);
+		return this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
 	}
 }

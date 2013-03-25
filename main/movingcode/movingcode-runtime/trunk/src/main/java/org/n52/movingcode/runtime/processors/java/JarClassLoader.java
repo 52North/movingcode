@@ -53,16 +53,12 @@ class JarClassLoader extends URLClassLoader {
         this.url = url;
     }
 
-    // if (exFile.exists()){
-    // JarClassLoader cl = new JarClassLoader(exFile.toURI().toURL());
-    // }
-
     /**
      * Returns the name of the jar file main class, or null if no "Main-Class" manifest attributes was
      * defined.
      */
     public String getMainClassName() throws IOException {
-        URL u = new URL("jar", "", url + "!/");
+        URL u = new URL("jar", "", this.url + "!/");
         JarURLConnection uc = (JarURLConnection) u.openConnection();
         Attributes attr = uc.getMainAttributes();
         return attr != null ? attr.getValue(Attributes.Name.MAIN_CLASS) : null;

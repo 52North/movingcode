@@ -53,32 +53,32 @@ public final class GeoprocessingFeed {
     public GeoprocessingFeed(InputStream atomStream) {
         Parser parser = Abdera.getInstance().getParser();
         Document<Feed> doc = parser.parse(atomStream);
-        feed = doc.getRoot();
-        System.out.println("Found Feed: " + feed.getTitle());
+        this.feed = doc.getRoot();
+        System.out.println("Found Feed: " + this.feed.getTitle());
     }
 
     public GeoprocessingFeed(FeedTemplate template) {
 
         Abdera abdera = new Abdera();
-        feed = abdera.newFeed();
+        this.feed = abdera.newFeed();
 
         // set ID
-        feed.setId(template.getID());
+        this.feed.setId(template.getID());
         // set title and subtitle
-        feed.setTitle(template.getFeedTitle());
-        feed.setSubtitle(template.getFeedSubtitle());
+        this.feed.setTitle(template.getFeedTitle());
+        this.feed.setSubtitle(template.getFeedSubtitle());
         // set last update
-        feed.setUpdated(new Date());
+        this.feed.setUpdated(new Date());
         // set author
         if (template.getFeedAuthorEmail() != null) {
-            feed.addAuthor(template.getFeedAuthorName(), template.getFeedAuthorEmail(), null);
+            this.feed.addAuthor(template.getFeedAuthorName(), template.getFeedAuthorEmail(), null);
         }
         else {
-            feed.addAuthor(template.getFeedAuthorName());
+            this.feed.addAuthor(template.getFeedAuthorName());
         }
         // set link
-        feed.addLink(template.getFeedURL());
-        feed.addLink(template.getFeedURL(), "self");
+        this.feed.addLink(template.getFeedURL());
+        this.feed.addLink(template.getFeedURL(), "self");
 
     }
 
@@ -88,10 +88,10 @@ public final class GeoprocessingFeed {
         // keySet of existing entries; is filled in the loop
         Set<String> feedIDs = new HashSet<String>();
 
-        feed.setUpdated(new Date(System.currentTimeMillis()));
+        this.feed.setUpdated(new Date(System.currentTimeMillis()));
 
         // MERGE newer entries into old entries
-        for (Entry entry : feed.getEntries()) {
+        for (Entry entry : this.feed.getEntries()) {
             GeoprocessingFeedEntry currentEntry = new GeoprocessingFeedEntry(entry);
             feedIDs.add(currentEntry.getIdentifier());
             // check if there is a candidate entry with the same ID
@@ -106,7 +106,7 @@ public final class GeoprocessingFeed {
         for (String currentID : candidateIDs) {
             GeoprocessingFeedEntry gpEntry = candidateEntries.get(currentID);
             System.out.println("Adding new feed entry for: " + gpEntry.getIdentifier());
-            feed.addEntry(gpEntry.getAtomEntry());
+            this.feed.addEntry(gpEntry.getAtomEntry());
         }
 
         // set new update timestamp of the feed
@@ -121,7 +121,7 @@ public final class GeoprocessingFeed {
      * @return Array of {@link Entry}
      */
     public Entry[] getEntries() {
-        return feed.getEntries().toArray(new Entry[feed.getEntries().size()]);
+        return this.feed.getEntries().toArray(new Entry[this.feed.getEntries().size()]);
     }
 
     /**
@@ -133,7 +133,7 @@ public final class GeoprocessingFeed {
      */
     public void write(OutputStream os) throws IOException {
         Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
-        writer.writeTo(feed, os);
+        writer.writeTo(this.feed, os);
 
         // feed.writeTo(os);
     }

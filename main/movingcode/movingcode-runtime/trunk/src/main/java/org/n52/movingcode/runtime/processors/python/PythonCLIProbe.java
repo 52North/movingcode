@@ -89,9 +89,7 @@ public class PythonCLIProbe implements IPlatformComponentProbe {
             if (exitVal != 0) {
                 return false;
             }
-            else {
-                return true;
-            }
+            return true;
         }
         catch (Exception e) {
             return false;

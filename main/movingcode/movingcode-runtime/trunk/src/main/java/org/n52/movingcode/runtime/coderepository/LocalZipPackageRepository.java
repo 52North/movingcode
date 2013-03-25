@@ -13,7 +13,7 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
  * @author Matthias Mueller, TU Dresden
  *
  */
-public final class LocalZipPackageRepository extends AbstractRepository implements IMovingCodeRepository{
+public final class LocalZipPackageRepository extends AbstractRepository {
 
 	private static final String[] ZIP_EXTENSION = {"zip"};
 

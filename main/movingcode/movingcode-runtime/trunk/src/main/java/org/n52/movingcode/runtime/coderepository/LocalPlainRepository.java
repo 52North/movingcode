@@ -36,7 +36,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * @author Matthias Mueller, TU Dresden
  *
  */
-public final class LocalPlainRepository extends AbstractRepository implements IMovingCodeRepository{
+public final class LocalPlainRepository extends AbstractRepository {
 	// valid name for the package description XML file
 	private static final String PACKAGE_DESCRIPTION_XML = "packagedescription.xml";
 	

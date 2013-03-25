@@ -37,8 +37,6 @@ import org.rosuda.REngine.Rserve.RserveException;
  */
 public class R_RServeProbe implements IPlatformComponentProbe {
 
-    private static final int TIMEOUT_SECONDS = 10;
-
     private static Logger log = Logger.getLogger(R_RServeProbe.class);
 
     private RConnector c = new RConnector();

@@ -78,7 +78,7 @@ public class JavaJARProcessor extends AbstractProcessor {
         File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath() + File.separator + AUID.randomAUID());
 
         if ( !tmpWorkspace.mkdir()) {
-            logger.error("Could not create instance workspace!");
+            this.logger.error("Could not create instance workspace!");
             return false;
         }
 
@@ -87,7 +87,7 @@ public class JavaJARProcessor extends AbstractProcessor {
             this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
         }
         catch (Exception e) {
-            logger.error("Cannot write to instance workspace. " + clonedWorkspace.getAbsolutePath());
+            this.logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
             return false;
         }
 
@@ -140,11 +140,12 @@ public class JavaJARProcessor extends AbstractProcessor {
             // if it wasn't declared throw an exception
             // (no way to guess it)
             if (mainClassName == null) {
+                cl.close();
                 throw new IOException("No declared main class in JAR: " + executable);
             }
 
             // build String[] args for executing "public static void main"
-            String[] args = buildArgs(executionValues, this);
+            String[] args = buildArgs(this.executionValues, this);
 
             // execute by invoking the main class with arguments
             try {
@@ -161,7 +162,9 @@ public class JavaJARProcessor extends AbstractProcessor {
             catch (InvocationTargetException e) {
                 throw new IOException("Could not execute main class in JAR: " + e.getMessage());
             }
-
+            finally {
+                cl.close();
+            }
         }
         else {
             throw new IOException("Could not find executable: " + executable);
@@ -175,7 +178,7 @@ public class JavaJARProcessor extends AbstractProcessor {
                     @SuppressWarnings("unchecked")
                     List<MediaData> mediaValues = (List<MediaData>) this.get(identifier);
                     for (int i = 0; i < mediaValues.size(); i++) {
-                        String fileName = executionValues.get(identifier)[i];
+                        String fileName = this.executionValues.get(identifier)[i];
                         // <-- this is the important line -->
                         mediaValues.get(i).setMediaStream(new FileInputStream(fileName));
                     }
@@ -217,7 +220,7 @@ public class JavaJARProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = boolValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -238,7 +241,7 @@ public class JavaJARProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = intValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -259,7 +262,7 @@ public class JavaJARProcessor extends AbstractProcessor {
                 for (int i = 0; i < stringValues.length; i++) {
                     stringValues[i] = dblValues.get(i).toString();
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -276,7 +279,7 @@ public class JavaJARProcessor extends AbstractProcessor {
             if (isInput) {
                 @SuppressWarnings("unchecked")
                 String[] stringValues = ((List<String>) data).toArray(new String[data.size()]);
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 if (data.getDirection() == Direction.OUT) {
@@ -312,7 +315,7 @@ public class JavaJARProcessor extends AbstractProcessor {
                     stringValues[i] = file.getAbsolutePath();
 
                 }
-                executionValues.put(data.getIdentifier(), stringValues);
+                this.executionValues.put(data.getIdentifier(), stringValues);
             }
             else {
                 // special treatment for output-only data
@@ -332,7 +335,7 @@ public class JavaJARProcessor extends AbstractProcessor {
 
                         stringValues[i] = path;
                     }
-                    executionValues.put(data.getIdentifier(), stringValues);
+                    this.executionValues.put(data.getIdentifier(), stringValues);
                 }
                 else {
                     // TODO: cannot happen (?)
