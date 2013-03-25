@@ -30,9 +30,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.n52.movingcode.runtime.MovingCodeRepository;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 
+/**
+ * This class provides a generator for Geoprocessing Feeds, i.e.
+ * Atom feeds that serve a compilation of Moving Code packages.
+ * 
+ * TODO: some overlapping functionality with {@link GeoprocessingFeed}
+ * 
+ * @author Matthias Mueller, TU Dresden
+ *
+ */
 public class FeedGenerator {
 
     static Logger logger = Logger.getLogger(FeedGenerator.class);
@@ -62,7 +71,24 @@ public class FeedGenerator {
             logger.error("Feed generation failed!" + e.getMessage());
         }
     }
-
+    
+    /**
+     * This method updates an existing feed {@link GeoprocessingFeed}.
+     * 
+     * It does three things:
+     * 
+     * 1) update existing entries
+     * 2) add new entries
+     * 3) remove old entries (TODO. implement)
+     * 
+     * @param feed {@link GeoprocessingFeed}
+     * @param rootURL {@link String}
+     * @param targetFeedFileName {@link String}
+     * @param repositoryFolder {@link String}
+     * @param webFolder {@link String}
+     * @param template {@link FeedTemplate}
+     * @throws Exception {@link Exception}
+     */
     private static void updateFeedFile(GeoprocessingFeed feed,
                                        String rootURL,
                                        String targetFeedFileName,
@@ -88,8 +114,10 @@ public class FeedGenerator {
         }
 
         Map<String, GeoprocessingFeedEntry> candidateFeedEntries = new HashMap<String, GeoprocessingFeedEntry>();
-        MovingCodeRepository localRepo = new MovingCodeRepository(new File(repositoryFolder));
-        for (String currentLocalPackageID : localRepo.getPackageIDs()) {
+        IMovingCodeRepository mcRepo = IMovingCodeRepository.Factory.createFromZipFilesFolder(new File(repositoryFolder));
+        
+       // MovingCodeRepository localRepo = new MovingCodeRepository(new File(repositoryFolder));
+        for (String currentLocalPackageID : mcRepo.getPackageIDs()) {
             logger.info("Processing package: " + currentLocalPackageID);
 
             String dumpLocation = webFolder + File.separator + currentLocalPackageID + File.separator;
@@ -97,14 +125,14 @@ public class FeedGenerator {
 
             // dump package to new web location
             File newLocation = new File(dumpLocation + "package.zip");
-            MovingCodePackage packageToDump = localRepo.getPackage(currentLocalPackageID);
+            MovingCodePackage packageToDump = mcRepo.getPackage(currentLocalPackageID);
             packageToDump.dumpPackage(newLocation);
 
             // dump description to new web location
             packageToDump.dumpDescription(new File(dumpLocation + "packagedescription.xml"));
 
-            GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(localRepo.getPackageDescription(currentLocalPackageID),
-                                                                      localRepo.getPackageTimestamp(currentLocalPackageID),
+            GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(mcRepo.getPackageDescription(currentLocalPackageID),
+                                                                      mcRepo.getPackageTimestamp(currentLocalPackageID),
                                                                       webLocation + "package.zip",
                                                                       webLocation + "packagedescription.xml");
 
