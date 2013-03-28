@@ -98,7 +98,14 @@ public class JavaJARProcessor extends AbstractProcessor {
         // TODO implement
         return true;
     }
-
+    
+    /**
+     * TODO: Or call separate virtual machine, e.g.:
+     * 
+     * %java -Xmx1g -classpath ./netcdfAll-4.3.jar 
+     * ucar.nc2.dataset.GeoTiffWriter -in a.nc -out b.tif
+     * 
+     */
     public void execute(int timeoutSeconds) throws IllegalArgumentException, RuntimeException, IOException {
 
         if ( !init()) {

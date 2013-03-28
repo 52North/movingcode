@@ -144,15 +144,15 @@ public class MovingCodeRepositoryManager {
 	}
     
     /**
-     * Finds a package for a given functional identifier.
+     * Finds a package for a given function identifier.
      * 
-     * @param functionalIdentifier
+     * @param functionIdentifier
      * @return
      */
-    public synchronized MovingCodePackage getFunction(String functionalIdentifier) {
+    public synchronized MovingCodePackage getFunction(String functionIdentifier) {
         for (IMovingCodeRepository repo : repositories.values()) {
-            if (repo.providesFunction(functionalIdentifier)) {
-                return repo.getPackageByFunction(functionalIdentifier);
+            if (repo.providesFunction(functionIdentifier)) {
+                return repo.getPackageByFunction(functionIdentifier);
             }
         }
         return null;
@@ -177,7 +177,7 @@ public class MovingCodeRepositoryManager {
 	}
 
 	/**
-	 * Contains check: Is a there a package registered for a given functional ID?
+	 * Contains check: Is a there a package registered for a given function ID?
 	 * 
 	 * @param identifier
 	 * @return boolean

@@ -43,6 +43,7 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
  * @author Matthias Mueller, TU Dresden
  * 
  */
+@Deprecated
 public class RepositoryManager {
 
 	private static RepositoryManager instance;

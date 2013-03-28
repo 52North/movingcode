@@ -34,7 +34,6 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.MovingCodeRepositoryManager;
-import org.n52.movingcode.runtime.RepositoryManager;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 /**
@@ -97,7 +96,9 @@ public class LocalDropInFolderRepository extends LocalPlainRepository {
 			
 			for (MovingCodePackage movingCodePackage : newPackages.keySet()) {
 				if (getPackage(movingCodePackage.getPackageIdentifier()) == null) {
-					if (!RepositoryManager.getInstance().providesFunction(movingCodePackage.getFunctionalIdentifier())) {
+					// TODO: resolve this logic somewhere else
+					// code repositories shouldn't call their manager.
+					if (!MovingCodeRepositoryManager.getInstance().providesFunction(movingCodePackage.getFunctionalIdentifier())) {
 						register(movingCodePackage);
 						logger.info("Added MovingCodePackage with id "+
 								movingCodePackage.getFunctionalIdentifier());

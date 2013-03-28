@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.n52.movingcode.runtime.RepositoryManager;
+import org.n52.movingcode.runtime.MovingCodeRepositoryManager;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
@@ -39,7 +39,7 @@ import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 public class FeedReadTest extends GlobalTestConfig {
 
-    private RepositoryManager rm = RepositoryManager.getInstance();
+    private MovingCodeRepositoryManager rm = MovingCodeRepositoryManager.getInstance();
 
     Logger logger = Logger.getLogger(FeedReadTest.class);
 
