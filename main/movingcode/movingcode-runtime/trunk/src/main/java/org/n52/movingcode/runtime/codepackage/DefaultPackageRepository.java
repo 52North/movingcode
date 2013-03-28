@@ -24,6 +24,7 @@
 
 package org.n52.movingcode.runtime.codepackage;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,4 +124,13 @@ public class DefaultPackageRepository {
 	public String[] getPackageIDs() {
 		return this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
 	}
+	
+    public MovingCodePackage retrievePackageByFunction(String function) {
+    	Collection<String> packageNames = this.fIDpID_Lookup.get(function);
+    	if (packageNames != null && !packageNames.isEmpty()) {
+    		return retrievePackage(packageNames.iterator().next());
+    	}
+    	
+    	return null;
+    }
 }

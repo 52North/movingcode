@@ -23,9 +23,11 @@
  */
 package org.n52.movingcode.runtime.coderepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -53,6 +55,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	
 	// registered packages - KVP (packageID, mPackage)
 	private Map<String, MovingCodePackage> packages = new HashMap<String, MovingCodePackage>();
+	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
 	
 	// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
 	private Multimap<String, String> fIDpID_Lookup = ArrayListMultimap.create();
@@ -115,4 +118,18 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
     		return null;
     	}
     }
+    
+	public synchronized void addRepositoryChangeListener(RepositoryChangeListener l) {
+		this.changeListeners.add(l);
+	}
+
+	public synchronized void removeRepositoryChangeListener(RepositoryChangeListener l) {
+		this.changeListeners.remove(l);
+	}
+	
+	protected synchronized void informRepositoryChangeListeners() {
+		for (RepositoryChangeListener l : this.changeListeners) {
+			l.onRepositoryUpdate(this);
+		}
+	}
 }
