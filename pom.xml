@@ -142,27 +142,6 @@
 	<build>
 		<plugins>
 
-			<!-- XML beans plugin to generate JAVA from XSDs -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>xmlbeans-maven-plugin</artifactId>
-				<version>2.3.3</version>
-				<executions>
-					<execution>
-						<id>sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>xmlbeans</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<download>true</download>
-					<javaSource>1.6</javaSource>
-					<sourceGenerationDirectory>src/main/java</sourceGenerationDirectory>
-				</configuration>
-			</plugin>
-
 			<!-- Assembly pluginto aggregate project into single JAR -->
 			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
 				<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
@@ -287,6 +266,33 @@
 							<tag>movingcode-runtime-${project.rel.org.n52.movingcode:movingcode-runtime}</tag>
 						</configuration>
 					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>xmlbeans</id>
+			<build>
+				<plugins>
+			<!-- XML beans plugin to generate JAVA from XSDs -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xmlbeans-maven-plugin</artifactId>
+				<version>2.3.3</version>
+				<executions>
+					<execution>
+						<id>sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xmlbeans</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<download>true</download>
+					<javaSource>1.6</javaSource>
+					<sourceGenerationDirectory>src/main/java</sourceGenerationDirectory>
+				</configuration>
+			</plugin>
 				</plugins>
 			</build>
 		</profile>
