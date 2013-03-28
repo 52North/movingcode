@@ -59,9 +59,10 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * @author Matthias Mueller, TU Dresden
  *
  */
-public final class LocalPlainRepository extends AbstractRepository {
+public class LocalPlainRepository extends AbstractRepository {
 	// valid name for the package description XML file
 	private static final String PACKAGE_DESCRIPTION_XML = "packagedescription.xml";
+	private File directory;
 	
 	/**
 	 * 
@@ -73,7 +74,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 * 
 	 */
 	public LocalPlainRepository(File sourceDirectory) {
-		
+		this.directory = sourceDirectory;
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> packageFolders = scanForFolders(sourceDirectory);
 
@@ -142,6 +143,12 @@ public final class LocalPlainRepository extends AbstractRepository {
 		return FileUtils.listFiles(directory, FileFilterUtils.directoryFileFilter(), null);
 	}
 	
+	
+	
+	public File getDirectory() {
+		return directory;
+	}
+
 	/**
 	 * Finds the last modified date of a directory by scanning it's contents
 	 * 

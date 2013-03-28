@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.Date;
 
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.coderepository.RemoteFeedRepository;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -102,6 +101,22 @@ public interface IMovingCodeRepository {
 	 * this method again.
 	 */
 	public String[] getFunctionIDs();
+	
+	/**
+	 * registers a changelistener. Implementations decide if they support
+	 * the changelistener pattern.
+	 * 
+	 * @param l the listener
+	 */
+	public void addRepositoryChangeListener(RepositoryChangeListener l);
+
+	/**
+	 * removes a changelistener. Implementations decide if they support
+	 * the changelistener pattern.
+	 * 
+	 * @param l the listener
+	 */
+	public void removeRepositoryChangeListener(RepositoryChangeListener l);
 	
 	
 	//###########################################################################//

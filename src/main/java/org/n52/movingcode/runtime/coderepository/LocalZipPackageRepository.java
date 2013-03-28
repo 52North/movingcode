@@ -79,7 +79,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	 * @param directory {@link File} - parent directory to scan.
 	 * @return A {@link Collection} of {@link File} - the zipfiles found
 	 */
-	private static Collection<File> scanForZipFiles(File directory) {
+	public static Collection<File> scanForZipFiles(File directory) {
 		return FileUtils.listFiles(directory, ZIP_EXTENSION, true);
 	}
 
@@ -91,13 +91,13 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	 * @param filePath {@link String} - Path
 	 * @return
 	 */
-	private static final String generateIDFromFilePath(String filePath) {
+	public static final String generateIDFromFilePath(String filePath) {
 		String id = "";
 
 		// trim ".zip"
 		for (String extension : ZIP_EXTENSION) {
 			if (filePath.endsWith(extension)) {
-				id = filePath.substring(0, filePath.lastIndexOf(extension));
+				id = filePath.substring(0, filePath.lastIndexOf(extension)-1);
 			}
 		}
 
