@@ -41,9 +41,9 @@ import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
 
-public class DropInFolderTest {
+public class SilentFolderUpdateTest {
 
-	private static final Logger logger = Logger.getLogger(DropInFolderTest.class);
+	private static final Logger logger = Logger.getLogger(SilentFolderUpdateTest.class);
 	protected boolean updateReceived;
 
 	@Test
@@ -65,7 +65,7 @@ public class DropInFolderTest {
 			@Override
 			public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
 				logger.info("Received update on Repo "+updatedRepo);
-				synchronized (DropInFolderTest.this) {
+				synchronized (SilentFolderUpdateTest.this) {
 					logger.info("Repos packages: "+ Arrays.toString(updatedRepo.getPackageIDs()));
 					if (updatedRepo.containsPackage(mcp.getPackageIdentifier())) {
 						logger.info("Expected package included in repo: "+mcp.getPackageIdentifier());
