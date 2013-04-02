@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
-import org.n52.movingcode.runtime.coderepository.LocalDropInFolderRepository;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
 
@@ -61,7 +60,7 @@ public class DropInFolderTest {
 		final MovingCodePackage mcp = new MovingCodePackage(testFile,
 				LocalZipPackageRepository.generateIDFromFilePath(targetFile.getAbsolutePath()));
 	
-		IMovingCodeRepository repo = new LocalDropInFolderRepository(tmpDropIn, 1);
+		IMovingCodeRepository repo = new LocalZipPackageRepository(tmpDropIn);
 		repo.addRepositoryChangeListener(new RepositoryChangeListener() {
 			@Override
 			public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
@@ -79,7 +78,7 @@ public class DropInFolderTest {
 		logger.info("Copying "+ testFile.getAbsolutePath() +" to "+tmpDropIn.getAbsolutePath());
 		FileUtils.copyFileToDirectory(testFile, tmpDropIn);
 		
-		Thread.sleep(2000);
+		Thread.sleep(IMovingCodeRepository.localPollingInterval*2);
 		
 		synchronized (this) {
 			Assert.assertTrue("Package update not received!", updateReceived);

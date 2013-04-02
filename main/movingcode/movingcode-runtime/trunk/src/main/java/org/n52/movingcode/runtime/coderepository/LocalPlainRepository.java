@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -59,10 +61,15 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * @author Matthias Mueller, TU Dresden
  *
  */
-public class LocalPlainRepository extends AbstractRepository {
+public final class LocalPlainRepository extends AbstractRepository {
 	// valid name for the package description XML file
 	private static final String PACKAGE_DESCRIPTION_XML = "packagedescription.xml";
-	private File directory;
+	private final File directory;
+	
+	private String fingerprint;
+	
+	private Timer timerDaemon;
+	
 	
 	/**
 	 * 
@@ -75,11 +82,22 @@ public class LocalPlainRepository extends AbstractRepository {
 	 */
 	public LocalPlainRepository(File sourceDirectory) {
 		this.directory = sourceDirectory;
-		// recursively obtain all zipfiles in sourceDirectory
-		Collection<File> packageFolders = scanForFolders(sourceDirectory);
-
-		logger.info("Scanning directory: " + sourceDirectory.getAbsolutePath());
+		// compute directory fingerprint
+		fingerprint = RepositoryUtils.directoryFingerprint(directory);
 		
+		// load packages from folder
+		load();
+		
+		// start timer daemon
+		timerDaemon = new Timer(true);
+		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
+	}
+	
+	private void load(){
+		// recursively obtain all zipfiles in sourceDirectory
+		Collection<File> packageFolders = scanForFolders(directory);
+
+		logger.info("Scanning directory: " + directory.getAbsolutePath());
 		
 		
 		for (File currentFolder : packageFolders) {
@@ -142,12 +160,6 @@ public class LocalPlainRepository extends AbstractRepository {
 	private static Collection<File> scanForFolders(File directory) {
 		return FileUtils.listFiles(directory, FileFilterUtils.directoryFileFilter(), null);
 	}
-	
-	
-	
-	public File getDirectory() {
-		return directory;
-	}
 
 	/**
 	 * Finds the last modified date of a directory by scanning it's contents
@@ -170,5 +182,31 @@ public class LocalPlainRepository extends AbstractRepository {
 			}
 		}
 		return lastMod;
+	}
+	
+	/**
+	 * A task which re-computes the directory's fingerprint and
+	 * triggers a content reload if required.
+	 * 
+	 * @author Matthias Mueller
+	 *
+	 */
+	private final class CheckFolder extends TimerTask {
+		
+		@Override
+		public void run() {
+			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
+			if (!newFingerprint.equals(fingerprint)){
+				logger.info("Repository content has silently changed. Running update ...");
+				// set new fingerprint
+				fingerprint = newFingerprint;
+				// clear an reload
+				clear();
+				load();
+				
+				logger.info("Reload finished. Calling Repository Change Listeners.");
+				informRepositoryChangeListeners();
+			}			
+		}
 	}
 }

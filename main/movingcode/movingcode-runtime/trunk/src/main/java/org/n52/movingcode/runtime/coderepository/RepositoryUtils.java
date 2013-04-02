@@ -25,7 +25,14 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.HashMap;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -36,6 +43,8 @@ import java.util.HashMap;
  *
  */
 public class RepositoryUtils {
+	
+	private static final Logger logger = Logger.getLogger(RepositoryUtils.class);
 	
 	// HTTP-URI prefix
 	private static final String httpPrefix = "http://";
@@ -149,4 +158,36 @@ public class RepositoryUtils {
 		return res.toString();
 	}
 	
+	/**
+	 * Computes a fingerprint for a given directory
+	 * 
+	 * @param directory
+	 * @return
+	 * @throws NoSuchAlgorithmException - should not occur
+	 */
+	public static String directoryFingerprint(final File directory) {
+		final Collection<File> files = FileUtils.listFiles(directory, null, true);
+		
+		StringBuffer fNamesAndTimes = new StringBuffer("");
+		for (File file : files){
+			fNamesAndTimes = fNamesAndTimes.append(file.getAbsolutePath() + file.lastModified());
+		}
+		
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA-1");
+			byte[] hash = md.digest(fNamesAndTimes.toString().getBytes());
+			
+			String result = "";
+		    for ( byte b : hash ) {
+		        result += Integer.toHexString(b + 256) + " ";
+		    }
+			
+		    return result;
+		} catch (NoSuchAlgorithmException e) {
+			logger.error("Could not find SHA-1 algorithm.");
+			return null;
+		}
+		
+	}
 }
