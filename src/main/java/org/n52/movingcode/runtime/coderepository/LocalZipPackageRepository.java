@@ -25,6 +25,8 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
@@ -39,6 +41,12 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 public final class LocalZipPackageRepository extends AbstractRepository {
 
 	private static final String[] ZIP_EXTENSION = {"zip"};
+	
+	private final File directory;
+	
+	private String fingerprint;
+	
+	private Timer timerDaemon;
 
 	/**
 	 * 
@@ -50,10 +58,23 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	 * 
 	 */
 	public LocalZipPackageRepository(File sourceDirectory) {
+		this.directory = sourceDirectory;
+		// compute directory fingerprint
+		fingerprint = RepositoryUtils.directoryFingerprint(directory);
+		
+		// load packages from folder
+		load();
+		
+		// start timer daemon
+		timerDaemon = new Timer(true);
+		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
+	}
+	
+	private void load(){
 		// recursively obtain all zipfiles in sourceDirectory
-		Collection<File> zipFiles = scanForZipFiles(sourceDirectory);
+		Collection<File> zipFiles = scanForZipFiles(directory);
 
-		logger.info("Scanning directory: " + sourceDirectory.getAbsolutePath());
+		logger.info("Scanning directory: " + directory.getAbsolutePath());
 
 		for (File currentFile : zipFiles) {
 			String id = generateIDFromFilePath(currentFile.getPath());
@@ -105,5 +126,31 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		id = id.replace("\\", "/");
 
 		return id;
+	}
+	
+	/**
+	 * A task which re-computes the directory's fingerprint and
+	 * triggers a content reload if required.
+	 * 
+	 * @author Matthias Mueller
+	 *
+	 */
+	private final class CheckFolder extends TimerTask {
+		
+		@Override
+		public void run() {
+			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
+			if (!newFingerprint.equals(fingerprint)){
+				logger.info("Repository content has silently changed. Running update ...");
+				// set new fingerprint
+				fingerprint = newFingerprint;
+				// clear an reload
+				clear();
+				load();
+				
+				logger.info("Reload finished. Calling Repository Change Listeners.");
+				informRepositoryChangeListeners();
+			}			
+		}
 	}
 }

@@ -40,6 +40,9 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 
 public interface IMovingCodeRepository {
 	
+	final long localPollingInterval = 5 * 1000; // 5 sec
+	final long remotePollingInterval = 10 * 60 * 1000; // 10 min
+	
 	/**
 	 * Returns the IDs of all registered packages.
 	 * 

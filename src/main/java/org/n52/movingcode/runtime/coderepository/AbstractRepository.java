@@ -55,11 +55,13 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	
 	// registered packages - KVP (packageID, mPackage)
 	private Map<String, MovingCodePackage> packages = new HashMap<String, MovingCodePackage>();
-	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
 	
 	// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
 	private Multimap<String, String> fIDpID_Lookup = ArrayListMultimap.create();
 
+	// registered changeListerners
+	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
+	
 	static Logger logger = Logger.getLogger(AbstractRepository.class);
 	
 	/**
@@ -119,17 +121,34 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
     	}
     }
     
+    @Override
 	public synchronized void addRepositoryChangeListener(RepositoryChangeListener l) {
 		this.changeListeners.add(l);
 	}
-
+    
+    @Override
 	public synchronized void removeRepositoryChangeListener(RepositoryChangeListener l) {
 		this.changeListeners.remove(l);
 	}
 	
+    /**
+     * informs all listeners about an update.
+     */
 	protected synchronized void informRepositoryChangeListeners() {
 		for (RepositoryChangeListener l : this.changeListeners) {
 			l.onRepositoryUpdate(this);
 		}
 	}
+	
+	/**
+	 * Clear this repository. (Removes all contained packages)
+	 */
+	protected void clear(){
+		// registered packages - KVP (packageID, mPackage)
+		this.packages = new HashMap<String, MovingCodePackage>();
+		
+		// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
+		this.fIDpID_Lookup = ArrayListMultimap.create();
+	}
+	
 }
