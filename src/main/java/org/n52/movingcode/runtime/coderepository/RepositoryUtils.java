@@ -27,12 +27,13 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 
 /**
@@ -189,5 +190,26 @@ public class RepositoryUtils {
 			return null;
 		}
 		
+	}
+	
+	/**
+	 * Static helper method that performs a cross check with the processor factory
+	 * to filter out unsupported packages (i.e. packages that cannot be executed with
+	 * the current processor configuration).  
+	 * 
+	 * @param packageIDs - a given Array of {@link String} packageIDs
+	 * @param repo - a {@link IMovingCodeRepository} that is assumed to contain the packageIDs and provides the according MovingCode packages
+	 * @return Array of {@link String} that contains only those packageIDs that represent executable packages.
+	 */
+	public static final String[] filterExecutablePackageIDs(String[] packageIDs, IMovingCodeRepository repo){
+		ArrayList<String> resultSet = new ArrayList<String>();
+		for (String currentPID : packageIDs){
+			boolean supported = ProcessorFactory.getInstance().supportsPackage(repo.getPackage(currentPID));
+			if (supported){
+				resultSet.add(currentPID);
+			}
+		}
+		
+		return resultSet.toArray(new String[resultSet.size()]);
 	}
 }
