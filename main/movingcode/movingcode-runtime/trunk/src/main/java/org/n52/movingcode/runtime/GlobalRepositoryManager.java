@@ -220,7 +220,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public synchronized ProcessDescriptionType getProcessDescription(String functionIdentifier) {
 		MovingCodePackage[] mcpArray = getPackageByFunction(functionIdentifier);
 		if (mcpArray != null && mcpArray.length > 0){
-			return mcpArray[1].getDescription().getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
+			return mcpArray[0].getDescription().getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
 		} else {
 			return null;
 		}
