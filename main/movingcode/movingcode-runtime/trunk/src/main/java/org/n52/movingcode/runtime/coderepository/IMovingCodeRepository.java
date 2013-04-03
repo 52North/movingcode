@@ -73,9 +73,10 @@ public interface IMovingCodeRepository {
 	 * your own logic and request the package directly by calling {@link IMovingCodeRepository#getPackage(String)}
 	 * 
 	 * @param {@link String} functionID - the (unique) ID of the package
+	 * @return - Array of MovingCodePackage
 	 * 
 	 */
-	public MovingCodePackage getPackageByFunction(String functionID);
+	public MovingCodePackage[] getPackageByFunction(String functionID);
 
 	/**
 	 * returns the last known update timestamp of a MovingCodePackage

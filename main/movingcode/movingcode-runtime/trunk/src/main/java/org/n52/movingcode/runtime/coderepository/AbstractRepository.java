@@ -112,10 +112,14 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
     }
     
     @Override
-    public MovingCodePackage getPackageByFunction(String functionID){
+    public MovingCodePackage[] getPackageByFunction(String functionID){
     	Collection<String> packageIDs = this.fIDpID_Lookup.get(functionID);
-    	if (packageIDs.size() > 0){
-    		return this.packages.get(packageIDs.iterator().next());
+    	if (packageIDs.size() != 0){
+    		ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
+    		for (String currentPID : packageIDs){
+    			resultSet.add(packages.get(currentPID));
+    		}
+    		return resultSet.toArray(new MovingCodePackage[resultSet.size()]);
     	} else {
     		return null;
     	}

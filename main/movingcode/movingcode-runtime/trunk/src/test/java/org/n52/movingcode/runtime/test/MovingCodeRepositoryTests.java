@@ -30,7 +30,7 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.n52.movingcode.runtime.MovingCodeRepositoryManager;
+import org.n52.movingcode.runtime.GlobalRepositoryManager;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.iodata.IOParameter;
@@ -96,8 +96,8 @@ public class MovingCodeRepositoryTests extends GlobalTestConfig {
         System.out.println(packageFolder.getAbsolutePath());
 
         // Act
-        MovingCodeRepositoryManager repoMan = MovingCodeRepositoryManager.getInstance();
-        repoMan.addRepository(packageFolderName);
+        GlobalRepositoryManager repoMan = GlobalRepositoryManager.getInstance();
+        repoMan.addLocalPlainRepository(packageFolderName);
 
         // Assert
         Assert.assertTrue(repoMan.providesFunction(zTransformID));

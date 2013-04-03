@@ -90,6 +90,13 @@ public class ProcessorFactory {
         }
         return null; // if no suitable processor was found
     }
+    
+    public boolean supportsPackage(final MovingCodePackage mcPackage){
+    	String processorID = findCompatibleProcessor(mcPackage.getDescription().getPackageDescription());
+    	
+    	// return true if processorID is not null
+    	return processorID != null ? true : false; 
+    }
 
     public static synchronized ProcessorFactory getInstance() {
         if (instance == null) {
@@ -204,7 +211,8 @@ public class ProcessorFactory {
             e.printStackTrace();
         }
         catch (Exception e) {
-            // catch everything
+            // catch everything else
+        	e.printStackTrace();
         }
         return null;
     }

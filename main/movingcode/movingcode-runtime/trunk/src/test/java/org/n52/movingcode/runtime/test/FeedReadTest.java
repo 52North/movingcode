@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.n52.movingcode.runtime.MovingCodeRepositoryManager;
+import org.n52.movingcode.runtime.GlobalRepositoryManager;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
@@ -39,7 +39,7 @@ import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 public class FeedReadTest extends GlobalTestConfig {
 
-    private MovingCodeRepositoryManager rm = MovingCodeRepositoryManager.getInstance();
+    private GlobalRepositoryManager rm = GlobalRepositoryManager.getInstance();
 
     Logger logger = Logger.getLogger(FeedReadTest.class);
 
@@ -51,7 +51,7 @@ public class FeedReadTest extends GlobalTestConfig {
             rm.addRepository(url);
             logger.info("Added Repo: " + GlobalTestConfig.feedURL);
 
-            for (String id : rm.getProcessIDs()) {
+            for (String id : rm.getPackageIDs()) {
                 logger.info("\nFound process: " + id);
                 MovingCodePackage pack = rm.getPackage(id);
 
