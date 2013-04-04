@@ -147,7 +147,9 @@ public class JavaJARProcessor extends AbstractProcessor {
             // if it wasn't declared throw an exception
             // (no way to guess it)
             if (mainClassName == null) {
-                cl.close();
+            	//XXX: URLClassLoader#close() is Java 1.7+ only. If 1.7
+                //is needed, change configuration of maven-compiler-plugin
+//                cl.close();
                 throw new IOException("No declared main class in JAR: " + executable);
             }
 
@@ -170,7 +172,9 @@ public class JavaJARProcessor extends AbstractProcessor {
                 throw new IOException("Could not execute main class in JAR: " + e.getMessage());
             }
             finally {
-                cl.close();
+            	//XXX: URLClassLoader#close() is Java 1.7+ only. If 1.7
+                //is needed, change configuration of maven-compiler-plugin
+//                cl.close();
             }
         }
         else {
