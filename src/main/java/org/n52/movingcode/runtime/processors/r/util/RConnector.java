@@ -68,7 +68,9 @@ public class RConnector {
                 }
                 catch (Exception e) {
                     log.error("Attempted to start Rserve and establish a connection failed", e);
-                    rse.addSuppressed(e);
+                    //XXX: Throwable#addSuppressed(e) is Java 1.7+ only. If 1.7
+                    //is needed, change configuration of maven-compiler-plugin
+//                    rse.addSuppressed(e);
                 }
             }
             else
