@@ -1,0 +1,26 @@
+# This file maps Internet media types to file extension(s).
+# Same structure as:
+# http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
+#
+# provides file extension lookups for ArcToolboxProcessor
+#
+# MIME type (lowercased)			Extensions
+# ================================= ==========
+
+image/geotiff						tif
+image/tiff							tif
+application/geotiff					tif
+application/x-geotiff				tif
+
+application/x-erdas-hfa				img
+
+image/jpeg							jpg
+image/png							png
+
+text/csv							csv
+
+application/dbase					dbf
+
+application/x-zipped-shp			zip
+
+application/gml+xml					gml
