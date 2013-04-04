@@ -7,10 +7,15 @@
 		<version>5.6.4</version>
 	</parent>
 	<groupId>org.n52.mc</groupId>
-	<artifactId>mc-runtime</artifactId>
+	<artifactId>movingcode-runtime-parent</artifactId>
 	<version>0.6-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	<name>movingcode-runtime</name>
+	<packaging>pom</packaging>
+	<name>movingcode runtime reactor</name>
+
+	<modules>
+		<module>mc-xml-processors</module>
+		<module>mc-runtime</module>
+	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,6 +58,7 @@
 		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
 	</scm>
 
+
 	<repositories>
 		<repository>
 			<id>n52-releases</id>
@@ -67,186 +73,156 @@
 		</repository>
 	</repositories>
 
-	<dependencies>
-		<!-- junit for the unit tests -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.xmlbeans</groupId>
-			<artifactId>xmlbeans</artifactId>
-			<version>2.4.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.5</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-exec</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava-collections</artifactId>
-			<version>r03</version>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.0.4</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.abdera</groupId>
-			<artifactId>abdera-bundle</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.rosuda</groupId>
-			<artifactId>REngine</artifactId>
-			<version>0.6-8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.rosuda</groupId>
-			<artifactId>RserveEngine</artifactId>
-			<version>0.6-8</version>
-		</dependency>
-
-		<!-- Movingcode schema project -->
-		<dependency>
-			<groupId>org.n52.mc</groupId>
-			<artifactId>mc-schema</artifactId>
-			<version>1.0</version>
-		</dependency>
-
-	</dependencies>
-
-	<build>
-		<plugins>
-
-			<!-- Assembly pluginto aggregate project into single JAR -->
-			<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
-				<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
-				</configuration> </plugin> -->
-
-			<!-- Deploy Plugin - adds artifact to repository -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
+	<dependencyManagement>
+		<dependencies>
+			<!-- junit for the unit tests -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.10</version>
+				<scope>test</scope>
+			</dependency>
+	
+			<dependency>
+				<groupId>org.n52.mc</groupId>
+				<artifactId>mc-runtime</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.n52.mc</groupId>
+				<artifactId>mc-xml-processors</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+	
+			<dependency>
+				<groupId>org.apache.xmlbeans</groupId>
+				<artifactId>xmlbeans</artifactId>
+				<version>2.4.0</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
 				<version>2.5</version>
-<!-- 				<dependencies> -->
-<!-- 					<dependency> -->
-<!-- 						<groupId>org.apache.maven.wagon</groupId> -->
-<!-- 						<artifactId>wagon-ssh</artifactId> -->
-<!-- 						<version>2.2</version> -->
-<!-- 					</dependency> -->
-<!-- 				</dependencies> -->
-			</plugin>
-
-			<!-- Releases a maven project, doing "repetitive handwork" -->
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<connectionUrl>
-						scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/${project.artifactId}
-					</connectionUrl>
-				</configuration>
-			</plugin>
-
-			<!-- JAR plugin to build and sign JARs -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-			</plugin>
-
-			<!-- Compiler plugin for Java 1.6 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-				<executions>
-					<execution>
-						<id>test-compile</id>
-						<phase>process-test-sources</phase>
-						<goals>
-							<goal>testCompile</goal>
-						</goals>
-						<configuration>
-							<source>1.6</source>
-							<target>1.6</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Surefire plugin for automated tests -->
-			<!-- Currently disabled -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12.4</version>
-				<configuration>
-					<skipTests>true</skipTests>
-				</configuration>
-			</plugin>
-			
-			<!-- run "mvn license:check" to check -->
-			<!-- run "mvn license:format" to add to the files -->
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>1.9.0</version>
-				<configuration>
-					<header>src/main/resources/52N_license.txt</header>
-					<excludes>
-						<exclude>**/test/resources/**</exclude>
-						<exclude>**/runtime/processorconfig/**/*.java</exclude>
-					</excludes>
-					<includes>
-						<include>**/*.java</include>
-						<include>**/*.properties</include>
-						<include>**/*.xml</include>
-						<include>**/*.xsl</include>
-					</includes>
-					<strictCheck>true</strictCheck>
-					<properties>
-						<year>${project.inceptionYear}</year>
-					</properties>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>test</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-exec</artifactId>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava-collections</artifactId>
+				<version>r03</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.16</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.0.4</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.abdera</groupId>
+				<artifactId>abdera-bundle</artifactId>
+				<version>1.1.2</version>
+			</dependency>
+	
+			<dependency>
+				<groupId>org.rosuda</groupId>
+				<artifactId>REngine</artifactId>
+				<version>0.6-8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.rosuda</groupId>
+				<artifactId>RserveEngine</artifactId>
+				<version>0.6-8</version>
+			</dependency>
+	
+			<!-- Movingcode schema project -->
+			<dependency>
+				<groupId>org.n52.mc</groupId>
+				<artifactId>mc-schema</artifactId>
+				<version>1.0</version>
+			</dependency>
+	
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<pluginManagement>
+			<plugins>
+	
+				<!-- Assembly pluginto aggregate project into single JAR -->
+				<!-- <plugin> <artifactId>maven-assembly-plugin</artifactId> <configuration> 
+					<descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> </descriptorRefs> 
+					</configuration> </plugin> -->
+	
+				<!-- Deploy Plugin - adds artifact to repository -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+	
+				<!-- Releases a maven project, doing "repetitive handwork" -->
+				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<configuration>
+						<connectionUrl>
+							scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/${project.artifactId}
+						</connectionUrl>
+					</configuration>
+				</plugin>
+	
+				<!-- JAR plugin to build and sign JARs -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+	
+				<!-- Compiler plugin for Java 1.6 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.5.1</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+	
+				<!-- Surefire plugin for automated tests -->
+				<!-- Currently disabled -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.12.4</version>
+					<configuration>
+						<skipTests>true</skipTests>
+					</configuration>
+				</plugin>
+				
+				<!-- run "mvn license:check" to check -->
+				<!-- run "mvn license:format" to add to the files -->
+				<plugin>
+					<groupId>com.mycila.maven-license-plugin</groupId>
+					<artifactId>maven-license-plugin</artifactId>
+					<version>1.9.0</version>
+				</plugin>
+	
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
@@ -266,33 +242,6 @@
 							<tag>movingcode-runtime-${project.rel.org.n52.movingcode:movingcode-runtime}</tag>
 						</configuration>
 					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>xmlbeans</id>
-			<build>
-				<plugins>
-			<!-- XML beans plugin to generate JAVA from XSDs -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>xmlbeans-maven-plugin</artifactId>
-				<version>2.3.3</version>
-				<executions>
-					<execution>
-						<id>sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>xmlbeans</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<download>true</download>
-					<javaSource>1.6</javaSource>
-					<sourceGenerationDirectory>src/main/java</sourceGenerationDirectory>
-				</configuration>
-			</plugin>
 				</plugins>
 			</build>
 		</profile>
