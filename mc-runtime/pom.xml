@@ -1,0 +1,243 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.n52.mc</groupId>
+		<artifactId>movingcode-runtime-parent</artifactId>
+		<version>0.6-SNAPSHOT</version>
+	</parent>
+	<artifactId>mc-runtime</artifactId>
+	<packaging>jar</packaging>
+	<name>mc-runtime</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<issueManagement>
+		<system>Bugzilla</system>
+		<url>
+        	https://bugzilla.52north.org/
+        </url>
+	</issueManagement>
+	<licenses>
+		<license>
+			<name>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</name>
+			<url>http://www.gnu.org/licenses/gpl.txt</url>
+		</license>
+	</licenses>
+	<inceptionYear>2012</inceptionYear>
+	<developers>
+		<developer>
+			<id>matthias</id>
+			<name>Matthias Mueller</name>
+			<email>matthias_mueller@tu-dresden.de</email>
+			<url>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mueller.m</url>
+			<organization>TU Dresden, Geoinformation Systems</organization>
+			<organizationUrl>http://tu-dresden.de/fgh/geo/gis</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+			<properties />
+		</developer>
+	</developers>
+	<scm>
+		<!-- Specification of the Source-Content-Managementsystem -->
+		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</connection>
+		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
+		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
+	</scm>
+
+	<repositories>
+		<repository>
+			<id>n52-releases</id>
+			<name>52n Releases</name>
+			<url>http://52north.org/maven/repo/releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<!-- junit for the unit tests -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.n52.mc</groupId>
+			<artifactId>mc-xml-processors</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-collections</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-bundle</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.rosuda</groupId>
+			<artifactId>REngine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.rosuda</groupId>
+			<artifactId>RserveEngine</artifactId>
+		</dependency>
+
+		<!-- Movingcode schema project -->
+		<dependency>
+			<groupId>org.n52.mc</groupId>
+			<artifactId>mc-schema</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- Deploy Plugin - adds artifact to repository -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+			</plugin>
+
+			<!-- Releases a maven project, doing "repetitive handwork" -->
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<connectionUrl>
+						scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/${project.artifactId}
+					</connectionUrl>
+				</configuration>
+			</plugin>
+
+			<!-- JAR plugin to build and sign JARs -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+
+			<!-- Compiler plugin for Java 1.6 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>test-compile</id>
+						<phase>process-test-sources</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<source>1.6</source>
+							<target>1.6</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Surefire plugin for automated tests -->
+			<!-- Currently disabled -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			
+			<!-- run "mvn license:check" to check -->
+			<!-- run "mvn license:format" to add to the files -->
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>src/main/resources/52N_license.txt</header>
+					<excludes>
+						<exclude>**/test/resources/**</exclude>
+						<exclude>**/runtime/processorconfig/**/*.java</exclude>
+					</excludes>
+					<includes>
+						<include>**/*.java</include>
+						<include>**/*.properties</include>
+						<include>**/*.xml</include>
+						<include>**/*.xsl</include>
+					</includes>
+					<strictCheck>true</strictCheck>
+					<properties>
+						<year>${project.inceptionYear}</year>
+					</properties>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<configuration>
+							<connectionUrl>
+								scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/
+							</connectionUrl>
+							<preparationGoals>clean</preparationGoals>
+							<!-- make use of system prop set by hudson -->
+							<tag>movingcode-runtime-${project.rel.org.n52.movingcode:movingcode-runtime}</tag>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
