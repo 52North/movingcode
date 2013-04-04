@@ -19,13 +19,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- Movingcode schema project -->
-		<dependency>
-			<groupId>org.n52.mc</groupId>
-			<artifactId>mc-schema</artifactId>
-			<version>1.0</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -47,7 +40,9 @@
 					<download>true</download>
 					<javaSource>1.6</javaSource>
 				</configuration>
-			</plugin>			<!-- JAR plugin to build and sign JARs -->
+			</plugin>
+			
+			<!-- JAR plugin to build and sign JARs -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
