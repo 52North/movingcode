@@ -4,7 +4,7 @@
   <MainVariable>
     <Variable name="O3.MIXING.RATIO" unit="ppmv"/>
   </MainVariable>
-  <Dataset id="satellite_a" name="MIP_NL__2P">
+  <Dataset id="satellite_a" name="${satellite_a}">
     <Directory>/home/matthes/arbeit/GeoViQua/GECA/data/MIP_NL__2P</Directory>
     <Filter>
       <IncludeFilter>DATETIME</IncludeFilter>
@@ -18,7 +18,7 @@
       <IncludeFilter>O3.MIXING.RATIO_UNCERTAINTY</IncludeFilter>
     </Filter>
   </Dataset>
-  <Dataset id="satellite_b" name="GOM_NL__2P">
+  <Dataset id="satellite_b" name="${satellite_b}">
     <Directory>/home/matthes/arbeit/GeoViQua/GECA/data/GOM_NL__2P</Directory>
     <Filter>
       <IncludeFilter>DATETIME</IncludeFilter>
@@ -34,12 +34,12 @@
   </Dataset>
   <InterComparison type="InterComparison">
     <CollocationCriteria>
-      <Criterion name="dt" unit="h" type="double">2</Criterion>
-      <Criterion name="dp" unit="km" type="double">1000</Criterion>
+      <Criterion name="dt" unit="h" type="double">${CollocationCriteria_dt}</Criterion>
+      <Criterion name="dp" unit="km" type="double">${CollocationCriteria_dp}</Criterion>
     </CollocationCriteria>
     <ResamplingOptions>
-      <Input name="scheme">nearest_neighbour</Input>
-      <Input name="master">satellite_b</Input>
+      <Input name="scheme">${ResamplingScheme}</Input>
+      <Input name="master">${ResamplingMaster}</Input>
     </ResamplingOptions>
     <VerticalResamplingOptions>
         <Input name="target_vertical_grid" variable="ALTITUDE" unit="km">vertical_grid_b</Input>
