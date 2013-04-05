@@ -61,6 +61,15 @@ public enum IODataType {
 
         // check possible well-known data types
         String datatype = wpsLiteral.getStringValue();
+        if (datatype == null || datatype.trim().isEmpty()) {
+        	if (wpsLiteral.isSetReference()) {
+        		datatype = wpsLiteral.getReference().trim();
+        		String[] split = datatype.split(":");
+        		if (split != null && split.length > 1) {
+        			datatype = split[split.length-1];
+        		}
+        	}
+        }
 
         if (datatype.equalsIgnoreCase("string")) {
             return IODataType.STRING;

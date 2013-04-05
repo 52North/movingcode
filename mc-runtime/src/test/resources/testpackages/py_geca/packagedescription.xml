@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Description for echo process Author: Matthias Mueller, TU 
-	Dresden Website: http://tu-dresden.de/fgh/geo/gis -->
 <mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
 	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
@@ -15,37 +13,79 @@
 			<ows:Abstract>GECA Satellite Data Intercomparison</ows:Abstract>
 			<DataInputs>
 				<Input minOccurs="1" maxOccurs="1">
-					<ows:Identifier>InterComparisonDefinition</ows:Identifier>
-					<ows:Title>The Echo Call</ows:Title>
-					<ows:Abstract>Some arbitrary input</ows:Abstract>
-					<ComplexData>
-						<Default>
-							<Format>
-								<MimeType>text/plain</MimeType>
-							</Format>
-						</Default>
-						<Supported>
-							<Format>
-								<MimeType>text/plain</MimeType>
-							</Format>
-						</Supported>
-					</ComplexData>
+					<ows:Identifier>satellite_a</ows:Identifier>
+					<ows:Title>satellite_a dataset identifier</ows:Title>
+					<ows:Abstract>satellite_a dataset identifier</ows:Abstract>
+					<LiteralData>
+						<ows:DataType ows:reference="xs:string"/>
+						<ows:AnyValue/>
+					</LiteralData>
+				</Input>
+				<Input minOccurs="1" maxOccurs="1">
+					<ows:Identifier>satellite_b</ows:Identifier>
+					<ows:Title>satellite_b dataset identifier</ows:Title>
+					<ows:Abstract>satellite_b dataset identifier</ows:Abstract>
+					<LiteralData>
+						<ows:DataType ows:reference="xs:string"/>
+						<ows:AnyValue/>
+					</LiteralData>
+				</Input>
+				<Input minOccurs="1" maxOccurs="1">
+					<ows:Identifier>CollocationCriteria_dt</ows:Identifier>
+					<ows:Title>CollocationCriteria_dt unit h</ows:Title>
+					<ows:Abstract>the CollocationCriteria with name 'dt', unit 'h'
+					encoded as a floating number (e.g '2')</ows:Abstract>
+					<LiteralData>
+						<ows:DataType ows:reference="xs:string"/>
+						<ows:AnyValue/>
+					</LiteralData>
+				</Input>
+				<Input minOccurs="1" maxOccurs="1">
+					<ows:Identifier>CollocationCriteria_dp</ows:Identifier>
+					<ows:Title>CollocationCriteria_dp unit km</ows:Title>
+					<ows:Abstract>the CollocationCriteria with name 'dp', unit 'km'
+					encoded as a floating number (e.g. '1000')</ows:Abstract>
+					<LiteralData>
+						<ows:DataType ows:reference="xs:string"/>
+						<ows:AnyValue/>
+					</LiteralData>
+				</Input>
+				<Input minOccurs="1" maxOccurs="1">
+					<ows:Identifier>ResamplingScheme</ows:Identifier>
+					<ows:Title>ResamplingScheme</ows:Title>
+					<ows:Abstract>the ResamplingScheme (e.g. 'nearest_neighbour')</ows:Abstract>
+					<LiteralData>
+						<ows:DataType ows:reference="xs:string"/>
+						<ows:AnyValue/>
+					</LiteralData>
+				</Input>
+				<Input minOccurs="1" maxOccurs="1">
+					<ows:Identifier>ResamplingMaster</ows:Identifier>
+					<ows:Title>ResamplingMaster</ows:Title>
+					<ows:Abstract>the ResamplingMaster ('satellite_a' or 'satellite_b')</ows:Abstract>
+					<LiteralData>
+						<ows:DataType ows:reference="xs:string"/>
+						<ows:AllowedValues>
+							<ows:Value>satellite_a</ows:Value>
+							<ows:Value>satellite_b</ows:Value>
+						</ows:AllowedValues>
+					</LiteralData>
 				</Input>
 			</DataInputs>
 			<ProcessOutputs>
 				<Output>
 					<ows:Identifier>PDF</ows:Identifier>
 					<ows:Title>PDF Report</ows:Title>
-					<ows:Abstract>The same arbitrary response</ows:Abstract>
+					<ows:Abstract>The Intercomparison Report as PDF</ows:Abstract>
 					<ComplexOutput>
 						<Default>
 							<Format>
-								<MimeType>text/plain</MimeType>
+								<MimeType>application/pdf</MimeType>
 							</Format>
 						</Default>
 						<Supported>
 							<Format>
-								<MimeType>text/plain</MimeType>
+								<MimeType>application/pdf</MimeType>
 							</Format>
 						</Supported>
 					</ComplexOutput>
@@ -61,14 +101,14 @@
 	</mc:contractedPlatform>
 	<mc:contractedInfrastructure>
 		<mc:occi.compute.memory>0.1</mc:occi.compute.memory>
-		<mc:occi.storage.size>0.01</mc:occi.storage.size>
+		<mc:occi.storage.size>0.5</mc:occi.storage.size>
 	</mc:contractedInfrastructure>
 	<mc:exploitationRights>
 		<mc:creativeCommonsLicense>
 			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>
-			<mc:dct.title>de.tu-dresden.geo.gis.algorithms.test.echo</mc:dct.title>
-			<mc:cc.attributionName>Matthias Mueller</mc:cc.attributionName>
-			<mc:cc.attributionURL>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mitarbeiter/mueller.m</mc:cc.attributionURL>
+			<mc:dct.title>org.geoviqua.geca.intercomparisono</mc:dct.title>
+			<mc:cc.attributionName>Matthes Rieke</mc:cc.attributionName>
+			<mc:cc.attributionURL>http://matthesrieke.github.com</mc:cc.attributionURL>
 		</mc:creativeCommonsLicense>
 	</mc:exploitationRights>
 	<mc:workspace>
@@ -79,11 +119,31 @@
 			<!-- Inputs -->
 			<mc:parameter>
 				<mc:positionID>1</mc:positionID>
-				<mc:functionalInputID>InterComparisonDefinition</mc:functionalInputID>
+				<mc:functionalInputID>satellite_a</mc:functionalInputID>
+			</mc:parameter>
+			<mc:parameter>
+				<mc:positionID>2</mc:positionID>
+				<mc:functionalInputID>satellite_b</mc:functionalInputID>
+			</mc:parameter>
+			<mc:parameter>
+				<mc:positionID>3</mc:positionID>
+				<mc:functionalInputID>CollocationCriteria_dt</mc:functionalInputID>
+			</mc:parameter>
+			<mc:parameter>
+				<mc:positionID>4</mc:positionID>
+				<mc:functionalInputID>CollocationCriteria_dp</mc:functionalInputID>
+			</mc:parameter>
+			<mc:parameter>
+				<mc:positionID>5</mc:positionID>
+				<mc:functionalInputID>ResamplingScheme</mc:functionalInputID>
+			</mc:parameter>
+			<mc:parameter>
+				<mc:positionID>6</mc:positionID>
+				<mc:functionalInputID>ResamplingMaster</mc:functionalInputID>
 			</mc:parameter>
 			<!-- Outputs -->
 			<mc:parameter>
-				<mc:positionID>2</mc:positionID>
+				<mc:positionID>7</mc:positionID>
 				<mc:functionalOutputID>PDF</mc:functionalOutputID>
 			</mc:parameter>
 		</mc:executionParameters>
