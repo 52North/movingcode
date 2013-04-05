@@ -58,8 +58,15 @@ public enum IODataType {
 	public Class< ? extends Object> getSupportedClass() {
 		return this.clazz;
 	}
-
-	public static final IODataType findDataType(DomainMetadataType wpsLiteral) throws UnknownFormatConversionException {
+	
+	/**
+	 * Private method that guesses the internal data type from a ows:domainMetadataType
+	 * 
+	 * @param wpsLiteral {@link DomainMetadataType}
+	 * @return {@link IODataType} -  the interanl data type, i.e. {string|boolean|float|double|int|integer}
+	 * @throws UnknownFormatConversionException
+	 */
+	private static final IODataType findDataType(DomainMetadataType wpsLiteral) {
 
 		// 1. try it with well-known data types in the OGC type system
 		String datatype = wpsLiteral.getStringValue();
@@ -79,24 +86,34 @@ public enum IODataType {
 				}
 			}
 		}
-
-		if (datatype.equalsIgnoreCase("string")) {
-			return IODataType.STRING;
+		
+		// make sure we are not running into NPE in the following comparison
+		if (datatype == null)
+		{
+			return null;
 		}
-		if (datatype.equalsIgnoreCase("boolean")) {
-			return IODataType.BOOLEAN;
-		}
-		if (datatype.equalsIgnoreCase("float")) {
-			return IODataType.DOUBLE;
-		}
-		if (datatype.equalsIgnoreCase("double")) {
-			return IODataType.DOUBLE;
-		}
-		if (datatype.equalsIgnoreCase("int")) {
-			return IODataType.INTEGER;
-		}
-		if (datatype.equalsIgnoreCase("integer")) {
-			return IODataType.INTEGER;
+		// return internal data type based on the type guess
+		else
+		{
+			
+			if (datatype.equalsIgnoreCase("string")) {
+				return IODataType.STRING;
+			}
+			if (datatype.equalsIgnoreCase("boolean")) {
+				return IODataType.BOOLEAN;
+			}
+			if (datatype.equalsIgnoreCase("float")) {
+				return IODataType.DOUBLE;
+			}
+			if (datatype.equalsIgnoreCase("double")) {
+				return IODataType.DOUBLE;
+			}
+			if (datatype.equalsIgnoreCase("int")) {
+				return IODataType.INTEGER;
+			}
+			if (datatype.equalsIgnoreCase("integer")) {
+				return IODataType.INTEGER;
+			}
 		}
 
 		return null;
