@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>mc-runtime</artifactId>
 	<packaging>jar</packaging>
-	<name>mc-runtime</name>
+	<name>52North Moving Code Runtime</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

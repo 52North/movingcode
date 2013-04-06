@@ -41,6 +41,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
+import org.apache.log4j.Logger;
 
 /**
  * @author Matthias Mueller, TU Dresden
@@ -48,13 +49,15 @@ import org.apache.abdera.writer.Writer;
  */
 public final class GeoprocessingFeed {
 
+    static Logger logger = Logger.getLogger(GeoprocessingFeed.class);
+
     private final Feed feed;
 
     public GeoprocessingFeed(InputStream atomStream) {
         Parser parser = Abdera.getInstance().getParser();
         Document<Feed> doc = parser.parse(atomStream);
         this.feed = doc.getRoot();
-        System.out.println("Found Feed: " + this.feed.getTitle());
+        logger.info("Found Feed: " + this.feed.getTitle());
     }
 
     public GeoprocessingFeed(FeedTemplate template) {
