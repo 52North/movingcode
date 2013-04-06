@@ -10,7 +10,7 @@
 	<artifactId>movingcode-runtime-parent</artifactId>
 	<version>0.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>movingcode runtime reactor</name>
+	<name>Moving Code Runtime Reactor</name>
 
 	<modules>
 		<module>mc-xml-processors</module>
