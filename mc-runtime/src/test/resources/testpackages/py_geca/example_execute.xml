@@ -7,13 +7,13 @@
 	<ows:Identifier>org.geoviqua.geca.intercomparison</ows:Identifier>
 	<wps:DataInputs>
 		<wps:Input>
-			<ows:Identifier>dataset_a</ows:Identifier>
+			<ows:Identifier>satellite_a</ows:Identifier>
 			<wps:Data>
 				<wps:LiteralData dataType="xs:string">MIP_NL__2P</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
-			<ows:Identifier>dataset_b</ows:Identifier>
+			<ows:Identifier>satellite_b</ows:Identifier>
 			<wps:Data>
 				<wps:LiteralData dataType="xs:string">GOM_NL__2P</wps:LiteralData>
 			</wps:Data>

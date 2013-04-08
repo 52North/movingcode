@@ -20,8 +20,8 @@ def copyAndPrepareTemplateDefinition(cwd, arguments, dataset_base):
 		newLine = line.replace("${workspace}", cwd + os.sep + WORKSPACE_SUB_FOLDER)
 		newLine = newLine.replace("${dataset_a_base_folder}", dataset_base + os.sep + arguments[1])
 		newLine = newLine.replace("${dataset_b_base_folder}", dataset_base + os.sep + arguments[2])
-		newLine = newLine.replace("${dataset_a}", arguments[1])
-		newLine = newLine.replace("${dataset_b}", arguments[2])
+		newLine = newLine.replace("${satellite_a}", arguments[1])
+		newLine = newLine.replace("${satellite_b}", arguments[2])
 		newLine = newLine.replace("${CollocationCriteria_dt}", arguments[3])
 		newLine = newLine.replace("${CollocationCriteria_dp}", arguments[4])
 		newLine = newLine.replace("${ResamplingScheme}", arguments[5])
@@ -62,7 +62,7 @@ def main(argv):
 
 	#read config
 	config = ConfigParser.ConfigParser()
-	cfgpath = cwd+ os.sep +".."+ os.sep + "geca-config.cfg"
+	cfgpath = "geca-config.cfg"
 	print cfgpath
 	config.read(cfgpath)
 	

@@ -4,7 +4,7 @@
   <MainVariable>
     <Variable name="O3.MIXING.RATIO" unit="ppmv"/>
   </MainVariable>
-  <Dataset id="satellite_a" name="${dataset_a}">
+  <Dataset id="satellite_a" name="${satellite_a}">
     <Directory>${dataset_a_base_folder}</Directory>
     <Filter>
       <IncludeFilter>DATETIME</IncludeFilter>
@@ -18,7 +18,7 @@
       <IncludeFilter>O3.MIXING.RATIO_UNCERTAINTY</IncludeFilter>
     </Filter>
   </Dataset>
-  <Dataset id="satellite_b" name="${dataset_b}">
+  <Dataset id="satellite_b" name="${satellite_b}">
     <Directory>${dataset_b_base_folder}</Directory>
     <Filter>
       <IncludeFilter>DATETIME</IncludeFilter>

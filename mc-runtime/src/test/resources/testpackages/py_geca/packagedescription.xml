@@ -13,18 +13,18 @@
 			<ows:Abstract>GECA Satellite Data Intercomparison</ows:Abstract>
 			<DataInputs>
 				<Input minOccurs="1" maxOccurs="1">
-					<ows:Identifier>dataset_a</ows:Identifier>
-					<ows:Title>dataset_b dataset identifier</ows:Title>
-					<ows:Abstract>dataset_b dataset identifier</ows:Abstract>
+					<ows:Identifier>satellite_a</ows:Identifier>
+					<ows:Title>satellite_a dataset identifier</ows:Title>
+					<ows:Abstract>satellite_a dataset identifier</ows:Abstract>
 					<LiteralData>
 						<ows:DataType ows:reference="xs:string"/>
 						<ows:AnyValue/>
 					</LiteralData>
 				</Input>
 				<Input minOccurs="1" maxOccurs="1">
-					<ows:Identifier>dataset_b</ows:Identifier>
-					<ows:Title>dataset_b dataset identifier</ows:Title>
-					<ows:Abstract>dataset_b dataset identifier</ows:Abstract>
+					<ows:Identifier>satellite_b</ows:Identifier>
+					<ows:Title>satellitet_b dataset identifier</ows:Title>
+					<ows:Abstract>satellite_b dataset identifier</ows:Abstract>
 					<LiteralData>
 						<ows:DataType ows:reference="xs:string"/>
 						<ows:AnyValue/>
@@ -62,12 +62,12 @@
 				<Input minOccurs="1" maxOccurs="1">
 					<ows:Identifier>ResamplingMaster</ows:Identifier>
 					<ows:Title>ResamplingMaster</ows:Title>
-					<ows:Abstract>the ResamplingMaster ('dataset_a' or 'dataset_b')</ows:Abstract>
+					<ows:Abstract>the ResamplingMaster ('satellite_a' or 'satellite_b')</ows:Abstract>
 					<LiteralData>
 						<ows:DataType ows:reference="xs:string"/>
 						<ows:AllowedValues>
-							<ows:Value>dataset_a</ows:Value>
-							<ows:Value>dataset_b</ows:Value>
+							<ows:Value>satellite_a</ows:Value>
+							<ows:Value>satellite_b</ows:Value>
 						</ows:AllowedValues>
 					</LiteralData>
 				</Input>
@@ -90,7 +90,7 @@
 						</Supported>
 					</ComplexOutput>
 				</Output>
-				<Output minOccurs="0" maxOccurs="1">
+				<Output>
 					<ows:Identifier>ZIP</ows:Identifier>
 					<ows:Title>Report ZIP</ows:Title>
 					<ows:Abstract>The complete output of the Intercomparison Report</ows:Abstract>
@@ -131,16 +131,16 @@
 	<mc:workspace>
 		<mc:workspaceRoot>./bin</mc:workspaceRoot>
 		<mc:executableLocation>./mc-geca.py</mc:executableLocation>
-		<mc:containerType>http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.7</mc:containerType>
+		<mc:containerType>http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.5</mc:containerType>
 		<mc:executionParameters>
 			<!-- Inputs -->
 			<mc:parameter>
 				<mc:positionID>1</mc:positionID>
-				<mc:functionalInputID>dataset_a</mc:functionalInputID>
+				<mc:functionalInputID>satellite_a</mc:functionalInputID>
 			</mc:parameter>
 			<mc:parameter>
 				<mc:positionID>2</mc:positionID>
-				<mc:functionalInputID>dataset_b</mc:functionalInputID>
+				<mc:functionalInputID>satellite_b</mc:functionalInputID>
 			</mc:parameter>
 			<mc:parameter>
 				<mc:positionID>3</mc:positionID>
