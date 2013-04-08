@@ -40,6 +40,9 @@ import java.util.List;
 import org.apache.abdera.model.Link;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlError;
+import org.apache.xmlbeans.XmlOptions;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeedEntry;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.FunctionalDescriptionsListType;
@@ -56,6 +59,8 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 public class MovingCodePackage {
 
+	private static final Logger logger = Logger.getLogger(MovingCodePackage.class);
+	
     public static enum FunctionalType {
         WPS100, WSDL10, WSDL20
     };
@@ -269,7 +274,15 @@ public class MovingCodePackage {
         // and return the validation result
         if (this.packageDescription != null) {
             if ( !this.packageDescription.isNil()) {
-                return this.packageDescription.validate();
+            	//information on validation errors
+            	if (!this.packageDescription.validate()) {
+            		List<XmlError> errors = new ArrayList<XmlError>();
+            		this.packageDescription.validate(new XmlOptions().setErrorListener(errors));
+            		logger.warn("Package is not valid: "+errors);
+            		return false;
+            	} else {
+            		return true;
+            	}
             }
         }
         return false;
