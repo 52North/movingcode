@@ -54,10 +54,13 @@ public final class GeoprocessingFeed {
     private final Feed feed;
 
     public GeoprocessingFeed(InputStream atomStream) {
+        logger.debug("Loading Feed from " + atomStream);
+        
         Parser parser = Abdera.getInstance().getParser();
         Document<Feed> doc = parser.parse(atomStream);
         this.feed = doc.getRoot();
-        logger.info("Found Feed: " + this.feed.getTitle());
+        
+        logger.info("New Feed: " + this.feed.getTitle());
     }
 
     public GeoprocessingFeed(FeedTemplate template) {

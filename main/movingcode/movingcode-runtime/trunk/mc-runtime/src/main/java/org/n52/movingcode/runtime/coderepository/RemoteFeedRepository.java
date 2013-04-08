@@ -57,12 +57,16 @@ public final class RemoteFeedRepository extends AbstractRepository {
     public RemoteFeedRepository(final URL atomFeedURL) {
         InputStream stream = null;
         try {
+            logger.debug("Create RemoteFeedRepository from " + atomFeedURL);
             stream = atomFeedURL.openStream();
             GeoprocessingFeed feed = new GeoprocessingFeed(stream);
 
             for (Entry entry : feed.getEntries()) {
                 // create new moving code package from the entry
                 GeoprocessingFeedEntry gpfe = new GeoprocessingFeedEntry(entry);
+                logger.trace("Loading entry " + gpfe.toString());
+
+                // FIXME this call slows down startup of WPS server
                 MovingCodePackage mcPackage = new MovingCodePackage(gpfe);
 
                 // validate
@@ -72,7 +76,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
                     register(mcPackage);
                 }
                 else {
-                    System.out.println("Info: " + atomFeedURL.toString() + " contains an invalid package: "
+                    logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
                             + mcPackage.getPackageIdentifier());
                 }
             }
@@ -91,6 +95,8 @@ public final class RemoteFeedRepository extends AbstractRepository {
                     logger.error("Could not close GeoprocessingFeed stream.", e);
                 }
         }
+
+        logger.trace("Created!");
     }
 
 }
