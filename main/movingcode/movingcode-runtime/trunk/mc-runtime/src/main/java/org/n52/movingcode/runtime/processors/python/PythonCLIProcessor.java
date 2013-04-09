@@ -24,6 +24,7 @@
 
 package org.n52.movingcode.runtime.processors.python;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,8 +40,10 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -138,6 +141,9 @@ public class PythonCLIProcessor extends AbstractProcessor {
 
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 		Executor executor = new DefaultExecutor();
+	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+	    executor.setStreamHandler(streamHandler);
 
 		// put a watchdog if required
 		if (timeoutSeconds > 0) {
@@ -149,6 +155,13 @@ public class PythonCLIProcessor extends AbstractProcessor {
 			executor.execute(cmdLine, resultHandler);
 			resultHandler.waitFor();
 			int exitVal = resultHandler.getExitValue();
+			if (exitVal != 0) {
+				logger.error(outputStream.toString());
+			}
+			else {
+				if (logger.isDebugEnabled())
+					logger.debug(outputStream.toString());
+			}
 		}
 		catch (ExecuteException e) {
 			throw new RuntimeException(e.getMessage());
