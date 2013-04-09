@@ -15,13 +15,26 @@ def copyAndPrepareTemplateDefinition(cwd, arguments, dataset_base):
 	print dataset_base
 	tmpDef = uuid.uuid4().hex +".xml"
 	
+	datasetAFolder = dataset_base + os.sep + arguments[1]
+	datasetBFolder = dataset_base + os.sep + arguments[2]
+	
+	index = arguments[1].find('/')
+	if (index < 0):
+		arguments[1].find('\\')
+	datasetAName = arguments[1][:index]
+	
+	index = arguments[2].find('/')
+	if (index < 0):
+		arguments[2].find('\\')
+	datasetBName = arguments[2][:index]
+	
 	shutil.copyfile(TEMPLATE_FILE, tmpDef)
 	for line in fileinput.input(tmpDef, inplace = 1): # Does a list of files, and writes redirects STDOUT to the file in question
 		newLine = line.replace("${workspace}", cwd + os.sep + WORKSPACE_SUB_FOLDER)
-		newLine = newLine.replace("${dataset_a_base_folder}", dataset_base + os.sep + arguments[1])
-		newLine = newLine.replace("${dataset_b_base_folder}", dataset_base + os.sep + arguments[2])
-		newLine = newLine.replace("${satellite_a}", arguments[1])
-		newLine = newLine.replace("${satellite_b}", arguments[2])
+		newLine = newLine.replace("${dataset_a_base_folder}", datasetAFolder)
+		newLine = newLine.replace("${dataset_b_base_folder}", datasetBFolder)
+		newLine = newLine.replace("${satellite_a}", datasetAName)
+		newLine = newLine.replace("${satellite_b}", datasetBName)
 		newLine = newLine.replace("${CollocationCriteria_dt}", arguments[3])
 		newLine = newLine.replace("${CollocationCriteria_dp}", arguments[4])
 		newLine = newLine.replace("${ResamplingScheme}", arguments[5])
@@ -48,6 +61,9 @@ def copyResultToOutputFiles(arguments):
 		dest = arguments[8]
 		zipdir(WORKSPACE_SUB_FOLDER + os.sep + "output", dest)
 		
+def removeResources(tempDef):
+	shutil.rmtree(WORKSPACE_SUB_FOLDER)
+	os.remove(tempDef)
 
 def main(argv):	
 
@@ -74,6 +90,9 @@ def main(argv):
 	
 	#finally, copy output files
 	copyResultToOutputFiles(sys.argv)
+	
+	#cleanup after us
+	#removeResources(tempDefinition)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
