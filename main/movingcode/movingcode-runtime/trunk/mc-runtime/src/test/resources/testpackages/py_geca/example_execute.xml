@@ -9,13 +9,13 @@
 		<wps:Input>
 			<ows:Identifier>satellite_a</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData dataType="xs:string">MIP_NL__2P</wps:LiteralData>
+				<wps:LiteralData dataType="xs:string">MIP_NL__2P/2010/01/01</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
 			<ows:Identifier>satellite_b</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData dataType="xs:string">GOM_NL__2P</wps:LiteralData>
+				<wps:LiteralData dataType="xs:string">GOM_NL__2P/2010/01</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
