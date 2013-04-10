@@ -40,7 +40,6 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -95,6 +94,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
 		// 3. unzip workspace from package and assign workspaceDir
 		try {
 			this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
+			this.logger.info("Using temporary workspace at "+this.clonedWorkspace);
 		}
 		catch (Exception e) {
 			this.logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
@@ -142,7 +142,8 @@ public class PythonCLIProcessor extends AbstractProcessor {
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 		Executor executor = new DefaultExecutor();
 	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-	    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+	    ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+	    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, errorStream);
 	    executor.setStreamHandler(streamHandler);
 
 		// put a watchdog if required
@@ -156,11 +157,14 @@ public class PythonCLIProcessor extends AbstractProcessor {
 			resultHandler.waitFor();
 			int exitVal = resultHandler.getExitValue();
 			if (exitVal != 0) {
-				logger.error(outputStream.toString());
+				logger.error("stderr was: "+errorStream.toString());
+				logger.error("stdout was: "+outputStream.toString());
 			}
 			else {
-				if (logger.isDebugEnabled())
-					logger.debug(outputStream.toString());
+				if (logger.isDebugEnabled()) {
+					logger.debug("stdout was:"+outputStream.toString());
+					logger.debug("stderr was:"+errorStream.toString());
+				}
 			}
 		}
 		catch (ExecuteException e) {
