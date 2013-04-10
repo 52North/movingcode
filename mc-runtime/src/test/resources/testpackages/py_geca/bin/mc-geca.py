@@ -7,12 +7,15 @@ import uuid
 import ConfigParser
 from contextlib import closing
 from zipfile import ZipFile, ZIP_DEFLATED
+from subprocess import call, Popen, PIPE
+import getpass
+import tempfile
 
 TEMPLATE_FILE = "template_definition.xml"
 WORKSPACE_SUB_FOLDER = "workspace"
 
 def copyAndPrepareTemplateDefinition(cwd, arguments, dataset_base):
-	print dataset_base
+	print "Data folder: "+dataset_base
 	tmpDef = uuid.uuid4().hex +".xml"
 	
 	datasetAFolder = dataset_base + os.sep + arguments[1]
@@ -61,8 +64,9 @@ def copyResultToOutputFiles(arguments):
 		dest = arguments[8]
 		zipdir(WORKSPACE_SUB_FOLDER + os.sep + "output", dest)
 		
-def removeResources(tempDef):
+def removeResources(tempDef, temp_mpl_dir):
 	shutil.rmtree(WORKSPACE_SUB_FOLDER)
+	shutil.rmtree(temp_mpl_dir)
 	os.remove(tempDef)
 
 def main(argv):	
@@ -79,20 +83,39 @@ def main(argv):
 	#read config
 	config = ConfigParser.ConfigParser()
 	cfgpath = "geca-config.cfg"
-	print cfgpath
 	config.read(cfgpath)
 	
 	#prepare the template file
 	tempDefinition = copyAndPrepareTemplateDefinition(cwd, sys.argv, config.get("workspace", "dataset_base_folder"))
+
+	#add /usr/local/bin to path - the default location of gtcontrol and the like
+	path = os.getenv("PATH")
+	os.environ['PATH'] = "/usr/local/bin" + os.pathsep + path
+	print "$PATH set to: " +os.getenv("PATH")
+	
+	pWhich = Popen(["which", "gtcontrol"], stdout=PIPE)
+	gtControlFull, err = pWhich.communicate()
+	gtControlFull = gtControlFull.strip()
+	
+	if not gtControlFull.strip():
+		gtControlFull = "gtcontrol"
+	
+	print "Found gtcontrol at: "+ gtControlFull
+	
+	#we need to set MPLCONFIGDIR
+	temp_mpl_dir = tempfile.mkdtemp()
+	os.environ['MPLCONFIGDIR'] = temp_mpl_dir
 	
 	print "Using temporary definition file: "+ tempDefinition
-	os.system("gtcontrol "+tempDefinition)
+	#os.system("gtcontrol "+tempDefinition)
+	print "calling '" +gtControlFull+ " " +cwd + os.sep + tempDefinition +"'"
+	call([gtControlFull, cwd + os.sep + tempDefinition])
 	
 	#finally, copy output files
 	copyResultToOutputFiles(sys.argv)
 	
 	#cleanup after us
-	#removeResources(tempDefinition)
+	removeResources(tempDefinition, temp_mpl_dir)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
