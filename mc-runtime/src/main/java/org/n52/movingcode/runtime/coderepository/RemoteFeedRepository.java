@@ -174,6 +174,14 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			}		
 		}
 	}
-
+	
+	/**
+	 * Returns the time at which the feed was last updated.
+	 * 
+	 * @return {@link Date}
+	 */
+	protected Date lastUpdated(){
+		return lastFeedUpdate;
+	}
 
 }

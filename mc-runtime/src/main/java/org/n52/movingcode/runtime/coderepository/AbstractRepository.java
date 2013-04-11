@@ -70,22 +70,41 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	protected volatile int readLock = 0;
 
 	/**
-	 * Private method for registering packages with this repository instance.
-	 * Puts a new KVP (packageID, mcPackage) into the packages Map.
-	 * Also registers a KVP (functionalID,packageID) in the fIDpID_Lookup.
+	 * Protected method for registering packages with this repository.
+	 * Puts a new KVP (packageID, mcPackage) into the packages Map {@link AbstractRepository#packages}.
+	 * Also registers a KVP (functionalID,packageID) in the lookup Map {@link AbstractRepository#fIDpID_Lookup}.
 	 * 
 	 * @param mcPackage {@link MovingCodePackage}
 	 */
 	protected void register(MovingCodePackage mcPackage) {
-		aquireWriteLock();
+		acquireWriteLock();
 		this.packages.put(mcPackage.getPackageIdentifier(), mcPackage);
-		this.fIDpID_Lookup.put(mcPackage.getFunctionalIdentifier(), mcPackage.getPackageIdentifier());
+		this.fIDpID_Lookup.put(mcPackage.getFunctionIdentifier(), mcPackage.getPackageIdentifier());
 		returnWriteLock();
+		informRepositoryChangeListeners();
+	}
+	
+	/**
+	 * Protected method for un-registering packages with this repository.
+	 * Removes a package from {@link AbstractRepository#packages} and
+	 * from {@link AbstractRepository#fIDpID_Lookup}
+	 * 
+	 * @param packageID
+	 */
+	protected void unregister(String packageID){
+		acquireWriteLock();
+		if (fIDpID_Lookup.containsValue(packageID)){
+			String fID = getPackage(packageID).getFunctionIdentifier();
+			fIDpID_Lookup.remove(fID, packageID);
+		}
+		
+		returnWriteLock();
+		informRepositoryChangeListeners();
 	}
 
 	@Override
 	public boolean providesFunction(String functionID) {
-		aquireReadLock();
+		acquireReadLock();
 		boolean retval = this.fIDpID_Lookup.containsKey(functionID);
 		returnReadLock();
 		return retval;
@@ -93,7 +112,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public boolean containsPackage(String packageID) {
-		aquireReadLock();
+		acquireReadLock();
 		boolean retval = this.packages.containsKey(packageID);
 		returnReadLock();
 		return retval;
@@ -101,7 +120,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public String[] getFunctionIDs() {
-		aquireReadLock();
+		acquireReadLock();
 		String[] retval = this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
 		returnReadLock();
 		return retval;
@@ -109,7 +128,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public String[] getPackageIDs() {
-		aquireReadLock();
+		acquireReadLock();
 		String[] retval = this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
 		returnReadLock();
 		return retval;
@@ -117,7 +136,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public MovingCodePackage getPackage(String packageID) {
-		aquireReadLock();
+		acquireReadLock();
 		MovingCodePackage retval = this.packages.get(packageID);
 		returnReadLock();
 		return retval;
@@ -125,7 +144,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public Date getPackageTimestamp(String packageID) {
-		aquireReadLock();
+		acquireReadLock();
 		Date retval = this.packages.get(packageID).getTimestamp();
 		returnReadLock();	
 		return retval;
@@ -133,7 +152,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public PackageDescriptionDocument getPackageDescription(String packageID) {
-		aquireReadLock();
+		acquireReadLock();
 		PackageDescriptionDocument retval = this.packages.get(packageID).getDescription();
 		returnReadLock();
 		return retval;
@@ -141,7 +160,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	@Override
 	public MovingCodePackage[] getPackageByFunction(String functionID){
-		aquireReadLock(); // acquire lock
+		acquireReadLock(); // acquire lock
 		Collection<String> packageIDs = this.fIDpID_Lookup.get(functionID);
 		if (packageIDs.size() != 0){
 			ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
@@ -179,7 +198,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * Clear this repository. (Removes all contained packages)
 	 */
 	protected void clear(){
-		aquireWriteLock();
+		acquireWriteLock();
 
 		// registered packages - KVP (packageID, mPackage)
 		this.packages = new HashMap<String, MovingCodePackage>();
@@ -190,7 +209,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		returnWriteLock();
 	}
 
-	protected synchronized void aquireWriteLock(){
+	protected synchronized void acquireWriteLock(){
 		while (writeLock || readLock !=0 ){
 			// spin
 		}
@@ -201,7 +220,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		writeLock = false;
 	}
 
-	protected synchronized void aquireReadLock(){
+	protected synchronized void acquireReadLock(){
 		while (writeLock){
 			// spin
 		}
