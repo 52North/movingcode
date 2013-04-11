@@ -85,29 +85,9 @@ public class RepositoryUtils {
 		//
 		for (String currentSourceID : sourcePackageIDs){
 			
-			// 1. clone ID
-			String targetID = new String(currentSourceID);
+			String targetID = escapePackageIDToLocalPath(currentSourceID);
 			
-			
-			// 2. remove http prefix
-			if (targetID.startsWith(httpPrefix)){
-				targetID = targetID.substring(httpPrefix.length());
-			}
-			
-			// 3. replace invalid char sequences with File.separator
-			for (String sequence : separatorReplacements){
-				targetID = targetID.replaceAll(sequence, File.separator);
-			}
-			
-			// 4. remove consecutive occurrences of File.separator
-			targetID = removeConsecutiveFileSeparator(targetID);
-			
-			// 5. remove leading File.separator
-			if (targetID.startsWith(File.separator)){
-				targetID = targetID.substring(File.separator.length());
-			}
-			
-			// 6. store in map
+			// store in map
 			targetIDs.put(currentSourceID, targetID);
 			
 		}
@@ -211,5 +191,31 @@ public class RepositoryUtils {
 		}
 		
 		return resultSet.toArray(new String[resultSet.size()]);
+	}
+	
+	public static String escapePackageIDToLocalPath(String packageID){
+		// 1. clone ID
+		String escapedID = new String(packageID);
+		
+		
+		// 2. remove http prefix
+		if (escapedID.startsWith(httpPrefix)){
+			escapedID = escapedID.substring(httpPrefix.length());
+		}
+		
+		// 3. replace invalid char sequences with File.separator
+		for (String sequence : separatorReplacements){
+			escapedID = escapedID.replaceAll(sequence, File.separator);
+		}
+		
+		// 4. remove consecutive occurrences of File.separator
+		escapedID = removeConsecutiveFileSeparator(escapedID);
+		
+		// 5. remove leading File.separator
+		if (escapedID.startsWith(File.separator)){
+			escapedID = escapedID.substring(File.separator.length());
+		}
+		
+		return escapedID;
 	}
 }
