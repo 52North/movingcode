@@ -58,6 +58,9 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * For any sub-folders found in <absPath> it will be assumed that it contains a plain (unzipped)
  * Moving Code package.
  * 
+ * Performs occasional checks for updated content.
+ * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
+ * 
  * @author Matthias Mueller, TU Dresden
  *
  */
@@ -93,6 +96,10 @@ public final class LocalPlainRepository extends AbstractRepository {
 		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
 	}
 	
+	/**
+	 * private method that encapsulates the logic for loading zipped
+	 * MovingCode packages from a local folder.  
+	 */
 	private void load(){
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> packageFolders = scanForFolders(directory);
