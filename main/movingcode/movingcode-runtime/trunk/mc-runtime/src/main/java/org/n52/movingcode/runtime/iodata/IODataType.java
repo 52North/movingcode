@@ -27,8 +27,6 @@
 
 package org.n52.movingcode.runtime.iodata;
 
-import java.util.UnknownFormatConversionException;
-
 import net.opengis.ows.x11.DomainMetadataType;
 import net.opengis.wps.x100.InputDescriptionType;
 import net.opengis.wps.x100.OutputDescriptionType;
@@ -63,8 +61,7 @@ public enum IODataType {
 	 * Private method that guesses the internal data type from a ows:domainMetadataType
 	 * 
 	 * @param wpsLiteral {@link DomainMetadataType}
-	 * @return {@link IODataType} -  the interanl data type, i.e. {string|boolean|float|double|int|integer}
-	 * @throws UnknownFormatConversionException
+	 * @return {@link IODataType} - the internal data type, i.e. {string|boolean|float|double|int|integer}
 	 */
 	private static final IODataType findDataType(DomainMetadataType wpsLiteral) {
 
