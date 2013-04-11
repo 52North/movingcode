@@ -92,19 +92,19 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				// create new moving code package from the entry
 				GeoprocessingFeedEntry gpfe = new GeoprocessingFeedEntry(entry);
 				logger.trace("Loading entry " + gpfe.toString());
-
-				// FIXME this call slows down startup of WPS server
-				MovingCodePackage mcPackage = new MovingCodePackage(gpfe);
-
+				
+				String packageID = gpfe.getIdentifier();
+				MovingCodePackage mcPackage = new MovingCodePackage(gpfe, packageID);
+				
 				// validate
 				// and add to package map
 				// and add current file to zipFiles map
 				if (mcPackage.isValid()) {
-					register(mcPackage);
+					register(mcPackage, packageID);
 				}
 				else {
 					logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
-							+ mcPackage.getPackageIdentifier());
+							+ packageID);
 				}
 			}
 

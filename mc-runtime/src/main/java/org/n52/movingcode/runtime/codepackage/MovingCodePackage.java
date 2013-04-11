@@ -116,7 +116,7 @@ public class MovingCodePackage {
      * @param {@link GeoprocessingFeedEntry} atomFeedEntry - an entry from a geoprocessing feed
      * 
      */
-    public MovingCodePackage(final GeoprocessingFeedEntry atomFeedEntry) {
+    public MovingCodePackage(final GeoprocessingFeedEntry atomFeedEntry, String packageID) {
 
         PackageDescriptionDocument packageDescription = null;
         ZippedPackage archive = null;
@@ -156,7 +156,7 @@ public class MovingCodePackage {
             this.supportedFuncTypes = null;
         }
 
-        this.packageIdentifier = atomFeedEntry.getIdentifier();
+        this.packageIdentifier = packageID;
         this.timeStamp = atomFeedEntry.getUpdated();
         this.archive = archive;
 
