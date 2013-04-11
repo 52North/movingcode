@@ -35,6 +35,9 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
  * This class implements an {@link IMovingCodeRepository} for local zipped packages, stored
  * in a folder structure.
  * 
+ * Performs occasional checks for updated content.
+ * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
+ * 
  * @author Matthias Mueller, TU Dresden
  *
  */
@@ -57,7 +60,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	 * @param sourceDirectory {@link File} - the directory to be scanned for Moving Code Packages.
 	 * 
 	 */
-	public LocalZipPackageRepository(File sourceDirectory) {
+	public LocalZipPackageRepository(final File sourceDirectory) {
 		this.directory = sourceDirectory;
 		// compute directory fingerprint
 		fingerprint = RepositoryUtils.directoryFingerprint(directory);
@@ -78,7 +81,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 
 		for (File currentFile : zipFiles) {
 			String id = generateIDFromFilePath(currentFile.getPath());
-			logger.info("Found package: " + currentFile + "; using ID: " + id);
+			logger.trace("Found package: " + currentFile + "; using ID: " + id);
 
 			MovingCodePackage mcPackage = new MovingCodePackage(currentFile, id);
 
