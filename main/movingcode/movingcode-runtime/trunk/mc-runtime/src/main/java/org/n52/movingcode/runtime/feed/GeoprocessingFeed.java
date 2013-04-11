@@ -158,5 +158,15 @@ public final class GeoprocessingFeed {
 
         this.feed.setUpdated(lastUpdate);
     }
+    
+    /**
+     * Return the last update <updated>YYYY-MM-DDThh:mm:ss.nnn</updated>
+     * of this feed.
+     * 
+     * @return {@link Date} - last known update of this feed
+     */
+    public Date lastUpdated(){
+    	return feed.getUpdated();
+    }
 
 }
