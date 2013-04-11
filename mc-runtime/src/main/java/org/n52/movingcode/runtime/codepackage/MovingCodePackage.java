@@ -75,10 +75,11 @@ public class MovingCodePackage {
     private PackageDescriptionDocument packageDescription = null;
 
     // identifier of the provided functionality (e.g. WPS process identifier)
-    private final String functionalIdentifier;
+    private final String functionIdentifier;
 
     // unique identifier of this package
     // TODO: refactor; should be derived from the archive
+    @Deprecated
     private final String packageIdentifier;
 
     // Package time stamp, i.e. date of creation or last modification
@@ -98,11 +99,11 @@ public class MovingCodePackage {
 
         if (this.packageDescription != null
                 && this.packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-            this.functionalIdentifier = this.packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+            this.functionIdentifier = this.packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
             this.supportedFuncTypes = getFunctionalTypes(this.packageDescription);
         }
         else {
-            this.functionalIdentifier = null;
+            this.functionIdentifier = null;
             this.supportedFuncTypes = null;
         }
         this.timeStamp = getTimestamp(zipFile);
@@ -147,11 +148,11 @@ public class MovingCodePackage {
         // how can deal with that?
         if (packageDescription != null
                 && packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-            this.functionalIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+            this.functionIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
             this.supportedFuncTypes = getFunctionalTypes(packageDescription);
         }
         else {
-            this.functionalIdentifier = null;
+            this.functionIdentifier = null;
             this.supportedFuncTypes = null;
         }
 
@@ -179,11 +180,11 @@ public class MovingCodePackage {
 
         if (packageDescription != null
                 && packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-            this.functionalIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+            this.functionIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
             this.supportedFuncTypes = getFunctionalTypes(packageDescription);
         }
         else {
-            this.functionalIdentifier = null;
+            this.functionIdentifier = null;
             this.supportedFuncTypes = null;
         }
 
@@ -264,7 +265,7 @@ public class MovingCodePackage {
     public boolean isValid() {
 
         // a valid MovingCodePackage MUST have an identifier
-        if (this.functionalIdentifier == null) {
+        if (this.functionIdentifier == null) {
             return false;
         }
 
@@ -294,8 +295,8 @@ public class MovingCodePackage {
      * 
      * @return String
      */
-    public final String getFunctionalIdentifier() {
-        return this.functionalIdentifier;
+    public final String getFunctionIdentifier() {
+        return this.functionIdentifier;
     }
 
     /**
@@ -304,7 +305,10 @@ public class MovingCodePackage {
      * by the functional ID.
      * 
      * @return String
+     * 
+     * TODO: remove method, see {@link MovingCodePackage#packageIdentifier}
      */
+    @Deprecated
     public final String getPackageIdentifier() {
         return this.packageIdentifier;
     }
@@ -373,7 +377,7 @@ public class MovingCodePackage {
         builder.append(", packageDescription=");
         builder.append(this.packageDescription);
         builder.append(", functionalIdentifier=");
-        builder.append(this.functionalIdentifier);
+        builder.append(this.functionIdentifier);
         builder.append(", packageIdentifier=");
         builder.append(this.packageIdentifier);
         builder.append(", timeStamp=");
