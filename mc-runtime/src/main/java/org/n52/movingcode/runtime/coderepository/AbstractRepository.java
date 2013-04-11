@@ -195,7 +195,8 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	}
 
 	/**
-	 * Clear this repository. (Removes all contained packages)
+	 * Clear this repository. (Removes all contained packages and informs
+	 * the registered listeners.)
 	 */
 	protected void clear(){
 		acquireWriteLock();
@@ -207,6 +208,9 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		this.fIDpID_Lookup = ArrayListMultimap.create();
 
 		returnWriteLock();
+		
+		// inform change listeners
+		informRepositoryChangeListeners();
 	}
 
 	protected synchronized void acquireWriteLock(){
