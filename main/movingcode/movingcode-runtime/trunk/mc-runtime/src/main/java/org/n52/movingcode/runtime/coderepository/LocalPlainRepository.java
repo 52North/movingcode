@@ -149,7 +149,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage);
+				register(mcPackage, id);
 			}
 			else {
 				logger.error(currentFolder.getAbsolutePath() + " is an invalid package.");
