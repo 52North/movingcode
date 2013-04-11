@@ -49,21 +49,26 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * @author Matthias Mueller, TU Dresden
  * 
+ * Considered thread safe. Uses separate read and write locks.
  * 
  */
 public abstract class AbstractRepository implements IMovingCodeRepository{
-	
+
 	// registered packages - KVP (packageID, mPackage)
 	private Map<String, MovingCodePackage> packages = new HashMap<String, MovingCodePackage>();
-	
+
 	// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
 	private Multimap<String, String> fIDpID_Lookup = ArrayListMultimap.create();
 
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
-	
+
 	static Logger logger = Logger.getLogger(AbstractRepository.class);
-	
+
+	// volatile read and write locks
+	protected volatile boolean writeLock = false;
+	protected volatile int readLock = 0;
+
 	/**
 	 * Private method for registering packages with this repository instance.
 	 * Puts a new KVP (packageID, mcPackage) into the packages Map.
@@ -72,87 +77,139 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * @param mcPackage {@link MovingCodePackage}
 	 */
 	protected void register(MovingCodePackage mcPackage) {
+		aquireWriteLock();
 		this.packages.put(mcPackage.getPackageIdentifier(), mcPackage);
 		this.fIDpID_Lookup.put(mcPackage.getFunctionalIdentifier(), mcPackage.getPackageIdentifier());
+		returnWriteLock();
 	}
 
 	@Override
 	public boolean providesFunction(String functionID) {
-		return this.fIDpID_Lookup.containsKey(functionID);
+		aquireReadLock();
+		boolean retval = this.fIDpID_Lookup.containsKey(functionID);
+		returnReadLock();
+		return retval;
 	}
 
 	@Override
 	public boolean containsPackage(String packageID) {
-		return this.packages.containsKey(packageID);
+		aquireReadLock();
+		boolean retval = this.packages.containsKey(packageID);
+		returnReadLock();
+		return retval;
 	}
 
 	@Override
 	public String[] getFunctionIDs() {
-		return this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
+		aquireReadLock();
+		String[] retval = this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
+		returnReadLock();
+		return retval;
 	}
 
 	@Override
 	public String[] getPackageIDs() {
-		return this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
+		aquireReadLock();
+		String[] retval = this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
+		returnReadLock();
+		return retval;
 	}
-	
-    @Override
-    public MovingCodePackage getPackage(String packageID) {
-    	return this.packages.get(packageID);
-    }
 
-    @Override
-    public Date getPackageTimestamp(String packageID) {
-    	return this.packages.get(packageID).getTimestamp();
-    }
+	@Override
+	public MovingCodePackage getPackage(String packageID) {
+		aquireReadLock();
+		MovingCodePackage retval = this.packages.get(packageID);
+		returnReadLock();
+		return retval;
+	}
 
-    @Override
-    public PackageDescriptionDocument getPackageDescription(String packageID) {
-    	return this.packages.get(packageID).getDescription();
-    }
-    
-    @Override
-    public MovingCodePackage[] getPackageByFunction(String functionID){
-    	Collection<String> packageIDs = this.fIDpID_Lookup.get(functionID);
-    	if (packageIDs.size() != 0){
-    		ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
-    		for (String currentPID : packageIDs){
-    			resultSet.add(packages.get(currentPID));
-    		}
-    		return resultSet.toArray(new MovingCodePackage[resultSet.size()]);
-    	} else {
-    		return null;
-    	}
-    }
-    
-    @Override
+	@Override
+	public Date getPackageTimestamp(String packageID) {
+		aquireReadLock();
+		Date retval = this.packages.get(packageID).getTimestamp();
+		returnReadLock();	
+		return retval;
+	}
+
+	@Override
+	public PackageDescriptionDocument getPackageDescription(String packageID) {
+		aquireReadLock();
+		PackageDescriptionDocument retval = this.packages.get(packageID).getDescription();
+		returnReadLock();
+		return retval;
+	}
+
+	@Override
+	public MovingCodePackage[] getPackageByFunction(String functionID){
+		aquireReadLock(); // acquire lock
+		Collection<String> packageIDs = this.fIDpID_Lookup.get(functionID);
+		if (packageIDs.size() != 0){
+			ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
+			for (String currentPID : packageIDs){
+				resultSet.add(packages.get(currentPID));
+			}
+			returnReadLock(); // return lock
+			return resultSet.toArray(new MovingCodePackage[resultSet.size()]);
+		} else {
+			returnReadLock(); // return lock
+			return null;
+		}
+	}
+
+	@Override
 	public synchronized void addRepositoryChangeListener(RepositoryChangeListener l) {
 		this.changeListeners.add(l);
 	}
-    
-    @Override
+
+	@Override
 	public synchronized void removeRepositoryChangeListener(RepositoryChangeListener l) {
 		this.changeListeners.remove(l);
 	}
-	
-    /**
-     * informs all listeners about an update.
-     */
+
+	/**
+	 * informs all listeners about an update.
+	 */
 	protected synchronized void informRepositoryChangeListeners() {
 		for (RepositoryChangeListener l : this.changeListeners) {
 			l.onRepositoryUpdate(this);
 		}
 	}
-	
+
 	/**
 	 * Clear this repository. (Removes all contained packages)
 	 */
 	protected void clear(){
+		aquireWriteLock();
+
 		// registered packages - KVP (packageID, mPackage)
 		this.packages = new HashMap<String, MovingCodePackage>();
-		
+
 		// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
 		this.fIDpID_Lookup = ArrayListMultimap.create();
+
+		returnWriteLock();
 	}
-	
+
+	protected synchronized void aquireWriteLock(){
+		while (writeLock || readLock !=0 ){
+			// spin
+		}
+		writeLock = true;
+	}
+
+	protected synchronized void returnWriteLock(){
+		writeLock = false;
+	}
+
+	protected synchronized void aquireReadLock(){
+		while (writeLock){
+			// spin
+		}
+		readLock++;
+	}
+
+	protected void returnReadLock(){
+		readLock--;
+	}
+
 }
