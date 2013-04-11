@@ -27,6 +27,7 @@ package org.n52.movingcode.runtime.test;
 import java.io.File;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,89 +42,103 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 
 public class MovingCodeRepositoryTests extends GlobalTestConfig {
 
-    private static final String zTransformID = "de.tu-dresden.geo.gis.algorithms.raster.ztransform";
-    private static final String packageFolderName = "src/test/resources/testpackages";
+	private static final String zTransformFunctionID = "de.tu-dresden.geo.gis.algorithms.raster.ztransform";
+	private static final String packageFolderName = "src/test/resources/testpackages";
 
-    private static final String workspace = packageFolderName + File.separator + "ztransform/ztransform";
-    private static final String descriptionXML = packageFolderName + File.separator
-            + "ztransform/packagedescription.xml";
+	private static final String workspace = packageFolderName + File.separator + "ztransform/ztransform";
+	private static final String descriptionXML = packageFolderName + File.separator
+	+ "ztransform/packagedescription.xml";
 
-    private static final String tempFolder = "C:\\tmp";
+	private static final String tempFolder = "C:\\tmp";
 
-    @Test
-    public void testDirectoryRepository() {
+	Logger logger = Logger.getLogger(MovingCodeRepositoryTests.class);
 
-        // Arrange
-        File packageFolder = new File(packageFolderName);
-        System.out.println(packageFolder.getAbsolutePath());
+	@Test
+	public void testDirectoryRepository() {
+		// create string buffer for the pachake report
+		StringBuffer report = new StringBuffer("\n");
+		
+		// Arrange
+		File packageFolder = new File(packageFolderName);
+		logger.info(packageFolder.getAbsolutePath());
 
-        // Act
-        IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
+		// Act
+		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
 
-        // Assert
-        Assert.assertTrue(mcRep.containsPackage(zTransformID));
-        System.out.println("Information for package: " + zTransformID);
-        System.out.println("Package Timestamp is: " + mcRep.getPackageTimestamp(zTransformID));
+		// Assert
+		Assert.assertTrue(mcRep.providesFunction(zTransformFunctionID));
+		report.append("Information for package: " + zTransformFunctionID + "\n");
+		
+		MovingCodePackage pack = mcRep.getPackageByFunction(zTransformFunctionID)[0]; // get the test package
+		Assert.assertFalse(pack == null); // make sure it is not null
+		report.append("Package Timestamp is: " + pack.getTimestamp() + "\n");
 
-        MovingCodePackage pack = mcRep.getPackage(zTransformID); // get the test package
-        Assert.assertFalse(pack == null); // make sure it is not null
+		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty
+		// parameter Map
+		Assert.assertFalse(paramsMap == null); // make sure it is not null
 
-        IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty
-                                                                                      // parameter Map
-        Assert.assertFalse(paramsMap == null); // make sure it is not null
+		report.append("--- Parameters ---\n");
+		for (IOParameter param : paramsMap.values()) {
+			report.append(
+					"Parameter "
+					+ param.getIdentifier().getHarmonizedValue()
+					+ ": "
+					+ param.getMinMultiplicity()
+					+ ".."
+					+ param.getMaxMultiplicity()
+					+ "\n"
+			);
+			
+			if (param.isMessageIn()) {
+				report.append("ServiceInputID: " + param.getMessageInputIdentifier() + "\n");
+			}
+			if (param.isMessageOut()) {
+				report.append("ServiceOutputID: " + param.getMessageOutputIdentifier() + "\n");
+			}
+			
+			report.append("Internal Type: " + param.getType().toString() + "\n");
+		}
+		
+		// show report
+		logger.info(report.toString());
+	}
 
-        System.out.println("--- Parameters ---");
-        for (IOParameter param : paramsMap.values()) {
-            System.out.println("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
-                    + param.getMinMultiplicity() + ".." + param.getMaxMultiplicity());
-            if (param.isMessageIn()) {
-                System.out.println("ServiceInputID: " + param.getMessageInputIdentifier());
-            }
-            if (param.isMessageOut()) {
-                System.out.println("ServiceOutputID: " + param.getMessageOutputIdentifier());
-            }
+	@Test
+	public void testRepoManager() {
 
-            System.out.println("Internal Type: " + param.getType().toString());
+		// Arrange
+		File packageFolder = new File(packageFolderName);
+		logger.info(packageFolder.getAbsolutePath());
 
-        }
-    }
+		// Act
+		GlobalRepositoryManager repoMan = GlobalRepositoryManager.getInstance();
+		repoMan.addLocalPlainRepository(packageFolderName);
 
-    @Test
-    public void testRepoManager() {
+		// Assert
+		Assert.assertTrue(repoMan.providesFunction(zTransformFunctionID));
+	}
 
-        // Arrange
-        File packageFolder = new File(packageFolderName);
-        System.out.println(packageFolder.getAbsolutePath());
+	@Test
+	public void testPackageZipping() throws Exception {
 
-        // Act
-        GlobalRepositoryManager repoMan = GlobalRepositoryManager.getInstance();
-        repoMan.addLocalPlainRepository(packageFolderName);
+		// Arrange
+		File wsFolder = new File(workspace);
+		PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(new File(descriptionXML));
 
-        // Assert
-        Assert.assertTrue(repoMan.providesFunction(zTransformID));
-    }
+		// Act
+		// create a new zipped package
+		File tempFile = new File(tempFolder + File.separator + UUID.randomUUID().toString() + ".zip");
+		String packageIdentifier = tempFile.getPath();
+		logger.info(packageIdentifier);
 
-    @Test
-    public void testPackageZipping() throws Exception {
+		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null, packageIdentifier);
 
-        // Arrange
-        File wsFolder = new File(workspace);
-        PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(new File(descriptionXML));
+		mcp.dumpPackage(tempFile);
+		// close package and reopen
+		mcp = null;
+		mcp = new MovingCodePackage(tempFile, packageIdentifier);
 
-        // Act
-        // create a new zipped package
-        File tempFile = new File(tempFolder + File.separator + UUID.randomUUID().toString() + ".zip");
-        String packageIdentifier = tempFile.getPath();
-        System.out.println(packageIdentifier);
-
-        MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null, packageIdentifier);
-
-        mcp.dumpPackage(tempFile);
-        // close package and reopen
-        mcp = null;
-        mcp = new MovingCodePackage(tempFile, packageIdentifier);
-
-        // Assert
-        Assert.assertTrue(mcp.isValid());
-    }
+		// Assert
+		Assert.assertTrue(mcp.isValid());
+	}
 }
