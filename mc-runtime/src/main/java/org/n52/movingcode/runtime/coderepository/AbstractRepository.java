@@ -79,7 +79,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	protected void register(MovingCodePackage mcPackage, String packageID) {
 		acquireWriteLock();
 		this.packages.put(packageID, mcPackage);
-		this.fIDpID_Lookup.put(mcPackage.getFunctionIdentifier(), mcPackage.getPackageIdentifier());
+		this.fIDpID_Lookup.put(mcPackage.getFunctionIdentifier(), packageID);
 		returnWriteLock();
 		informRepositoryChangeListeners();
 	}
