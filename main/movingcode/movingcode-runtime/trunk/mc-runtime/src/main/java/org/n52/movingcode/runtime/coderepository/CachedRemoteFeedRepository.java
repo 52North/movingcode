@@ -54,9 +54,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	private Date mirrorTimestamp;
 
 	/**
-	 * Constructor for remote atom feed repositories. Additionally requires a cache directory to
+	 * Constructor for cached atom feed repositories. Additionally requires a cache directory to
 	 * which the content of the atom feed will be mirrored.
-	 * 
 	 * 
 	 * Tries to access the atom feed at the given URL and scans its
 	 * entries. Then attempts to interpret the entries as MovingCodePackages. Packages that do not validate
