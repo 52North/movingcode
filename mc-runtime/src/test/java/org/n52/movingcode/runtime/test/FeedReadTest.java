@@ -48,9 +48,9 @@ public class FeedReadTest extends MCRuntimeTestConfig {
 			rm.addRepository(url);
 			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
 
-			for (String id : rm.getPackageIDs()) {
-				logger.info("\nFound process: " + id);
-				MovingCodePackage pack = rm.getPackage(id);
+			for (String pID : rm.getPackageIDs()) {
+				logger.info("\nFound process: " + pID);
+				MovingCodePackage pack = rm.getPackage(pID);
 
 				Assert.assertFalse(pack == null); // make sure it is not null
 
@@ -59,7 +59,7 @@ public class FeedReadTest extends MCRuntimeTestConfig {
 				// parameter
 				// Map
 				if (processor == null) {
-					logger.info("Couldn't get a processor for package " + pack.getPackageIdentifier());
+					logger.info("Couldn't get a processor for package " + pID);
 				}
 
 				else {
