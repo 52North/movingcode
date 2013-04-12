@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
-public class ValidatePackage extends GlobalTestConfig {
+public class ValidatePackage extends MCRuntimeTestConfig {
 
     @Test
     public void loadAndValidateGoodPackage() {
@@ -38,7 +38,7 @@ public class ValidatePackage extends GlobalTestConfig {
         // Arrange
         File packageFile = new File("src/test/resources/testpackages/ztransform.zip");
         String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+        logger.info(packageIdentifier);
 
         // Act
         MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
@@ -53,7 +53,7 @@ public class ValidatePackage extends GlobalTestConfig {
         // Arrange
         File packageFile = new File("src/test/resources/testpackages/py_copy.zip");
         String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+        logger.info(packageIdentifier);
 
         // Act
         MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
@@ -68,7 +68,7 @@ public class ValidatePackage extends GlobalTestConfig {
         // Arrange
         File packageFile = new File("src/test/resources/testpackages/bad_package_structure.zip");
         String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+        logger.info(packageIdentifier);
 
         // Act
         MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);

@@ -29,38 +29,35 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
-public class FeedConversionTest extends GlobalTestConfig {
+public class FeedConversionTest extends MCRuntimeTestConfig {
 
-    Logger logger = Logger.getLogger(FeedConversionTest.class);
-    
 
-    @Test
-    public void queryTUDFeed() {
-    	
-        try {
-            URL url = new URL(GlobalTestConfig.feedURL);
-            IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(url);
-            logger.info("Added Repo: " + GlobalTestConfig.feedURL);
-            
-            File tempDir = new File ("D:\\1111\\repo\\");
-            
-            RepositoryUtils.materializeAsLocalZipRepo(repo, tempDir);
-            
+	@Test
+	public void queryTUDFeed() {
 
-        }
-        catch (MalformedURLException e) {
-        	Assert.assertFalse(true);
-        	e.printStackTrace();
-        } catch (IOException e) {
-        	Assert.assertFalse(true);
+		try {
+			URL url = new URL(MCRuntimeTestConfig.feedURL);
+			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(url);
+			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
+
+			File tempDir = new File ("D:\\1111\\repo\\");
+
+			RepositoryUtils.materializeAsLocalZipRepo(repo, tempDir);
+
+
+		}
+		catch (MalformedURLException e) {
+			Assert.assertFalse(true);
+			e.printStackTrace();
+		} catch (IOException e) {
+			Assert.assertFalse(true);
 			e.printStackTrace();
 		}
-    }
+	}
 }
