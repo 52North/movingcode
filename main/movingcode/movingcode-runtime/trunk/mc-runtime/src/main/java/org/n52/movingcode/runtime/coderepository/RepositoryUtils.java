@@ -30,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -51,7 +52,12 @@ public class RepositoryUtils {
 	private static final String httpPrefix = "http://";
 	
 	// strings that shall be replaces by File.separator
-	private static final String[] separatorReplacements = {":/", ":\\\\", "\\\\"};
+	private static final String[] separatorReplacements = {":/", ":\\\\", "\\\\", ";"};
+	
+	// typical extensions for zipped packages
+	public static final String[] zipExtension = {".zip"};
+	
+	public static final String normalizedFileSeparator = "/";
 	
 	/**
 	 * Conversion method that creates a new {@link LocalZipPackageRepository} repository from any given {@link IMovingCodeRepository}.
@@ -85,7 +91,7 @@ public class RepositoryUtils {
 		//
 		for (String currentSourceID : sourcePackageIDs){
 			
-			String targetID = escapePackageIDToLocalPath(currentSourceID);
+			String targetID = normalizePackageID(currentSourceID);
 			
 			// store in map
 			targetIDs.put(currentSourceID, targetID);
@@ -193,29 +199,67 @@ public class RepositoryUtils {
 		return resultSet.toArray(new String[resultSet.size()]);
 	}
 	
-	public static String escapePackageIDToLocalPath(String packageID){
-		// 1. clone ID
-		String escapedID = new String(packageID);
+	/**
+	 * Normalizes any given packageID so that it can be used to create a local file path.
+	 * The following operations are performed:
+	 * 
+	 * 1. remove {@value #httpPrefix}
+	 * 2. replace any of {@value #separatorReplacements} with a {@value File#separator}
+	 * 3. reduce consecutive occurrences of {@link File#separator} to one
+	 * 4. remove a leading {@value File#separator}
+	 * 5. remove trailing {@value #zipExtension}
+	 * 5. replace all {@value File#separator} with {@value #normalizedFileSeparator}
+	 * 
+	 * @param {@link String} packageID - ID that shall be normalized
+	 * @return {@link String} - the normalized ID
+	 */
+	public static String normalizePackageID(String packageID){
+		// 0. clone ID
+		String normalizedID = new String(packageID);
 		
 		
-		// 2. remove http prefix
-		if (escapedID.startsWith(httpPrefix)){
-			escapedID = escapedID.substring(httpPrefix.length());
+		// 1. remove http prefix
+		if (normalizedID.startsWith(httpPrefix)){
+			normalizedID = normalizedID.substring(httpPrefix.length());
 		}
 		
-		// 3. replace invalid char sequences with File.separator
+		// 2. replace invalid char sequences with File.separator
 		for (String sequence : separatorReplacements){
-			escapedID = escapedID.replaceAll(sequence, File.separator);
+			if (normalizedID.contains(sequence)){
+				StringTokenizer st = new StringTokenizer(normalizedID, sequence);
+				StringBuffer retval = new StringBuffer(st.nextToken());
+				while (st.hasMoreTokens()){
+					retval.append(File.separator + st.nextToken());
+				}
+				normalizedID = retval.toString();
+			}
 		}
 		
-		// 4. remove consecutive occurrences of File.separator
-		escapedID = removeConsecutiveFileSeparator(escapedID);
+		// 3. remove consecutive occurrences of File.separator
+		normalizedID = removeConsecutiveFileSeparator(normalizedID);
 		
-		// 5. remove leading File.separator
-		if (escapedID.startsWith(File.separator)){
-			escapedID = escapedID.substring(File.separator.length());
+		// 4. remove leading File.separator
+		if (normalizedID.startsWith(File.separator)){
+			normalizedID = normalizedID.substring(File.separator.length());
 		}
 		
-		return escapedID;
+		// 5. replace invalid char sequences with File.separator
+		for (String ext : zipExtension){
+			if (normalizedID.endsWith(ext)){
+				normalizedID = normalizedID.substring(0, normalizedID.lastIndexOf(ext));
+			}
+		}
+		
+		// 6. replace all File.separator with "/"
+		if (normalizedID.contains(File.separator)){
+			StringTokenizer st = new StringTokenizer(normalizedID, File.separator);
+			StringBuffer retval = new StringBuffer(st.nextToken());
+			while (st.hasMoreTokens()){
+				retval.append(normalizedFileSeparator + st.nextToken());
+			}
+			normalizedID = retval.toString();
+		}
+		
+		return normalizedID;
 	}
 }
