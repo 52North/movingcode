@@ -27,7 +27,6 @@ package org.n52.movingcode.runtime.test;
 import java.io.File;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,7 +39,7 @@ import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
-public class MovingCodeRepositoryTests extends GlobalTestConfig {
+public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 	private static final String zTransformFunctionID = "de.tu-dresden.geo.gis.algorithms.raster.ztransform";
 	private static final String packageFolderName = "src/test/resources/testpackages";
@@ -50,8 +49,6 @@ public class MovingCodeRepositoryTests extends GlobalTestConfig {
 	+ "ztransform/packagedescription.xml";
 
 	private static final String tempFolder = "C:\\tmp";
-
-	Logger logger = Logger.getLogger(MovingCodeRepositoryTests.class);
 
 	@Test
 	public void testDirectoryRepository() {

@@ -37,81 +37,81 @@ import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
-public class ArcToolboxPackageTest extends GlobalTestConfig {
+public class ArcToolboxPackageTest extends MCRuntimeTestConfig {
 
-    private static final String packageFileName = "src/test/resources/testpackages/arcgis_ndvi_tbx.zip";
+	private static final String packageFileName = "src/test/resources/testpackages/arcgis_ndvi_tbx.zip";
 
-    private static final String nir_data = "src/test/resources/testpackages/arctoolbox_ndvi/testdata/nir.tif";
-    private static final String nir_id = "NIR";
-    private static final int nir_position = 1;
+	private static final String nir_data = "src/test/resources/testpackages/arctoolbox_ndvi/testdata/nir.tif";
+	private static final String nir_id = "NIR";
+	private static final int nir_position = 1;
 
-    private static final String red_data = "src/test/resources/testpackages/arctoolbox_ndvi/testdata/red.tif";
-    private static final String red_id = "RED";
-    private static final int red_position = 2;
+	private static final String red_data = "src/test/resources/testpackages/arctoolbox_ndvi/testdata/red.tif";
+	private static final String red_id = "RED";
+	private static final int red_position = 2;
 
-    private static final String ndvi_id = "NDVI";
-    private static final int ndvi_position = 3;
-    private static final String mimeType = "application/geotiff";
+	private static final String ndvi_id = "NDVI";
+	private static final int ndvi_position = 3;
+	private static final String mimeType = "application/geotiff";
 
-    @Test
-    public void loadNDVIPackage() {
+	@Test
+	public void loadNDVIPackage() {
 
-        // Arrange
-        File packageFile = new File(packageFileName);
-        String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+		// Arrange
+		File packageFile = new File(packageFileName);
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
-        // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		// Act
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 
-        // Assert
-        Assert.assertTrue(mcPackage.isValid());
-        Assert.assertTrue(new File(nir_data).exists());
-        Assert.assertTrue(new File(red_data).exists());
-        Assert.assertTrue(ProcessorFactory.getInstance().newProcessor(mcPackage) != null);
-    }
+		// Assert
+		Assert.assertTrue(mcPackage.isValid());
+		Assert.assertTrue(new File(nir_data).exists());
+		Assert.assertTrue(new File(red_data).exists());
+		Assert.assertTrue(ProcessorFactory.getInstance().newProcessor(mcPackage) != null);
+	}
 
-    @Test
-    public void executeNDVIPackage() throws IllegalArgumentException, FileNotFoundException {
+	@Test
+	public void executeNDVIPackage() throws IllegalArgumentException, FileNotFoundException {
 
-        // Arrange
-        File packageFile = new File(packageFileName);
-        String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+		// Arrange
+		File packageFile = new File(packageFileName);
+		String packageIdentifier = packageFile.getAbsolutePath();
+		System.out.println(packageIdentifier);
 
-        // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
-        AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
-                                                                                              // processor
+		// Act
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
+		// processor
 
-        // add NIR
-        Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(nir_position),
-                                            new MediaData(new FileInputStream(new File(nir_data)), mimeType)));
-        // add RED
-        Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(red_position),
-                                            new MediaData(new FileInputStream(new File(red_data)), mimeType)));
-        // add output (NDVI) declaration
-        Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(ndvi_position), new MediaData(null, mimeType)));
+		// add NIR
+		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(nir_position),
+				new MediaData(new FileInputStream(new File(nir_data)), mimeType)));
+		// add RED
+		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(red_position),
+				new MediaData(new FileInputStream(new File(red_data)), mimeType)));
+		// add output (NDVI) declaration
+		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(ndvi_position), new MediaData(null, mimeType)));
 
-        // Assert
-        Assert.assertTrue(processor.isFeasible());
+		// Assert
+		Assert.assertTrue(processor.isFeasible());
 
-        boolean succExecute = false;
-        try {
-            processor.execute(0);
-            succExecute = true;
-        }
-        catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+		boolean succExecute = false;
+		try {
+			processor.execute(0);
+			succExecute = true;
+		}
+		catch (RuntimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        Assert.assertTrue(succExecute);
+		Assert.assertTrue(succExecute);
 
-    }
+	}
 
 }

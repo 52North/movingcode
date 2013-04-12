@@ -38,112 +38,112 @@ import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
-public class PythonPackageTest extends GlobalTestConfig {
+public class PythonPackageTest extends MCRuntimeTestConfig {
 
-    private static final String packageFileName = "src/test/resources/testpackages/py_copy.zip";
-    private static final String dataFileName = "src/test/resources/testpackages/py_copy/testdata/test_null.tif";
-    private static final String inID = "CALL";
-    private static final int inPosition = 1;
-    private static final String outID = "RESPONSE";
-    private static final int outPosition = 2;
-    private static final String mimeType = "application/geotiff";
+	private static final String packageFileName = "src/test/resources/testpackages/py_copy.zip";
+	private static final String dataFileName = "src/test/resources/testpackages/py_copy/testdata/test_null.tif";
+	private static final String inID = "CALL";
+	private static final int inPosition = 1;
+	private static final String outID = "RESPONSE";
+	private static final int outPosition = 2;
+	private static final String mimeType = "application/geotiff";
 
-    @Test
-    public void loadPyCopyPackage() {
+	@Test
+	public void loadPyCopyPackage() {
 
-        // Arrange
-        File packageFile = new File(packageFileName);
-        String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+		// Arrange
+		File packageFile = new File(packageFileName);
+		String packageIdentifier = packageFile.getAbsolutePath();
+		logger.info(packageIdentifier);
 
-        // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		// Act
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
 
-        // Assert
-        Assert.assertTrue(mcPackage.isValid());
-        Assert.assertTrue(new File(dataFileName).exists());
-        Assert.assertTrue(ProcessorFactory.getInstance().newProcessor(mcPackage) != null);
-    }
+		// Assert
+		Assert.assertTrue(mcPackage.isValid());
+		Assert.assertTrue(new File(dataFileName).exists());
+		Assert.assertTrue(ProcessorFactory.getInstance().newProcessor(mcPackage) != null);
+	}
 
-    @Test
-    public void executePyCopyPackage() throws IllegalArgumentException, FileNotFoundException {
+	@Test
+	public void executePyCopyPackage() throws IllegalArgumentException, FileNotFoundException {
 
-        // Arrange
-        File packageFile = new File(packageFileName);
-        String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+		// Arrange
+		File packageFile = new File(packageFileName);
+		String packageIdentifier = packageFile.getAbsolutePath();
+		logger.info(packageIdentifier);
 
-        // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
-        AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
-                                                                                              // processor
+		// Act
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
+		// processor
 
-        // add input
-        Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(inPosition),
-                                            new MediaData(new FileInputStream(new File(dataFileName)), mimeType)));
-        // add output declaration
-        Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(outPosition), new MediaData(null, mimeType)));
+		// add input
+		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(inPosition),
+				new MediaData(new FileInputStream(new File(dataFileName)), mimeType)));
+		// add output declaration
+		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(outPosition), new MediaData(null, mimeType)));
 
-        // Assert
-        Assert.assertTrue(processor.isFeasible());
+		// Assert
+		Assert.assertTrue(processor.isFeasible());
 
-        boolean succExecute = false;
-        try {
-            processor.execute(0);
-            succExecute = true;
-        }
-        catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+		boolean succExecute = false;
+		try {
+			processor.execute(0);
+			succExecute = true;
+		}
+		catch (RuntimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    }
+	}
 
-    /**
-     * Same test as above but parameters are set by their public (functional) ID
-     * 
-     * @throws IllegalArgumentException
-     * @throws FileNotFoundException
-     */
-    @Test
-    public void executePyCopyPackage2() throws IllegalArgumentException, FileNotFoundException {
+	/**
+	 * Same test as above but parameters are set by their public (functional) ID
+	 * 
+	 * @throws IllegalArgumentException
+	 * @throws FileNotFoundException
+	 */
+	@Test
+	public void executePyCopyPackage2() throws IllegalArgumentException, FileNotFoundException {
 
-        // Arrange
-        File packageFile = new File(packageFileName);
-        String packageIdentifier = packageFile.getAbsolutePath();
-        System.out.println(packageIdentifier);
+		// Arrange
+		File packageFile = new File(packageFileName);
+		String packageIdentifier = packageFile.getAbsolutePath();
+		logger.info(packageIdentifier);
 
-        // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
-        AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
-                                                                                              // processor
+		// Act
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
+		// processor
 
-        // add input
-        Assert.assertTrue(processor.addData(inID, new MediaData(new FileInputStream(new File(dataFileName)), mimeType)));
-        // add output declaration
-        Assert.assertTrue(processor.addData(outID, new MediaData(null, mimeType)));
+		// add input
+		Assert.assertTrue(processor.addData(inID, new MediaData(new FileInputStream(new File(dataFileName)), mimeType)));
+		// add output declaration
+		Assert.assertTrue(processor.addData(outID, new MediaData(null, mimeType)));
 
-        // Assert
-        Assert.assertTrue(processor.isFeasible());
+		// Assert
+		Assert.assertTrue(processor.isFeasible());
 
-        boolean succExecute = false;
-        try {
-            processor.execute(0);
-            succExecute = true;
-        }
-        catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+		boolean succExecute = false;
+		try {
+			processor.execute(0);
+			succExecute = true;
+		}
+		catch (RuntimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-    }
+	}
 
 }
