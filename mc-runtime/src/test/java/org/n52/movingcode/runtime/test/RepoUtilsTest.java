@@ -1,5 +1,6 @@
 package org.n52.movingcode.runtime.test;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
@@ -12,8 +13,9 @@ public class RepoUtilsTest extends MCRuntimeTestConfig{
 	
 	@Test
 	public void packageIdNormalizationTest(){
-		logger.info(someNastyPID);
+		logger.trace(someNastyPID);
 		String normID = RepositoryUtils.normalizePackageID(someNastyPID);
-		logger.info(normID);
+		logger.trace(normID);
+		Assert.assertEquals(normalizedNastyPID, normID);
 	}
 }
