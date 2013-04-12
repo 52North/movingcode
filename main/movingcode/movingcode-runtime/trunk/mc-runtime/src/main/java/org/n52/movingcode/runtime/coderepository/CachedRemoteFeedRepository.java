@@ -164,7 +164,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			} 
 			// 2. if not: just dump the new package to folder
 			else {
-				addNewZipPackage(remoteRepo.getPackage(currentRemotePID));
+				addNewZipPackage(currentRemotePID, remoteRepo.getPackage(currentRemotePID));
 			}
 
 		}
@@ -236,13 +236,25 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * 
 	 * @param localPackageID
 	 * @param mcPackage
-	 * @return
+	 * @return success <code>true|false</code>
 	 */
 	private boolean replaceZipPackage(String localPackageID, MovingCodePackage mcPackage){
-
-		// TODO: implement
-		// delete old package, replace with new one, set time stamp
-		return true;
+		String zipFileName = localPackageID + RepositoryUtils.zipExtension;
+		zipFileName = cacheDirectory.getAbsolutePath() + File.separator + localPackageID;
+		File zipFile = new File(zipFileName);
+		// Try to delete old package
+		if (zipFile.delete()){
+			// dump new package
+			if (mcPackage.dumpPackage(zipFile)){
+				// set its time stamp to package time stamp
+				zipFile.setLastModified(mcPackage.getTimestamp().getTime());
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -250,12 +262,24 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 *  
 	 * @param localPackageID
 	 * @param mcPackage
-	 * @return
+	 * @return success <code>true|false</code>
 	 */
-	private boolean addNewZipPackage(MovingCodePackage mcPackage){
-		// TODO: implement
-		// write new package to disk and set its time stamp
-		return true;
+	private boolean addNewZipPackage(String localPackageID, MovingCodePackage mcPackage){
+		
+		// create file and missing directories
+		String zipFileName = localPackageID + RepositoryUtils.zipExtension;
+		zipFileName = cacheDirectory.getAbsolutePath() + File.separator + localPackageID;
+		File zipFile = new File(zipFileName);
+		zipFile.mkdirs(); // put into if-condition?
+		
+		// dump new package
+		if (mcPackage.dumpPackage(zipFile)){
+			// set its time stamp to package time stamp
+			zipFile.setLastModified(mcPackage.getTimestamp().getTime());
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
