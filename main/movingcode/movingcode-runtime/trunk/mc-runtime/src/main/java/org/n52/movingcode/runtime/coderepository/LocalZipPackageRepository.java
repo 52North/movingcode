@@ -80,7 +80,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
 
 		for (File currentFile : zipFiles) {
-			String id = generateIDFromFilePath(currentFile.getPath());
+			String id = RepositoryUtils.generateNormalizedIDFromFile(currentFile);
 			logger.trace("Found package: " + currentFile + "; using ID: " + id);
 
 			MovingCodePackage mcPackage = new MovingCodePackage(currentFile, id);
@@ -105,30 +105,6 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	 */
 	public static Collection<File> scanForZipFiles(File directory) {
 		return FileUtils.listFiles(directory, ZIP_EXTENSION, true);
-	}
-
-	/**
-	 * Private method that generates a packageID from a file path. Since the file path should be a unique ID
-	 * for each zip file on disk, the generated ID is also unique for each package registered with this
-	 * repository.
-	 * 
-	 * @param filePath {@link String} - Path
-	 * @return
-	 */
-	public static final String generateIDFromFilePath(String filePath) {
-		String id = "";
-
-		// trim ".zip"
-		for (String extension : ZIP_EXTENSION) {
-			if (filePath.endsWith(extension)) {
-				id = filePath.substring(0, filePath.lastIndexOf(extension)-1);
-			}
-		}
-
-		// substitute \ with /
-		id = id.replace("\\", "/");
-
-		return id;
 	}
 	
 	/**

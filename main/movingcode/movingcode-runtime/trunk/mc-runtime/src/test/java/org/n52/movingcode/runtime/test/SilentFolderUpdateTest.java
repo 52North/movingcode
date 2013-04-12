@@ -39,14 +39,14 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
+import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
 public class SilentFolderUpdateTest extends MCRuntimeTestConfig{
 	
 	protected boolean updateReceived;
 
 	@Test
-	public void
-	shouldReceiveNotificationOnPackageDrop() throws URISyntaxException, IOException, InterruptedException {
+	public void shouldReceiveNotificationOnPackageDrop() throws URISyntaxException, IOException, InterruptedException {
 		File tmpDir = FileUtils.getTempDirectory();
 		File tmpDropIn = new File(tmpDir, UUID.randomUUID().toString());
 		tmpDropIn.mkdir();
@@ -55,8 +55,9 @@ public class SilentFolderUpdateTest extends MCRuntimeTestConfig{
 		URL testPackage = getClass().getResource("/testpackages/py_copy.zip");
 		File testFile = new File(testPackage.toURI());
 		File targetFile = new File(tmpDropIn, testFile.getName());
-		final MovingCodePackage mcp = new MovingCodePackage(testFile,
-				LocalZipPackageRepository.generateIDFromFilePath(targetFile.getAbsolutePath()));
+		
+		// get us a normalized packageID from the pathname
+		final String pID = RepositoryUtils.generateNormalizedIDFromFile(targetFile);
 	
 		IMovingCodeRepository repo = new LocalZipPackageRepository(tmpDropIn);
 		repo.addRepositoryChangeListener(new RepositoryChangeListener() {
@@ -65,8 +66,8 @@ public class SilentFolderUpdateTest extends MCRuntimeTestConfig{
 				logger.info("Received update on Repo "+updatedRepo);
 				synchronized (SilentFolderUpdateTest.this) {
 					logger.info("Repos packages: "+ Arrays.toString(updatedRepo.getPackageIDs()));
-					if (updatedRepo.containsPackage(mcp.getPackageIdentifier())) {
-						logger.info("Expected package included in repo: "+mcp.getPackageIdentifier());
+					if (updatedRepo.containsPackage(pID)) {
+						logger.info("Expected package included in repo: " + pID);
 						updateReceived = true;
 					}
 				}

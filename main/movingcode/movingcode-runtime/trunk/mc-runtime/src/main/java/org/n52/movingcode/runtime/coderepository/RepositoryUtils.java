@@ -262,4 +262,16 @@ public class RepositoryUtils {
 		
 		return normalizedID;
 	}
+	
+	/**
+	 * Static method that generates a packageID from a file's absolute path.
+	 * Since the file path should be a unique ID for each zip file on disk,
+	 * the generated ID is also locally unique.
+	 * 
+	 * @param file {@link File} - the packageFile
+	 * @return packageID {@link String} - a normalized packageID
+	 */
+	public static final String generateNormalizedIDFromFile(final File file) {
+		return normalizePackageID(file.getAbsolutePath());
+	}
 }
