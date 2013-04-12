@@ -300,20 +300,6 @@ public class MovingCodePackage {
     }
 
     /**
-     * Returns the unique *package* identifier of this package. This identifier refers to the actual
-     * implementation of the functional contract. The implementation complies to the functionality indicated
-     * by the functional ID.
-     * 
-     * @return String
-     * 
-     * TODO: remove method, see {@link MovingCodePackage#packageIdentifier}
-     */
-    @Deprecated
-    public final String getPackageIdentifier() {
-        return this.packageIdentifier;
-    }
-
-    /**
      * Returns the timestamp of this package. The timestamp indicates the last update of the package content
      * and can be used as a simple versioning machanism.
      * 
