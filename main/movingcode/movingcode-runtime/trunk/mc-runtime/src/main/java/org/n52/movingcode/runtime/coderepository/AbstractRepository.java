@@ -213,25 +213,25 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		informRepositoryChangeListeners();
 	}
 
-	protected synchronized void acquireWriteLock(){
+	private synchronized void acquireWriteLock(){
 		while (writeLock || readLock !=0 ){
 			// spin
 		}
 		writeLock = true;
 	}
 
-	protected synchronized void returnWriteLock(){
+	private synchronized void returnWriteLock(){
 		writeLock = false;
 	}
 
-	protected synchronized void acquireReadLock(){
+	private synchronized void acquireReadLock(){
 		while (writeLock){
 			// spin
 		}
 		readLock++;
 	}
 
-	protected void returnReadLock(){
+	private void returnReadLock(){
 		readLock--;
 	}
 

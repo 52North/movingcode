@@ -44,15 +44,15 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 public class CachedRemoteFeedRepository extends AbstractRepository {
 
 	static Logger logger = Logger.getLogger(CachedRemoteFeedRepository.class);
-	
+
 	private final URL atomFeedURL;
 	private final File cacheDirectory;
-	
+
 	private RemoteFeedRepository remoteRepo;
 	private IMovingCodeRepository localRepoMirror;
-	
+
 	private Date mirrorTimestamp;
-	
+
 	/**
 	 * Constructor for remote atom feed repositories. Additionally requires a cache directory to
 	 * which the content of the atom feed will be mirrored.
@@ -70,12 +70,12 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		// assign local variables
 		this.atomFeedURL = atomFeedURL;
 		this.cacheDirectory = cacheDirectory;
-		
+
 		// load packages
 		load();
 
 	}
-	
+
 	/**
 	 * private method that encapsulates the logic for loading 
 	 * MovingCode packages.  
@@ -87,26 +87,26 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			cacheDirectory.mkdirs();
 			cacheDirectory.setLastModified(0);
 		}
-		
+
 		// 2. check if directory is empty
 		//    if so: reset lastModifiedDate
 		String[] contents = cacheDirectory.list();
 		if (contents == null || contents.length == 0){
 			cacheDirectory.setLastModified(0);
 		}
-		
+
 		// 3. determine last cache directory update
 		this.mirrorTimestamp = new Date(cacheDirectory.lastModified());
-		
+
 		// 4. now load the directory contents
 		registerLocalPackages();
-		
+
 		// 5. trigger remote repo init in separate thread
 		Thread tLoadRemote = new LoadRepoThread();
 		tLoadRemote.start();
-		
+
 	}
-	
+
 	/**
 	 * This method initializes the {@link #localRepoMirror} and registers its
 	 * packages with this repo.
@@ -114,104 +114,90 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	private void registerLocalPackages(){
 		// 1. init local mirror and load contents from disk
 		localRepoMirror = new LocalZipPackageRepository(cacheDirectory);
-		
+
 		// 2. Add all processes in the localRepoMirror to our list
 		for (String currentPID : localRepoMirror.getPackageIDs()){
 			register(localRepoMirror.getPackage(currentPID), currentPID);
 		}
 	}
-	
+
 	/**
 	 * Private update method. Updates the content of the local mirror. Usually
 	 * triggered if the remote repository has received an update.
 	 */
 	private void updateLocalMirror(){
-		
+
 		// clear the mirrors visible contents during the update process
 		// this will inform all change listeners that this repository 
 		// currently has no available packages.
-		
+
 		// TODO: the following lock might prevent the lsiterners from getting
 		// updated content. But this could be their problem. At least they should
 		// know that this repo is in an undecided state. How quickly they react to
 		// that information is their problem.
 		clear();
-		
-		// acquire lock during the update process
-		acquireWriteLock();
-		
-		
+
+
 		// Since we are the exclusive owner of the localRepoMirror
 		// and no change listener is registered with the local repository,
 		// the update of the underlying content can safely take place
-		
+
 		// release the old mirror - it will be reactivated later on
 		localRepoMirror = null;
-		
-		
-		// surround critical section with try/catch to ensure
-		// that the writeLock will be returned
-		try {
-			List<String> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
-			List<String> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
-			List<String> checkedLocalPIDs = new ArrayList<String>();
-			for (String currentRemotePID : remotePIDs){
-				String escapedRemotePID = RepositoryUtils.escapePackageIDToLocalPath(currentRemotePID);
-				// 1. for each remote package: compare if it was previously present in mirror
-				if (localPIDs.contains(escapedRemotePID)){
-					Date remoteTimeStamp = remoteRepo.getPackageTimestamp(currentRemotePID);
-					Date localTimeStamp = localRepoMirror.getPackageTimestamp(escapedRemotePID);
-					// 2.a if so: check time stamp to determine if it was updated
-					if (remoteTimeStamp.after(localTimeStamp)){
-						replaceZipPackage(escapedRemotePID, remoteRepo.getPackage(currentRemotePID));
-					}
-					// indicate that we have updated/checked this local PID
-					checkedLocalPIDs.add(escapedRemotePID);
-				} 
-				// 2. if not: just dump the new package to folder
-				else {
-					addNewZipPackage(remoteRepo.getPackage(currentRemotePID));
+
+
+		List<String> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
+		List<String> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
+		List<String> checkedLocalPIDs = new ArrayList<String>();
+		for (String currentRemotePID : remotePIDs){
+			String escapedRemotePID = RepositoryUtils.normalizePackageID(currentRemotePID);
+			// 1. for each remote package: compare if it was previously present in mirror
+			if (localPIDs.contains(escapedRemotePID)){
+				Date remoteTimeStamp = remoteRepo.getPackageTimestamp(currentRemotePID);
+				Date localTimeStamp = localRepoMirror.getPackageTimestamp(escapedRemotePID);
+				// 2.a if so: check time stamp to determine if it was updated
+				if (remoteTimeStamp.after(localTimeStamp)){
+					replaceZipPackage(escapedRemotePID, remoteRepo.getPackage(currentRemotePID));
 				}
-				
+				// indicate that we have updated/checked this local PID
+				checkedLocalPIDs.add(escapedRemotePID);
+			} 
+			// 2. if not: just dump the new package to folder
+			else {
+				addNewZipPackage(remoteRepo.getPackage(currentRemotePID));
 			}
-			
-			// 3. report unsafe packages (?)
-			// TODO: delete packages, if it really makes sense,
-			// maybe have a trigger or so
-			
-			localPIDs.removeAll(checkedLocalPIDs);
-			if(localPIDs.size() != 0){
-				StringBuffer report = new StringBuffer("\n");
-				report.append(
+
+		}
+
+		// 3. report unsafe packages (?)
+		// TODO: delete packages, if it really makes sense,
+		// maybe have a trigger or so
+
+		localPIDs.removeAll(checkedLocalPIDs);
+		if(localPIDs.size() != 0){
+			StringBuffer report = new StringBuffer("\n");
+			report.append(
 					"Package folder updated. The following packages are no longer present in the remote feed."
 					+ "However, they will be kept in the local mirror until you manually delete them.\n"
-				);
-				for (String currentPID : localPIDs){
-					report.append(currentPID + "\n");
-				}
-				logger.info(report.toString());
+			);
+			for (String currentPID : localPIDs){
+				report.append(currentPID + "\n");
 			}
-			// if everything went well:
-			// set new timeStamp for folder and repo
-			mirrorTimestamp = ((RemoteFeedRepository)remoteRepo).lastUpdated();
-			cacheDirectory.setLastModified(mirrorTimestamp.getTime());
-			
-		} catch (Exception e){
-			// if something went wrong: do not update time stamp log a warning and hope that the next update will be "clean"
-			logger.error("Something went wrong during the update process. The next update might heal this issue but you'd better have a look at the error report.\n" + e.getMessage() + "\n" + e.getStackTrace());
+			logger.info(report.toString());
 		}
-		finally {
-			// finally return the lock
-			returnWriteLock();
-		}
-		
+		// if everything went well:
+		// set new timeStamp for folder and repo
+		mirrorTimestamp = ((RemoteFeedRepository)remoteRepo).lastUpdated();
+		cacheDirectory.setLastModified(mirrorTimestamp.getTime());
+
+
 		// now re-read the local folder
 		registerLocalPackages();
-		
+
 		// ... and inform the change listeners
 		informRepositoryChangeListeners();
 	}
-	
+
 	/**
 	 * A task which re-computes the directory's fingerprint and
 	 * triggers a content reload if required.
@@ -220,13 +206,13 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 *
 	 */
 	private final class LoadRepoThread extends Thread {
-		
+
 		@Override
 		public void run() {
 			logger.info("Loading remote repository from URL " +  atomFeedURL.toString());
 			// create new remote repo
 			remoteRepo = new RemoteFeedRepository(atomFeedURL);
-			
+
 			// add change listener
 			remoteRepo.addRepositoryChangeListener(new RepositoryChangeListener() {
 				@Override
@@ -235,7 +221,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 				}
 			});
 			logger.info("Finished loading remote repository from URL " +  atomFeedURL.toString());
-			
+
 			// compare remote repo date and local cache date
 			// run an update if required
 			Date remoteDate = ((RemoteFeedRepository)remoteRepo).lastUpdated();
@@ -244,7 +230,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			}
 		}
 	}
-	
+
 	/**
 	 * Private method that is invoked during the update process of the local mirror directory
 	 * 
@@ -253,11 +239,12 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * @return
 	 */
 	private boolean replaceZipPackage(String localPackageID, MovingCodePackage mcPackage){
+
 		// TODO: implement
 		// delete old package, replace with new one, set time stamp
 		return true;
 	}
-	
+
 	/**
 	 * Private method that is invoked during the update process of the local mirror directory
 	 *  
