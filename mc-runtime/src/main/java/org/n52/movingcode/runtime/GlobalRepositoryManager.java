@@ -98,22 +98,12 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 * @return boolean - indicates that the new Repository was added.
 	 */
 	public synchronized boolean addLocalPlainRepository(String directory) {
-		if ( !repositories.containsKey(directory)) {
+		String repoID = directory;
+		if ( !repositories.containsKey(repoID)) {
 			
 			// add new repo
 			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
-			repositories.put(directory, repo);
-					
-			// add change listener
-			repo.addRepositoryChangeListener(new RepositoryChangeListener() {
-				@Override
-				public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
-					informRepositoryChangeListeners();
-				}
-			});
-			
-			// inform listeners
-			informRepositoryChangeListeners();
+			registerRepo(repoID, repo);
 			return true;
 		}
 		return false;
@@ -130,29 +120,60 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 * @return boolean - indicates that the new Repository was added.
 	 */
 	public synchronized boolean addLocalZipPackageRepository(String directory) {
-		if ( !repositories.containsKey(directory)) {
+		String repoID = directory;
+		if ( !repositories.containsKey(repoID)) {
 			
 			// add new repo
 			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
-			repositories.put(directory, repo);
-					
-			// add change listener
-			repo.addRepositoryChangeListener(new RepositoryChangeListener() {
-				@Override
-				public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
-					informRepositoryChangeListeners();
-				}
-			});
-			
-			// inform listeners
-			informRepositoryChangeListeners();
+			registerRepo(repoID, repo);
 			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Creates a new {@link MovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
+	 * Creates a new {@link IMovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
+	 * repository to the internal repositories Map. 
+	 * 1) If the feed URL was already loaded/registered, this method returns false.
+	 * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
+	 * 3) If the new Repository was successfully added, this method returns true.
+	 * 
+	 * @param atomFeedURL {@link URL} - A directory that contains a collection of {@link MovingCodePackage}.
+	 * @return boolean - indicates that the new Repository was added.
+	 */
+	public synchronized boolean addCachedRemoteRepository(URL atomFeedURL, File cacheDirectory) {
+		// TODO: create a simpler repo ID ...
+		String repoID = atomFeedURL.toString() + cacheDirectory.getAbsolutePath();
+		
+		if ( !repositories.containsKey(repoID)) {
+			
+			// add new repo
+			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createCachedRemoteRepository(atomFeedURL, cacheDirectory); 
+			registerRepo(repoID, repo);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Registers a previously created {@link IMovingCodeRepository}.
+	 * 
+	 * @param repo a previously created {@link IMovingCodeRepository} instance
+	 * @param repoId the id 
+	 * @return true if succesfully added
+	 */
+	public synchronized boolean addRepository(IMovingCodeRepository repo, String repoID) {
+		if ( !repositories.containsKey(repoID)) {
+			
+			// add new repo
+			registerRepo(repoID, repo);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Creates a new {@link IMovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
 	 * repository to the internal repositories Map. 
 	 * 1) If the feed URL was already loaded/registered, this method returns false.
 	 * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
@@ -162,55 +183,47 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 * @return boolean - indicates that the new Repository was added.
 	 */
 	public synchronized boolean addRepository(URL atomFeedURL) {
-		if ( !repositories.containsKey(atomFeedURL.toString())) {
+		String repoID = atomFeedURL.toString();
+		if ( !repositories.containsKey(repoID)) {
 			
 			// add new repo
 			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(atomFeedURL); 
-			repositories.put(atomFeedURL.toString(), repo);
-			
-			// add change listener
-			repo.addRepositoryChangeListener(new RepositoryChangeListener() {
-				@Override
-				public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
-					informRepositoryChangeListeners();
-				}
-			});
-			
-			// inform listeners
-			informRepositoryChangeListeners();
+			registerRepo(repoID, repo);
 			return true;
 		}
 		return false;
 	}
-
+	
 	/**
-	 * Registers a previously created {@link MovingCodeRepository}.
+	 * Private convenience method. Puts a {@link IMovingCodeRepository} on the private
+	 * Map {@link #repositories} and adds a default change listener to it. Thus 
+	 * the RepositoryManager will be noticed about content changes in this repository and
+	 * propagate this notice to its own listeners, i.e. the subscribers to the RepositoryManager.
 	 * 
-	 * @param repo a previously created {@link MovingCodeRepository} instance
-	 * @param repoId the id 
-	 * @return true if succesfully added
+	 * @param repoID {@link String} - the ID of the repository
+	 * @param repo {@link IMovingCodeRepository} - the repository
 	 */
-	public synchronized boolean addRepository(IMovingCodeRepository repo, String repoId) {
-		if ( !repositories.containsKey(repoId)) {
-			
-			// add new repo
-			repositories.put(repoId, repo);
-			
-			// add change listener
-			repo.addRepositoryChangeListener(new RepositoryChangeListener() {
-				@Override
-				public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
-					informRepositoryChangeListeners();
-				}
-			});
-			
-			// inform listeners
-			informRepositoryChangeListeners();
-			return true;
+	private final void registerRepo(String repoID, IMovingCodeRepository repo){
+		// if already registered: Exit
+		if (repositories.containsKey(repoID)){
+			return;
 		}
-		return false;
+		
+		// add repo to map
+		repositories.put(repoID, repo);
+		
+		// add change listener
+		repo.addRepositoryChangeListener(new RepositoryChangeListener() {
+			@Override
+			public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
+				informRepositoryChangeListeners();
+			}
+		});
+		
+		// inform listeners
+		informRepositoryChangeListeners();
 	}
-
+	
 	/**
 	 * Finds a package for a given function identifier.
 	 * 

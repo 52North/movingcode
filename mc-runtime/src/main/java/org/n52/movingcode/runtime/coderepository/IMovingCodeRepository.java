@@ -164,6 +164,21 @@ public interface IMovingCodeRepository {
 			return new LocalZipPackageRepository(sourceDirectory);
 		}
 		
+		/**
+		 * Creates a {@link IMovingCodeRepository} from a remote feed URL.
+		 * Uses a cache directory to store its contents
+		 * 
+		 * @param atomFeedURL {@link URL} -  the URL of the remote feed
+		 * @param cacheDirectory {@link File} - the directory that contains the cached content ot he remote repo
+		 * @return {@link IMovingCodeRepository} - the new repository
+		 * 
+		 * TODO: add a wipe trigger? --> Directory will be empties on load ... but is this really useful?
+		 * 
+		 */
+		public static final IMovingCodeRepository createCachedRemoteRepository(final URL atomFeedURL, final File cacheDirectory){
+			return new CachedRemoteFeedRepository(atomFeedURL, cacheDirectory);
+		}
+		
 	}
 
 }
