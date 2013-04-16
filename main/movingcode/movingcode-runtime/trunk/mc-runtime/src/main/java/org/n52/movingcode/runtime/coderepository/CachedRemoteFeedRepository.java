@@ -129,13 +129,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		// clear the mirrors visible contents during the update process
 		// this will inform all change listeners that this repository 
 		// currently has no available packages.
-
-		// TODO: the following lock might prevent the lsiterners from getting
-		// updated content. But this could be their problem. At least they should
-		// know that this repo is in an undecided state. How quickly they react to
-		// that information is their problem.
 		clear();
-
 
 		// Since we are the exclusive owner of the localRepoMirror
 		// and no change listener is registered with the local repository,
@@ -143,23 +137,23 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 		// release the old mirror - it will be reactivated later on
 		localRepoMirror = null;
-
-
+		
+		// perform the content update
 		List<String> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
 		List<String> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
 		List<String> checkedLocalPIDs = new ArrayList<String>();
 		for (String currentRemotePID : remotePIDs){
-			String escapedRemotePID = RepositoryUtils.normalizePackageID(currentRemotePID);
-			// 1. for each remote package: compare if it was previously present in mirror
-			if (localPIDs.contains(escapedRemotePID)){
+			String normalizedRemotePID = RepositoryUtils.normalizePackageID(currentRemotePID);
+			// 1. for each remote package: check if it was previously present in mirror
+			if (localPIDs.contains(normalizedRemotePID)){
 				Date remoteTimeStamp = remoteRepo.getPackageTimestamp(currentRemotePID);
-				Date localTimeStamp = localRepoMirror.getPackageTimestamp(escapedRemotePID);
+				Date localTimeStamp = localRepoMirror.getPackageTimestamp(normalizedRemotePID);
 				// 2.a if so: check time stamp to determine if it was updated
 				if (remoteTimeStamp.after(localTimeStamp)){
-					replaceZipPackage(escapedRemotePID, remoteRepo.getPackage(currentRemotePID));
+					replaceZipPackage(normalizedRemotePID, remoteRepo.getPackage(currentRemotePID));
 				}
 				// indicate that we have updated/checked this local PID
-				checkedLocalPIDs.add(escapedRemotePID);
+				checkedLocalPIDs.add(normalizedRemotePID);
 			} 
 			// 2. if not: just dump the new package to folder
 			else {
