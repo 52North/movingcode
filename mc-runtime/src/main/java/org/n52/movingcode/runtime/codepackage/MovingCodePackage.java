@@ -43,6 +43,7 @@ import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
+import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeedEntry;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.FunctionalDescriptionsListType;
@@ -126,7 +127,7 @@ public class MovingCodePackage {
         List<Link> links = atomFeedEntry.getAtomEntry().getLinks();
         for (Link link : links) {
             if (link.getMimeType() != null
-                    && link.getMimeType().toString().equals(GeoprocessingFeedEntry.PACKAGE_MIMETYPE)) {
+                    && link.getMimeType().toString().equals(GeoprocessingFeed.PACKAGE_MIMETYPE)) {
                 // try to extract a package description
                 try {
                     URL zipURL = link.getHref().toURL();
