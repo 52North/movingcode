@@ -54,8 +54,11 @@ public class RepositoryUtils {
 	// strings that shall be replaces by File.separator
 	private static final String[] separatorReplacements = {":/", ":\\\\", "\\\\", ";"};
 	
+	// default extension for zipped packages
+	public static final String defaultZipExtension = ".zip";
+	
 	// typical extensions for zipped packages
-	public static final String[] zipExtension = {".zip"};
+	public static final String[] zipExtension = {defaultZipExtension};
 	
 	public static final String normalizedFileSeparator = "/";
 	
