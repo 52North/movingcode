@@ -44,206 +44,237 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * @author Matthias Mueller, TU Dresden
  * 
+ * TODO: make class protected
+ * TODO: make all methods protected
+ * TODO: Should be used by {@link GeoprocessingFeed} class only.
+ * 
  */
 public final class GeoprocessingFeedEntry {
 
-    private Entry entry;
-    public static final String PACKAGE_MIMETYPE = "application/zip";
-    public static final String PACKAGE_DESCRIPTION_MIMETYPE = "text/xml";
-    public static final String PACKAGE_LINK_REL = "enclosure";
-    public static final String DETAILED_DESCRIPTION_LINK_REL = "alternate";
+	private Entry entry;
 
-    static Logger logger = Logger.getLogger(GeoprocessingFeedEntry.class);
+	static Logger logger = Logger.getLogger(GeoprocessingFeedEntry.class);
 
-    /**
-     * Creates a new entry from an existing entry. Both entries share the same content. If one of them is
-     * changed, the changes are propagated to its twin.
-     * 
-     * @param entry
-     */
-    public GeoprocessingFeedEntry(Entry entry) {
-        this.entry = entry;
-    }
+	/**
+	 * Creates a new entry from an existing entry. Both entries share the same content. If one of them is
+	 * changed, the changes are propagated to its twin.
+	 * 
+	 * @param entry
+	 * 
+	 * TODO: decrease visibility to protected
+	 */
+	public GeoprocessingFeedEntry(Entry entry) {
+		this.entry = entry;
+	}
 
-    /**
-     * Constructor for a brand new GeoprocessingFeedEntry.
-     * 
-     * 
-     * @param packageDesc
-     *        {@link PackageDescriptionDocument} - the packageDescription
-     * @param creationDate
-     *        {@link Date} - the creation Date of the new entry.
-     * @param packageURL
-     *        {@link String} - a URL from which the zipped content of the package can be retrieved
-     * @param descriptionURL
-     *        {@link String} - a URL that links to additional documentation of the package contents
-     */
-    public GeoprocessingFeedEntry(PackageDescriptionDocument packageDesc,
-                                  Date creationDate,
-                                  String packageURL,
-                                  String descriptionURL) {
+	/**
+	 * Constructor for a brand new GeoprocessingFeedEntry.
+	 * 
+	 * 
+	 * @param packageDesc
+	 *        {@link PackageDescriptionDocument} - the packageDescription
+	 * @param creationDate
+	 *        {@link Date} - the creation Date of the new entry.
+	 * @param packageURL
+	 *        {@link String} - a URL from which the zipped content of the package can be retrieved
+	 * @param descriptionURL
+	 *        {@link String} - a URL that links to additional documentation of the package contents
+	 *        
+	 * TODO: decrease visibility to protected
+	 */
+	public GeoprocessingFeedEntry(PackageDescriptionDocument packageDesc,
+			Date creationDate,
+			String packageURL,
+			String descriptionURL) {
 
-        if (packageDesc.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-            ProcessDescriptionType wpsDesc = packageDesc.getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
-            this.entry = makeNewEntry();
+		if (packageDesc.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
+			ProcessDescriptionType wpsDesc = packageDesc.getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
+			this.entry = makeNewEntry();
 
-            String identifier = wpsDesc.getIdentifier().getStringValue();
+			String identifier = wpsDesc.getIdentifier().getStringValue();
 
-            // String title = wpsDesc.getTitle().getStringValue();
+			// String title = wpsDesc.getTitle().getStringValue();
 
-            // String summary = null;
-            // if (wpsDesc.isSetAbstract()){
-            // String procAbstract = wpsDesc.getAbstract().getStringValue();
-            // summary = "<div><b>" + title + "</b><br/>" + procAbstract + "</div";
-            // } else {
-            // summary = "<div><b>" + title + "</b><br/>Sorry, the short description is missing.</div";
-            // }
-            // assert(summary!=null);
+			// String summary = null;
+			// if (wpsDesc.isSetAbstract()){
+			// String procAbstract = wpsDesc.getAbstract().getStringValue();
+			// summary = "<div><b>" + title + "</b><br/>" + procAbstract + "</div";
+			// } else {
+			// summary = "<div><b>" + title + "</b><br/>Sorry, the short description is missing.</div";
+			// }
+			// assert(summary!=null);
 
-            this.entry.setTitle(identifier); // set title
-            this.entry.setId(identifier); // set identifier
-            this.entry.setPublished(creationDate); // set published date
-            this.entry.setUpdated(creationDate); // set creation date
+			this.entry.setTitle(identifier); // set title
+			this.entry.setId(identifier); // set identifier
+			this.entry.setPublished(creationDate); // set published date
+			this.entry.setUpdated(creationDate); // set creation date
 
-            // this.entry.setSummaryAsHtml(summary); // set summary //TODO: a detailed IO description of the
-            // feed,
-            // TODO: either smaller summary or much less content
-            // we cannot be sure that summary is properly displayed (rss readers may discard HTML tags)
+			// this.entry.setSummaryAsHtml(summary); // set summary //TODO: a detailed IO description of the
+			// feed,
+			// TODO: either smaller summary or much less content
+			// we cannot be sure that summary is properly displayed (rss readers may discard HTML tags)
 
-            // this.entry.setContentElement(makeContent(packageURL)); // set package content
-            // TODO: Content should be some nice HTML stuff
-            this.entry.setContentElement(generateHTMLContent(wpsDesc));
+			// this.entry.setContentElement(makeContent(packageURL)); // set package content
+			// TODO: Content should be some nice HTML stuff
+			this.entry.setContentElement(generateHTMLContent(wpsDesc));
 
-            this.entry.addLink(makePackageDescriptionLink(descriptionURL)); // set package description link
-            this.entry.addLink(makePackageLink(packageURL)); // also set package link
+			this.entry.addLink(makePackageDescriptionLink(descriptionURL)); // set package description link
+			this.entry.addLink(makePackageLink(packageURL)); // also set package link
 
-            // TODO: add alternate link
-            // e.g. <link rel="alternate" href="http://www.gtfs-data-exchange.com/meta/6195524"
-            // type="text/html"/>
-            // use DETAILED_DESCRIPTION_LINK_REL
-        }
-        else {
-            // TODO: support other descriptions, e.g. WSDL
-        }
+			// TODO: add alternate link
+			// e.g. <link rel="alternate" href="http://www.gtfs-data-exchange.com/meta/6195524"
+			// type="text/html"/>
+			// use DETAILED_DESCRIPTION_LINK_REL
+		}
+		else {
+			// TODO: support other descriptions, e.g. WSDL
+		}
 
-    }
+	}
 
-    /**
-     * Returns the identifier of this entry.
-     * 
-     * @return {@link String}
-     */
-    public String getIdentifier() {
-        return this.entry.getId().toString();
-    }
+	/**
+	 * Returns the identifier of this entry.
+	 * 
+	 * @return {@link String}
+	 */
+	public String getIdentifier() {
+		return entry.getId().toString();
+	}
+	
+	/**
+	 * Set the identifier of this entry.
+	 * 
+	 * @param entryID {@link String}
+	 */
+	public void setIdentifier(final String entryID){
+		entry.setId(entryID);
+	}
 
-    /**
-     * Returns the publication date of this entry.
-     * 
-     * @return {@link Date}
-     */
-    public Date getPublished() {
-        return this.entry.getPublished();
-    }
+	/**
+	 * Returns the publication date of this entry.
+	 * 
+	 * @return {@link Date}
+	 */
+	public Date getPublished() {
+		return entry.getPublished();
+	}
+	
+	/**
+	 * Sets the publication date of this entry.
+	 * 
+	 * @param pubDate {@link Date}
+	 */
+	public void setPublished(Date pubDate){
+		entry.setPublished(pubDate);
+	}
 
-    /**
-     * Returns the last modified date of this entry.
-     * 
-     * @return {@link Date}
-     */
-    public Date getUpdated() {
-        return this.entry.getUpdated();
-    }
+	/**
+	 * Returns the last modified date of this entry.
+	 * 
+	 * @return {@link Date}
+	 */
+	public Date getUpdated() {
+		return entry.getUpdated();
+	}
+	
+	/**
+	 * Sets the Update date of this entry.
+	 * 
+	 * @param upDate {@link Date}
+	 */
+	public void setUpdated(Date upDate){
+		entry.setUpdated(upDate);
+	}
 
-    /**
-     * Return the general atom representation of this entry.
-     * 
-     * @return {@link Entry}
-     */
-    public Entry getAtomEntry() {
-        return this.entry;
-    }
+	/**
+	 * Return the general atom representation of this entry.
+	 * 
+	 * @return {@link Entry}
+	 */
+	public Entry getAtomEntry() {
+		return this.entry;
+	}
 
-    /**
-     * private static method to create a blank {@link Entry}
-     * 
-     * @return {@link Entry}
-     */
-    private static Entry makeNewEntry() {
-        return Abdera.getInstance().newEntry();
-    }
+	/**
+	 * private static method to create a blank {@link Entry}
+	 * 
+	 * @return {@link Entry}
+	 */
+	private static Entry makeNewEntry() {
+		return Abdera.getInstance().newEntry();
+	}
 
-    /**
-     * Updates this entry with the contents of a newer one. Procedure is as follows:
-     * 
-     * If the otherEntry is newer: 1. its contents will be copied to this entry 2. the old publication date
-     * will be kept
-     * 
-     * @param otherEntry
-     *        {@link GeoprocessingFeedEntry}
-     */
-    public void updateWith(GeoprocessingFeedEntry otherEntry) {
-        // check if other entry is newer
-        if (otherEntry.getUpdated().after(this.entry.getUpdated())) {
-            // replace with newer entry but keep old PublishedDate
-            Date published = this.getPublished();
-            this.entry = otherEntry.getAtomEntry();
-            this.entry.setPublished(published);
-            logger.info("Updating feed entry for: " + this.getIdentifier());
-        }
-        // if it is not newer - just keep the old one!
-    }
+	/**
+	 * Updates this entry with the contents of a newer one. Procedure is as follows:
+	 * 
+	 * If the otherEntry is newer: 1. its contents will be copied to this entry 2. the old publication date
+	 * will be kept
+	 * 
+	 * @param otherEntry
+	 *        {@link GeoprocessingFeedEntry}
+	 */
+	public void updateWith(GeoprocessingFeedEntry otherEntry) {
+		// check if other entry is newer
+		if (otherEntry.getUpdated().after(this.entry.getUpdated())) {
+			// replace with newer entry but keep old PublishedDate
+			Date published = this.getPublished();
+			this.entry = otherEntry.getAtomEntry();
+			this.entry.setPublished(published);
+			logger.info("Updating feed entry for: " + this.getIdentifier());
+		}
+		// if it is not newer - just keep the old one!
+	}
 
-    // private static Content makeContent(String packageURL){
-    // Content content = Abdera.getInstance().getFactory().newContent();
-    // content.setMimeType(PACKAGE_MIMETYPE);
-    // content.setSrc(packageURL);
-    // return content;
-    // }
+	// private static Content makeContent(String packageURL){
+	// Content content = Abdera.getInstance().getFactory().newContent();
+	// content.setMimeType(PACKAGE_MIMETYPE);
+	// content.setSrc(packageURL);
+	// return content;
+	// }
 
-    /**
-     * Static helper method that creates an Atom {@link Link} object from a given package URL.
-     * 
-     * @param packageURL
-     *        {@link String} - the package URL
-     * @return {@link Link}
-     */
-    private static final Link makePackageLink(String packageURL) {
-        Link link = Abdera.getInstance().getFactory().newLink();
-        link.setHref(packageURL);
-        link.setMimeType(PACKAGE_MIMETYPE);
-        link.setRel(PACKAGE_LINK_REL);
-        return link;
-    }
+	/**
+	 * Static helper method that creates an Atom {@link Link} object from a given package URL.
+	 * 
+	 * @param packageURL
+	 *        {@link String} - the package URL
+	 * @return {@link Link}
+	 */
+	private static final Link makePackageLink(String packageURL) {
+		Link link = Abdera.getInstance().getFactory().newLink();
+		link.setHref(packageURL);
+		link.setMimeType(GeoprocessingFeed.PACKAGE_MIMETYPE);
+		link.setRel(GeoprocessingFeed.PACKAGE_LINK_REL);
+		return link;
+	}
 
-    /**
-     * Static helper method that creates an Atom {@link Link} object from a given description URL.
-     * 
-     * @param descriptionURL
-     *        {@link String} - the package description URL
-     * @return {@link Link}
-     */
-    private static Link makePackageDescriptionLink(String descriptionURL) {
-        Link link = Abdera.getInstance().getFactory().newLink();
-        link.setHref(descriptionURL);
-        link.setMimeType(PACKAGE_DESCRIPTION_MIMETYPE);
-        link.setRel(PACKAGE_LINK_REL);
-        return link;
-    }
+	/**
+	 * Static helper method that creates an Atom {@link Link} object from a given description URL.
+	 * 
+	 * @param descriptionURL
+	 *        {@link String} - the package description URL
+	 * @return {@link Link}
+	 */
+	private static Link makePackageDescriptionLink(String descriptionURL) {
+		Link link = Abdera.getInstance().getFactory().newLink();
+		link.setHref(descriptionURL);
+		link.setMimeType(GeoprocessingFeed.PACKAGE_DESCRIPTION_MIMETYPE);
+		link.setRel(GeoprocessingFeed.PACKAGE_LINK_REL);
+		return link;
+	}
 
-    /**
-     * Generates a human-readable description from a PackageDescriptionDocument. This description is return as
-     * an Atom content object.
-     * 
-     * @param wpsDesc
-     *        {@link ProcessDescriptionType}
-     * @return {@link Content}
-     */
-    private static Content generateHTMLContent(final ProcessDescriptionType wpsDesc) {
-        Content content = Abdera.getInstance().getFactory().newContent(Content.Type.HTML);
-        content.setText(WPSDescriptionPrinter.printAsHTML(wpsDesc));
+	/**
+	 * Generates a human-readable description from a PackageDescriptionDocument. This description is return as
+	 * an Atom content object.
+	 * 
+	 * @param wpsDesc
+	 *        {@link ProcessDescriptionType}
+	 * @return {@link Content}
+	 */
+	private static Content generateHTMLContent(final ProcessDescriptionType wpsDesc) {
+		Content content = Abdera.getInstance().getFactory().newContent(Content.Type.HTML);
+		content.setText(WPSDescriptionPrinter.printAsHTML(wpsDesc));
 
-        return content;
-    }
+		return content;
+	}
 
 }
