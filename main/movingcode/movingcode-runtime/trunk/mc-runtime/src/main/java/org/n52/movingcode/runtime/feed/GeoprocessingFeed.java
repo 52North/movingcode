@@ -33,10 +33,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
@@ -74,7 +71,7 @@ public final class GeoprocessingFeed {
 	 */
 	protected GeoprocessingFeed(){
 		Abdera abdera = new Abdera();
-		this.feed = abdera.newFeed();
+		feed = abdera.newFeed();
 	}
 	
 	/**
@@ -87,9 +84,9 @@ public final class GeoprocessingFeed {
 
 		Parser parser = Abdera.getInstance().getParser();
 		Document<Feed> doc = parser.parse(atomStream);
-		this.feed = doc.getRoot();
+		feed = doc.getRoot();
 
-		logger.info("New Feed: " + this.feed.getTitle());
+		logger.info("New Feed: " + feed.getTitle());
 	}
 	
 	/**
@@ -97,7 +94,7 @@ public final class GeoprocessingFeed {
 	 * 
 	 * @param template {@link FeedTemplate}
 	 */
-	public GeoprocessingFeed(FeedTemplate template) {
+	protected GeoprocessingFeed(FeedTemplate template) {
 
 		Abdera abdera = new Abdera();
 		feed = abdera.newFeed();
@@ -136,11 +133,16 @@ public final class GeoprocessingFeed {
 		if (!containsEntry(entryID)){
 			String feedWebRoot = getFeedWebRoot();
 			GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(
+					feedWebRoot + entryID,
 					mcp.getDescription(),
-	                mcp.getTimestamp(),
-	                feedWebRoot + "package.zip",
-	                feedWebRoot + "packagedescription.xml");
+					mcp.getTimestamp(),
+					feedWebRoot + entryID + ".zip",
+					feedWebRoot + entryID + ".xml"
+	        );
 			feed.addEntry(entry.getAtomEntry());
+			
+			// call global time stamp update routine
+			updateFeedTimestamp();
 			return true;
 		}
 		else {
@@ -148,51 +150,7 @@ public final class GeoprocessingFeed {
 		}
 	}
 	
-	@Deprecated
-	public void updateFeed(Map<String, GeoprocessingFeedEntry> candidateEntries) {
-		// keySet of candidate entries
-		Set<String> candidateIDs = candidateEntries.keySet();
-		// keySet of existing entries; is filled in the loop
-		Set<String> feedIDs = new HashSet<String>();
-
-		feed.setUpdated(new Date(System.currentTimeMillis()));
-
-		// MERGE newer entries into old entries
-		for (Entry entry : this.feed.getEntries()) {
-			GeoprocessingFeedEntry currentEntry = new GeoprocessingFeedEntry(entry);
-			feedIDs.add(currentEntry.getIdentifier());
-			// check if there is a candidate entry with the same ID
-			if (candidateIDs.contains(currentEntry.getIdentifier())) {
-				// merge candidate entry into existing entry
-				currentEntry.updateWith(candidateEntries.get(currentEntry.getIdentifier()));
-			}
-		}
-
-		// ADD all completely new entries
-		candidateIDs.removeAll(feedIDs);
-		for (String currentID : candidateIDs) {
-			GeoprocessingFeedEntry gpEntry = candidateEntries.get(currentID);
-			logger.info("Adding new feed entry for: " + gpEntry.getIdentifier());
-			feed.addEntry(gpEntry.getAtomEntry());
-		}
-
-		// set new update timestamp of the feed
-		updateFeedTimestamp();
-	}
-
-
-	/**
-	 * Returns an Array of Feed Entries. This is a snapshot of the available entries present at the time the method
-	 * was called. Changes in the feed are not propagated to this array.
-	 * 
-	 * @return Array of {@link Entry}
-	 */
-	@Deprecated
-	public Entry[] getEntries() {
-		return feed.getEntries().toArray(new Entry[feed.getEntries().size()]);
-	}
-	
-	public GeoprocessingFeedEntry getFeedEntry(String entryID){
+	public GeoprocessingFeedEntry getFeedEntry(final String entryID){
 		for (Entry currentEntry : feed.getEntries()){
 			if (currentEntry.getId().toString().equals(entryID)){
 				return new GeoprocessingFeedEntry(currentEntry);
@@ -209,24 +167,12 @@ public final class GeoprocessingFeed {
 	 * @throws IOException {@link IOException}
 	 */
 	public void write(OutputStream os) throws IOException {
-		Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
+		// Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
+		// TODO: pipe stream through a filter that removes lines with nothing but spaces in it
+		
+		Writer writer = Abdera.getInstance().getWriterFactory().getWriter();
 		writer.writeTo(feed, os);
 		// feed.writeTo(os);
-	}
-
-	/**
-	 * checks all update timestamps of the feed entries and sets a new update timestamp for the whole feed.
-	 */
-	private final void updateFeedTimestamp() {
-		Date lastUpdate = feed.getUpdated();
-
-		for (Entry currentEntry : getEntries()) {
-			if (currentEntry.getUpdated().after(lastUpdate)) {
-				lastUpdate = currentEntry.getUpdated();
-			}
-		}
-
-		feed.setUpdated(lastUpdate);
 	}
 
 	/**
@@ -277,6 +223,8 @@ public final class GeoprocessingFeed {
 				currentEntry.setUpdated(upDate);
 			}
 		}
+		// call global time stamp update routine
+		updateFeedTimestamp();
 	}
 	
 	/**
@@ -295,7 +243,7 @@ public final class GeoprocessingFeed {
 			if (currentLink.getRel().equals("self")){
 				String webRoot = currentLink.getHref().toString();
 				// truncate trailing feed.xml
-				webRoot = webRoot.substring(0, webRoot.indexOf(feedMimeType));
+				webRoot = webRoot.substring(0, webRoot.indexOf(atomFeedFileName));
 				return webRoot;
 			}
 		}
@@ -314,6 +262,20 @@ public final class GeoprocessingFeed {
 		List<String> entries = Arrays.asList(getEntryIDs());
 		return entries.contains(entryID);
 		
+	}
+	
+	/**
+	 * checks all update timestamps of the feed entries and sets a new update timestamp for the whole feed.
+	 */
+	private final void updateFeedTimestamp() {
+		Date lastUpdate = feed.getUpdated();
+
+		for (Entry currentEntry : feed.getEntries()) {
+			if (currentEntry.getUpdated().after(lastUpdate)) {
+				lastUpdate = currentEntry.getUpdated();
+			}
+		}
+		feed.setUpdated(lastUpdate);
 	}
 	
 }

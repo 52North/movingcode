@@ -38,6 +38,13 @@ import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
+/**
+ * This class contains static utility methods that are used to create and update AtomFeeds for MC
+ * 
+ * 
+ * @author Matthias Mueller, TU Dresden
+ *
+ */
 public class FeedUtils {
 	
 	static Logger logger = Logger.getLogger(FeedUtils.class);
@@ -61,21 +68,31 @@ public class FeedUtils {
 		GeoprocessingFeed gpFeed = readOrCreateFeed(feedFile);
 		
 		// 3. do the content update
-		List<String> folderPIDs = Arrays.asList(repo.getPackageIDs());
+		List<String> zipFilePIDs = Arrays.asList(repo.getPackageIDs());
 		List<String> feedPIDs = Arrays.asList(gpFeed.getEntryIDs());
 		List<String> checkedFeedPIDs = new ArrayList<String>();
 		
-		for (String currentFolderPID: folderPIDs){
-			// 1. normalize folder PID
-			String feedPID = RepositoryUtils.normalizePackageID(currentFolderPID);
+		for (String currentZipPID: zipFilePIDs){
+			// 1. build and normalize folder PID
+			// remove leading feedFolder String, i.e. D:\feed1
+			String feedPID = currentZipPID.substring(feedFolderDirectory.getAbsolutePath().length());
+			feedPID = RepositoryUtils.normalizePackageID(feedPID);
+			if (feedPID.startsWith("/")){
+				feedPID = feedPID.substring(1, feedPID.length());
+			}
+			
 			// 2. for each local package: check if it was previously present in AtomFeed
 			if (feedPIDs.contains(feedPID)){
-				Date folderTimeStamp = repo.getPackageTimestamp(currentFolderPID);
+				Date folderTimeStamp = repo.getPackageTimestamp(currentZipPID);
 				Date feedTimeStamp = gpFeed.getEntryUpdatedTimeStamp(feedPID);
 				// 2.a if so: check time stamp to determine if it was updated
 				if (folderTimeStamp.after(feedTimeStamp)){
 					// set new update timestamp
 					gpFeed.setEntryUpdatedTimeStamp(feedPID, folderTimeStamp);
+					// write out new packagedescription
+					String currentXMLFileName = currentZipPID + ".xml";
+					File currentXMLFile = new File(currentXMLFileName);
+					repo.getPackage(currentZipPID).dumpDescription(currentXMLFile);
 					// TODO: do we have to update even more information?
 				}
 				// indicate that we have updated/checked this local PID
@@ -83,11 +100,32 @@ public class FeedUtils {
 			}
 			// 2.b if not: just add the current package
 			else {
-				gpFeed.addEntry(feedPID, repo.getPackage(currentFolderPID));
+				String currentXMLFileName = currentZipPID + ".xml";
+				// write out new packagedescription
+				File currentXMLFile = new File(currentXMLFileName);
+				repo.getPackage(currentZipPID).dumpDescription(currentXMLFile);
+				gpFeed.addEntry(feedPID, repo.getPackage(currentZipPID));
 			}
 		}
 		
-		// TODO: write feed back to disk
+		// 3. report unsafe packages (?)
+		// TODO: delete packages, if it really makes sense,
+		// maybe have a trigger or so
+
+		feedPIDs.removeAll(checkedFeedPIDs);
+		if(feedPIDs.size() != 0){
+			StringBuffer report = new StringBuffer("\n");
+			report.append(
+					"Package folder updated. The following packages are no longer present in the remote feed."
+					+ "However, they will be kept in the local mirror until you manually delete them.\n"
+			);
+			for (String currentPID : feedPIDs){
+				report.append(currentPID + "\n");
+			}
+			logger.info(report.toString());
+		}
+		
+		// write feed back to disk
 		logger.info("Writing new Feed to disk.");
         try {
         	OutputStream os = new FileOutputStream(feedFile);
