@@ -24,6 +24,13 @@
 
 package org.n52.movingcode.runtime.feed;
 
+/**
+ * 
+ * @author Matthias Mueller, TU Dresden
+ *
+ * TODO: is this still useful? Maybe for future re-engineering of the feed handling?
+ * TODO: if so, this could be transformed to a value object
+ */
 public class FeedTemplate {
     private String feedTitle;
     private String feedSubtitle;

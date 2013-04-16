@@ -43,8 +43,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * http://tools.ietf.org/html/rfc4946
  * 
  * @author Matthias Mueller, TU Dresden
- * 
- * TODO: make class protected
+ *
  * TODO: make all methods protected
  * TODO: Should be used by {@link GeoprocessingFeed} class only.
  * 
@@ -63,8 +62,12 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * TODO: decrease visibility to protected
 	 */
-	public GeoprocessingFeedEntry(Entry entry) {
+	protected GeoprocessingFeedEntry(Entry entry) {
 		this.entry = entry;
+	}
+	
+	protected GeoprocessingFeedEntry(){
+		this.entry = makeNewEntry();
 	}
 
 	/**
@@ -82,7 +85,7 @@ public final class GeoprocessingFeedEntry {
 	 *        
 	 * TODO: decrease visibility to protected
 	 */
-	public GeoprocessingFeedEntry(PackageDescriptionDocument packageDesc,
+	protected GeoprocessingFeedEntry(String entryID, PackageDescriptionDocument packageDesc,
 			Date creationDate,
 			String packageURL,
 			String descriptionURL) {
@@ -104,8 +107,8 @@ public final class GeoprocessingFeedEntry {
 			// }
 			// assert(summary!=null);
 
-			this.entry.setTitle(identifier); // set title
-			this.entry.setId(identifier); // set identifier
+			this.entry.setTitle(entryID); // set title
+			this.entry.setId(entryID); // set identifier
 			this.entry.setPublished(creationDate); // set published date
 			this.entry.setUpdated(creationDate); // set creation date
 

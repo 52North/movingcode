@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.abdera.model.Entry;
 import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
@@ -88,9 +87,9 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			GeoprocessingFeed feed = new GeoprocessingFeed(stream);
 			lastFeedUpdate = feed.lastUpdated();
 
-			for (Entry entry : feed.getEntries()) {
+			for (String currentEntryID : feed.getEntryIDs()) {
 				// create new moving code package from the entry
-				GeoprocessingFeedEntry gpfe = new GeoprocessingFeedEntry(entry);
+				GeoprocessingFeedEntry gpfe = feed.getFeedEntry(currentEntryID);
 				logger.trace("Loading entry " + gpfe.toString());
 				
 				String packageID = gpfe.getIdentifier();
