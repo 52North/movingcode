@@ -132,75 +132,6 @@ final class ZippedPackage implements ICodePackage {
         return null;
     }
 
-    // /*
-    // * creates an unzipped copy of the archive
-    // */
-    // private static void unzipPackage(ZippedPackage archive, File targetDirectory) {
-    //
-    // // zipFile and zip url MUST not be null at the same time
-    // assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
-    // String archiveName = null;
-    //
-    // try {
-    //
-    // ZipInputStream zis = null;
-    // if (archive.zipFile != null) {
-    // zis = new ZipInputStream(new FileInputStream(archive.zipFile));
-    // archiveName = archive.zipFile.getAbsolutePath();
-    // }
-    // else if (archive.zipURL != null) {
-    // zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
-    // archiveName = archive.zipURL.toString();
-    // }
-    //
-    // ZipEntry entry;
-    // while ( (entry = zis.getNextEntry()) != null) {
-    // String fileName = entry.getName();
-    // File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
-    //
-    // // create all required directories
-    // new File(newFile.getParent()).mkdirs();
-    //
-    // // if current zip entry is not a directory, do unzip
-    // if ( !entry.isDirectory()) {
-    // FileOutputStream fos = new FileOutputStream(newFile);
-    // IOUtils.copy(zis, fos);
-    // zis.close();
-    // fos.close();
-    // }
-    // zis.closeEntry();
-    // }
-    //
-    // // Enumeration<? extends ZipEntry> entries = zis.entries();
-    // // while (entries.hasMoreElements()){
-    // // ZipEntry entry = entries.nextElement();
-    // // String fileName = entry.getName();
-    // // File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
-    // //
-    // // // create all required directories
-    // // new File(newFile.getParent()).mkdirs();
-    // //
-    // // // if current zip entry is not a directory, do unzip
-    // // if(!entry.isDirectory()){
-    // // FileOutputStream fos = new FileOutputStream(newFile);
-    // // InputStream is = zif.getInputStream(entry);
-    // // IOUtils.copy(is, fos);
-    // // is.close();
-    // // fos.close();
-    // // }
-    // // }
-    // }
-    // catch (ZipException e) {
-    // System.err.println("Error! Could read from archive: " + archiveName);
-    // }
-    // catch (IOException e) {
-    // System.err.println("Error! Could not open archive: " + archiveName);
-    // }
-    // catch (NullPointerException e) {
-    // System.err.println("No archive has been declared. This should not happen ...");
-    // }
-    // }
-
     /**
      * Static private method that creates an unzipped copy of the archive.
      * 
@@ -213,7 +144,7 @@ final class ZippedPackage implements ICodePackage {
      */
     private static void unzipWorkspace(ZippedPackage archive, String workspaceDirName, File targetDirectory) {
 
-        // zipFile and zip url and isRaw() MUST not be null at the same time
+        // zipFile and zip url MUST not be null at the same time
         assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
         String archiveName = null;
 
@@ -271,7 +202,7 @@ final class ZippedPackage implements ICodePackage {
     @Override
     public boolean dumpPackage(File targetZipFile) {
         // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (zipFile == null) || (zipURL == null)));
+        assert ( ! ( (zipFile == null) && (zipURL == null)));
 
         // in case there is a zipped package file on disk
         if (zipFile != null) {
