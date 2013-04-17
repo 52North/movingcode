@@ -190,6 +190,8 @@
 						<include>**/ValidatePackageTest.java</include>
 						<include>**/SilentFolderUpdateTest.java</include>
 						<include>**/AUIDTest.java</include>
+						<include>**/ExecutableJARTest.java</include>
+						<include>**/FeedConversionTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>

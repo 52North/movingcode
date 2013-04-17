@@ -42,21 +42,29 @@ public class MCRuntimeTestConfig {
 	static Logger logger = Logger.getLogger(MCRuntimeTestConfig.class);
 	
 	static final String CR = "\n";
+	
+	private static volatile boolean processorConfigured = false;
+	private static volatile boolean loggerConfigured = false;
 
 	public MCRuntimeTestConfig() {
 		MCRuntimeTestConfig.setup();
 	}
 
-	private static void configureProcessors() throws XmlException, IOException {
-		File procConfigFile = new File(PROCESSOR_CONFIG_FILE);
-		logger.info(procConfigFile.getAbsolutePath());
-		ProcessorConfig.getInstance().setConfig(procConfigFile);
+	private static synchronized void configureProcessors() throws XmlException, IOException {
+		if (!processorConfigured){
+			File procConfigFile = new File(PROCESSOR_CONFIG_FILE);
+			ProcessorConfig.getInstance().setConfig(procConfigFile);
+			processorConfigured = true;
+		}
 	}
-
+	
 	private static void configureLogger() {
-		// Logger stuff
-		BasicConfigurator.configure();
-		LogManager.getRootLogger().setLevel(Level.INFO);
+		// TODO: currently the logging out looks like two loggers, why?
+		if (!loggerConfigured){
+			BasicConfigurator.configure();
+			LogManager.getRootLogger().setLevel(Level.INFO);
+			loggerConfigured = true;
+		}
 	}
 
 	static void setup() {
