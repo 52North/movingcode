@@ -144,7 +144,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 			
 			logger.info("Found package: " + currentFolder + "; using ID: " + id);
 
-			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd, timestamp, id);
+			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd, timestamp);
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map

@@ -53,11 +53,9 @@ public class PythonPackageTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		logger.info(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 
 		// Assert
 		Assert.assertTrue(mcPackage.isValid());
@@ -70,13 +68,11 @@ public class PythonPackageTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		logger.info(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
-		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
-		// processor
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		// get a processor
+		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); 
 
 		// add input
 		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(inPosition),
@@ -114,13 +110,11 @@ public class PythonPackageTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		logger.info(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
-		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
-		// processor
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+		// get a processor
+		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); 
 
 		// add input
 		Assert.assertTrue(processor.addData(inID, new MediaData(new FileInputStream(new File(dataFileName)), mimeType)));

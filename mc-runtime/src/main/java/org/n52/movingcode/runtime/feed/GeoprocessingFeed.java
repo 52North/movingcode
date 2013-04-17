@@ -56,14 +56,14 @@ public final class GeoprocessingFeed {
 	static Logger logger = Logger.getLogger(GeoprocessingFeed.class);
 
 	private final Feed feed;
-	
+
 	public static final String atomFeedFileName = "feed.xml";
 	public static final String feedMimeType = "application/atom+xml";
 	public static final String PACKAGE_MIMETYPE = "application/zip";
 	public static final String PACKAGE_DESCRIPTION_MIMETYPE = "text/xml";
 	public static final String PACKAGE_LINK_REL = "enclosure";
 	public static final String DETAILED_DESCRIPTION_LINK_REL = "alternate";
-	
+
 	/**
 	 * No argument constructor. This creates an empty feed without any of the
 	 * mandatory elements. Shall only be used by internal methods.
@@ -73,7 +73,7 @@ public final class GeoprocessingFeed {
 		Abdera abdera = new Abdera();
 		feed = abdera.newFeed();
 	}
-	
+
 	/**
 	 * Construct a {@link GeoprocessingFeed} from an atom XML stream
 	 * 
@@ -88,7 +88,7 @@ public final class GeoprocessingFeed {
 
 		logger.info("New Feed: " + feed.getTitle());
 	}
-	
+
 	/**
 	 * Construct a {@link GeoprocessingFeed} from a given {@link FeedTemplate} 
 	 * 
@@ -118,7 +118,7 @@ public final class GeoprocessingFeed {
 		feed.addLink(template.getFeedURL(), "self");
 
 	}
-	
+
 	/**
 	 * 
 	 * 
@@ -128,7 +128,7 @@ public final class GeoprocessingFeed {
 	 * 
 	 * TODO: add link with relation "self" to follow an atom recommendation
 	 */
-	public synchronized boolean addEntry(String entryID, MovingCodePackage mcp){
+	protected synchronized boolean addEntry(String entryID, MovingCodePackage mcp){
 		// add only if ID is still free
 		if (!containsEntry(entryID)){
 			String feedWebRoot = getFeedWebRoot();
@@ -138,9 +138,9 @@ public final class GeoprocessingFeed {
 					mcp.getTimestamp(),
 					feedWebRoot + entryID + ".zip",
 					feedWebRoot + entryID + ".xml"
-	        );
+			);
 			feed.addEntry(entry.getAtomEntry());
-			
+
 			// call global time stamp update routine
 			updateFeedTimestamp();
 			return true;
@@ -149,14 +149,40 @@ public final class GeoprocessingFeed {
 			return false;
 		}
 	}
-	
-	public GeoprocessingFeedEntry getFeedEntry(final String entryID){
+
+	/**
+	 * Returns a {@link GeoprocessingFeedEntry} for a given entryID.
+	 * If the entryID is not associated with a package, this method returns <code>null</code>.
+	 * 
+	 * @param entryID {@link String}
+	 * @return {@link GeoprocessingFeedEntry} -  the entry
+	 */
+	protected GeoprocessingFeedEntry getFeedEntry(final String entryID){
 		for (Entry currentEntry : feed.getEntries()){
 			if (currentEntry.getId().toString().equals(entryID)){
 				return new GeoprocessingFeedEntry(currentEntry);
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns a {@link MovingCodePackage} for a given entryID.
+	 * If the entryID is not associated with a package, this method returns <code>null</code>.
+	 * 
+	 * @param entryID {@link String}
+	 * @return {@link MovingCodePackage} - the package
+	 */
+	public MovingCodePackage getPackage(final String entryID){
+		GeoprocessingFeedEntry gpfe = getFeedEntry(entryID);
+		// if there is no entry or if its URL is invalid, return null
+		if (gpfe == null || gpfe.getZipPackageURL() == null){
+			return null;
+		} 
+		// else: return new package
+		else {
+			return new MovingCodePackage(gpfe.getZipPackageURL(), entryID, gpfe.getUpdated());
+		}
 	}
 
 	/**
@@ -169,7 +195,7 @@ public final class GeoprocessingFeed {
 	public void write(OutputStream os) throws IOException {
 		// Writer writer = Abdera.getInstance().getWriterFactory().getWriter("prettyxml");
 		// TODO: pipe stream through a filter that removes lines with nothing but spaces in it
-		
+
 		Writer writer = Abdera.getInstance().getWriterFactory().getWriter();
 		writer.writeTo(feed, os);
 		// feed.writeTo(os);
@@ -184,7 +210,7 @@ public final class GeoprocessingFeed {
 	public Date lastUpdated(){
 		return feed.getUpdated();
 	}
-	
+
 	/**
 	 * Returns the IDs of all registered entries.
 	 * 
@@ -197,7 +223,7 @@ public final class GeoprocessingFeed {
 		}
 		return allIDs.toArray(new String[allIDs.size()]);
 	}
-	
+
 	/**
 	 * 
 	 * @param entryID
@@ -211,7 +237,7 @@ public final class GeoprocessingFeed {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 
 	 * @param entryID {@link String}
@@ -226,7 +252,7 @@ public final class GeoprocessingFeed {
 		// call global time stamp update routine
 		updateFeedTimestamp();
 	}
-	
+
 	/**
 	 * Helper get the webRoot from the first feed/link/href element
 	 * Contains a trailing "/"!
@@ -237,7 +263,7 @@ public final class GeoprocessingFeed {
 	 */
 	private String getFeedWebRoot(){
 		// example: <link href="http://services2.glues.geo.tu-dresden.de/feeds/gpfeed.xml" rel="self" type="application/atom+xml"/>
-		
+
 		// find the link with the self relation and use its value to determine the web root
 		for (Link currentLink : feed.getLinks()){
 			if (currentLink.getRel().equals("self")){
@@ -247,11 +273,11 @@ public final class GeoprocessingFeed {
 				return webRoot;
 			}
 		}
-		
+
 		// "default" value for web root is "" (empty String)
 		return "";
 	}
-	
+
 	/**
 	 * Contains check for entryIDs
 	 * 
@@ -261,9 +287,9 @@ public final class GeoprocessingFeed {
 	private boolean containsEntry(String entryID){
 		List<String> entries = Arrays.asList(getEntryIDs());
 		return entries.contains(entryID);
-		
+
 	}
-	
+
 	/**
 	 * checks all update timestamps of the feed entries and sets a new update timestamp for the whole feed.
 	 */
@@ -277,5 +303,5 @@ public final class GeoprocessingFeed {
 		}
 		feed.setUpdated(lastUpdate);
 	}
-	
+
 }

@@ -58,11 +58,9 @@ public class ArcToolboxPackageTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 
 		// Assert
 		Assert.assertTrue(mcPackage.isValid());
@@ -76,11 +74,9 @@ public class ArcToolboxPackageTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		System.out.println(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); // get a
 		// processor
 

@@ -34,7 +34,6 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
-import org.n52.movingcode.runtime.feed.GeoprocessingFeedEntry;
 
 /**
  * This class implements an {@link IMovingCodeRepository} for Remote Geoprocessing Feeds.
@@ -89,21 +88,18 @@ public final class RemoteFeedRepository extends AbstractRepository {
 
 			for (String currentEntryID : feed.getEntryIDs()) {
 				// create new moving code package from the entry
-				GeoprocessingFeedEntry gpfe = feed.getFeedEntry(currentEntryID);
-				logger.trace("Loading entry " + gpfe.toString());
-				
-				String packageID = gpfe.getIdentifier();
-				MovingCodePackage mcPackage = new MovingCodePackage(gpfe, packageID);
+				MovingCodePackage mcp = feed.getPackage(currentEntryID);
+				logger.trace("Loading package for feed entry " + currentEntryID);
 				
 				// validate
 				// and add to package map
 				// and add current file to zipFiles map
-				if (mcPackage.isValid()) {
-					register(mcPackage, packageID);
+				if (mcp.isValid()) {
+					register(mcp, currentEntryID);
 				}
 				else {
 					logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
-							+ packageID);
+							+ currentEntryID);
 				}
 			}
 
