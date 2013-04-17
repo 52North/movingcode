@@ -32,13 +32,14 @@ public class GeneralProcessorTest extends MCRuntimeTestConfig {
 
 	@Test
 	public void loadSupportedProcessors() {
-
-		// Arrange
-
+		
+		StringBuffer report = new StringBuffer(CR);
+		
 		String[] processors = ProcessorFactory.getInstance().registeredProcessors();
 		for (String processor : processors) {
-			logger.info("Processor found: " + processor.toString());
+			report.append("Processor found: " + processor.toString() + CR);
 		}
+		logger.info(report.toString());
 	}
 
 }

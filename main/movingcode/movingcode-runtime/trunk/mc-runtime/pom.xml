@@ -183,6 +183,9 @@
 					<includes>
 						<includes>**/FeedReadTest.java</includes>
 						<includes>**/MovingCodeRepositoryTests.java</includes>
+						<includes>**/GeneralProcessorTest.java</includes>
+						<include>**/IOParameterTest.java</include>
+						<include>**/MimetypesTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>
