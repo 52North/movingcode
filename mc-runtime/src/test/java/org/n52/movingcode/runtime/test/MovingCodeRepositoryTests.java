@@ -52,8 +52,8 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 	@Test
 	public void testDirectoryRepository() {
-		// create string buffer for the pachake report
-		StringBuffer report = new StringBuffer("\n");
+		// create string buffer for the package report
+		StringBuffer report = new StringBuffer(CR);
 		
 		// Arrange
 		File packageFolder = new File(packageFolderName);
@@ -64,17 +64,17 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 		// Assert
 		Assert.assertTrue(mcRep.providesFunction(zTransformFunctionID));
-		report.append("Information for package: " + zTransformFunctionID + "\n");
+		report.append("Information for package: " + zTransformFunctionID + CR);
 		
 		MovingCodePackage pack = mcRep.getPackageByFunction(zTransformFunctionID)[0]; // get the test package
 		Assert.assertFalse(pack == null); // make sure it is not null
-		report.append("Package Timestamp is: " + pack.getTimestamp() + "\n");
+		report.append("Package Timestamp is: " + pack.getTimestamp() + CR);
 
 		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty
 		// parameter Map
 		Assert.assertFalse(paramsMap == null); // make sure it is not null
 
-		report.append("--- Parameters ---\n");
+		report.append("--- Parameters ---" + CR);
 		for (IOParameter param : paramsMap.values()) {
 			report.append(
 					"Parameter "
@@ -83,17 +83,17 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 					+ param.getMinMultiplicity()
 					+ ".."
 					+ param.getMaxMultiplicity()
-					+ "\n"
+					+ CR
 			);
 			
 			if (param.isMessageIn()) {
-				report.append("ServiceInputID: " + param.getMessageInputIdentifier() + "\n");
+				report.append("ServiceInputID: " + param.getMessageInputIdentifier() + CR);
 			}
 			if (param.isMessageOut()) {
-				report.append("ServiceOutputID: " + param.getMessageOutputIdentifier() + "\n");
+				report.append("ServiceOutputID: " + param.getMessageOutputIdentifier() + CR);
 			}
 			
-			report.append("Internal Type: " + param.getType().toString() + "\n");
+			report.append("Internal Type: " + param.getType().toString() + CR);
 		}
 		
 		// show report

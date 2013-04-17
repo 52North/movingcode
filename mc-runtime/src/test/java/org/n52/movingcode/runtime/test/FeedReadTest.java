@@ -42,14 +42,16 @@ public class FeedReadTest extends MCRuntimeTestConfig {
 
 	@Test
 	public void queryTUDFeed() {
-
+		// create string buffer for the test report
+		StringBuffer report = new StringBuffer(CR);
+		
 		try {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
 			rm.addRepository(url);
 			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
 
 			for (String pID : rm.getPackageIDs()) {
-				logger.info("\nFound process: " + pID);
+				report.append("\nFound process: " + pID + CR);
 				MovingCodePackage pack = rm.getPackage(pID);
 
 				Assert.assertFalse(pack == null); // make sure it is not null
@@ -59,34 +61,36 @@ public class FeedReadTest extends MCRuntimeTestConfig {
 				// parameter
 				// Map
 				if (processor == null) {
-					logger.info("Couldn't get a processor for package " + pID);
+					report.append("Couldn't get a processor for package " + pID + CR);
 				}
 
 				else {
 
-					logger.info("Compatible Processors: " + processor.getClass().getName());
+					report.append("Compatible Processors: " + processor.getClass().getName() + CR);
 
-					logger.info("--- Parameters ---");
+					report.append("--- Parameters ---" + CR);
 					for (IOParameter param : processor.values()) {
-						logger.info("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
-								+ param.getMinMultiplicity() + ".." + param.getMaxMultiplicity());
+						report.append("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
+								+ param.getMinMultiplicity() + ".." + param.getMaxMultiplicity() + CR);
 						if (param.isMessageIn()) {
-							logger.info("ServiceInputID: " + param.getMessageInputIdentifier());
+							report.append("ServiceInputID: " + param.getMessageInputIdentifier() + CR);
 						}
 						if (param.isMessageOut()) {
-							logger.info("ServiceOutputID: " + param.getMessageOutputIdentifier());
+							report.append("ServiceOutputID: " + param.getMessageOutputIdentifier() + CR);
 						}
 
-						logger.info("Internal Type: " + param.getType().toString());
+						report.append("Internal Type: " + param.getType().toString() + CR);
 					}
 				}
 
 			}
+			
+			// show report
+			logger.info(report.toString());
 
 		}
 		catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("Could not read test feed from URL " + feedURL + CR + "Please check if this feed is indeed up and running.");
 		}
 	}
 }

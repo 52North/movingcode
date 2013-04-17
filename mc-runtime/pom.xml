@@ -175,17 +175,20 @@
 			</plugin>
 
 			<!-- Surefire plugin for automated tests -->
-			<!-- Currently disabled -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>false</skipTests>
+					<includes>
+						<includes>**/FeedReadTest.java</includes>
+						<includes>**/MovingCodeRepositoryTests.java</includes>
+					</includes>
 				</configuration>
 			</plugin>
 			
 			<!-- run "mvn license:check" to check -->
-			<!-- run "mvn license:format" to add to the files -->
+			<!-- run "mvn license:format" to add missing licenses to the files -->
 			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
