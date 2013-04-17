@@ -22,7 +22,7 @@
 					<xs:documentation>A well known URI from the container registry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="tempWorkspace" type="xs:string" minOccurs="0"/>
+			<xs:element name="tempWorkspace" type="pc:tempWorkspaceType" minOccurs="0"/>
 			<xs:element name="property" type="pc:propertyType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="required">
@@ -35,7 +35,7 @@
 	<!-- Extendable type definition for processor defaults -->
 	<xs:complexType name="defaultsType">
 		<xs:sequence>
-			<xs:element name="tempWorkspace" type="xs:string"/>
+			<xs:element name="tempWorkspace" type="pc:tempWorkspaceType"/>
 			<xs:element name="availablePlatform" type="xs:anyURI" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>A well known URI from the platform registry</xs:documentation>
@@ -56,6 +56,32 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
+	
+	<xs:simpleType name="tempWorkspaceType">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:annotation>
+						<xs:documentation>
+							This can be any valid directory path
+						</xs:documentation>
+					</xs:annotation>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="$TEMP$">
+						<xs:annotation>
+						<xs:documentation>
+							This is a defined constant which indicates that the temp directory shall
+							be an arbitrary, sytem generated path.
+						</xs:documentation>
+					</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
 	
 	
 	<!-- ID type for processors -->
