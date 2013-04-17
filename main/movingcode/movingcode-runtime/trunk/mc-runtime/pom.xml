@@ -186,6 +186,9 @@
 						<includes>**/GeneralProcessorTest.java</includes>
 						<include>**/IOParameterTest.java</include>
 						<include>**/MimetypesTest.java</include>
+						<include>**/RepoUtilsTest.java</include>
+						<include>**/ValidatePackageTest.java</include>
+						<include>**/SilentFolderUpdateTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>

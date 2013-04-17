@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
-public class ValidatePackage extends MCRuntimeTestConfig {
+public class ValidatePackageTest extends MCRuntimeTestConfig {
 
     @Test
     public void loadAndValidateGoodPackage() {
