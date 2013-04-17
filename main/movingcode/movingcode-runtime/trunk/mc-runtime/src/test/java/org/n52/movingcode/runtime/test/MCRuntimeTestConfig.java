@@ -58,8 +58,8 @@ public class MCRuntimeTestConfig {
 		}
 	}
 	
+	// MM: this init is no longer needed, I think ...
 	private static void configureLogger() {
-		// TODO: currently the logging out looks like two loggers, why?
 		if (!loggerConfigured){
 			BasicConfigurator.configure();
 			LogManager.getRootLogger().setLevel(Level.INFO);
@@ -68,7 +68,7 @@ public class MCRuntimeTestConfig {
 	}
 
 	static void setup() {
-		configureLogger();
+		//configureLogger();
 		try {
 			configureProcessors();
 		}
