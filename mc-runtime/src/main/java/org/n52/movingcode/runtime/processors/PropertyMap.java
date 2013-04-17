@@ -33,28 +33,29 @@ import java.util.HashMap;
  * 
  * @author Matthias Mueller
  * 
+ * TODO: make it a value object --> comparable, .toString(), ...
  */
 public class PropertyMap extends HashMap<String, String> {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3104930318249367786L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3104930318249367786L;
 
-    public PropertyMap() {
-        super();
-    }
+	public PropertyMap() {
+		super();
+	}
 
-    /**
-     * Convenience method for printing a list of properties stored in this map.
-     * 
-     * @return {@link String} properties list
-     */
-    public String print() {
-        String retval = "";
-        for (String key : keySet()) {
-            retval = retval + key + "\t" + get(key) + "\n";
-        }
-        return retval;
-    }
+	/**
+	 * Convenience method for printing a list of properties stored in this map.
+	 * 
+	 * @return {@link String} properties list
+	 */
+	public String print() {
+		String retval = "";
+		for (String key : keySet()) {
+			retval = retval + key + "\t" + get(key) + "\n";
+		}
+		return retval;
+	}
 }
