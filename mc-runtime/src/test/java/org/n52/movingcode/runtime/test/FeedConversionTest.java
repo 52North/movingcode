@@ -29,11 +29,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
+import org.n52.movingcode.runtime.processors.AUID;
 
 public class FeedConversionTest extends MCRuntimeTestConfig {
 
@@ -45,19 +47,22 @@ public class FeedConversionTest extends MCRuntimeTestConfig {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
 			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(url);
 			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
+			
+			File tmpDir = new File(FileUtils.getTempDirectory(), AUID.randomAUID());
+			tmpDir.mkdir();
+			tmpDir.deleteOnExit();
+			
+			logger.info("Using temp dir " + tmpDir.getAbsolutePath());
 
-			File tempDir = new File ("D:\\1111\\repo\\");
-
-			RepositoryUtils.materializeAsLocalZipRepo(repo, tempDir);
-
+			RepositoryUtils.materializeAsLocalZipRepo(repo, tmpDir);
 
 		}
 		catch (MalformedURLException e) {
-			Assert.assertFalse(true);
+			Assert.fail();
 			e.printStackTrace();
 		} catch (IOException e) {
-			Assert.assertFalse(true);
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			Assert.fail();
 		}
 	}
 }
