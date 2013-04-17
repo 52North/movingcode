@@ -214,7 +214,7 @@ final class ZippedPackage implements ICodePackage {
     private static void unzipWorkspace(ZippedPackage archive, String workspaceDirName, File targetDirectory) {
 
         // zipFile and zip url and isRaw() MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
+        assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
         String archiveName = null;
 
         String wdName = workspaceDirName;
