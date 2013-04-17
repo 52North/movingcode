@@ -31,7 +31,7 @@ import org.junit.Test;
 
 import org.n52.movingcode.runtime.iodata.MimeTypeDatabase;
 
-public class Mimetypes extends MCRuntimeTestConfig {
+public class MimetypesTest extends MCRuntimeTestConfig {
 
     private static final String MT_NETCDF = "application/netcdf";
     private static final String MT_XNETCDF = "application/x-netcdf";
@@ -41,19 +41,17 @@ public class Mimetypes extends MCRuntimeTestConfig {
 
         // Arrange
         File packageFile = new File("src/test/resources/mimetypes/netcdf.types");
-        logger.info(packageFile.getAbsolutePath());
         MimeTypeDatabase rmf = null;
         try {
             rmf = new MimeTypeDatabase(packageFile.getAbsolutePath());
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Could not read MimeTypeDatabase from " + packageFile.getAbsolutePath());
         }
 
         // Act
         String ext = rmf.getExtensionStrings(MT_NETCDF)[0];
-        logger.info(ext);
+        logger.info("File for " + MT_NETCDF + " is: " + ext);
     }
 
 }
