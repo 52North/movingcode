@@ -95,7 +95,7 @@ final class ZippedPackage implements ICodePackage {
     private static PackageDescriptionDocument extractDescription(ZippedPackage archive) {
 
         // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) || (archive.zipURL == null)));
+        assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
         String archiveName = null;
 
         try {
