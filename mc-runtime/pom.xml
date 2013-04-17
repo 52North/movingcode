@@ -189,6 +189,7 @@
 						<include>**/RepoUtilsTest.java</include>
 						<include>**/ValidatePackageTest.java</include>
 						<include>**/SilentFolderUpdateTest.java</include>
+						<include>**/AUIDTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>
