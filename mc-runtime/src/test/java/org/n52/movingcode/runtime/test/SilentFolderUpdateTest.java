@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.UUID;
 
 import junit.framework.Assert;
 
@@ -39,6 +38,7 @@ import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
+import org.n52.movingcode.runtime.processors.AUID;
 
 public class SilentFolderUpdateTest extends MCRuntimeTestConfig{
 	
@@ -47,7 +47,7 @@ public class SilentFolderUpdateTest extends MCRuntimeTestConfig{
 	@Test
 	public void shouldReceiveNotificationOnPackageDrop() throws URISyntaxException, IOException, InterruptedException {
 		File tmpDir = FileUtils.getTempDirectory();
-		File tmpDropIn = new File(tmpDir, UUID.randomUUID().toString());
+		File tmpDropIn = new File(tmpDir, AUID.randomAUID());
 		tmpDropIn.mkdir();
 		tmpDropIn.deleteOnExit();
 		
