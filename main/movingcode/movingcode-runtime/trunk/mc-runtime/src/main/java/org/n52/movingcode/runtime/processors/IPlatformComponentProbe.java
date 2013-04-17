@@ -33,5 +33,5 @@ package org.n52.movingcode.runtime.processors;
  * 
  */
 public interface IPlatformComponentProbe {
-    public String probe();
+	public String probe();
 }

@@ -35,7 +35,9 @@ import java.io.IOException;
  * 
  */
 public interface IProcessor {
-
+	
+	public static final String randomTempDirToken = "$TEMP$";
+	
     /**
      * Performs a feasibility check for the request.
      * 

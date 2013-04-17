@@ -41,23 +41,23 @@ import org.n52.movingcode.runtime.iodata.IOParameterMap;
  */
 public abstract class AbstractProcessor extends IOParameterMap implements IProcessor {
 
-    private static final long serialVersionUID = -3617747844919275088L;
-    protected final File scratchWorkspace;
-    protected final MovingCodePackage mcPackage;
-    protected final PropertyMap properties;
+	private static final long serialVersionUID = -3617747844919275088L;
+	protected final File scratchWorkspace;
+	protected final MovingCodePackage mcPackage;
+	protected final PropertyMap properties;
 
-    /**
-     * The default and mandatory constructor for all processors in this framework.
-     * 
-     * @param {@link File} scratchworkspace
-     * @param {@link MovingCodePackage} mcp
-     * @param {@link PropertyMap} properties
-     */
-    public AbstractProcessor(final File scratchworkspace, final MovingCodePackage mcp, final PropertyMap properties) {
-        super(mcp);
-        this.scratchWorkspace = scratchworkspace;
-        this.mcPackage = mcp;
-        this.properties = properties;
-    }
+	/**
+	 * The default and mandatory constructor for all processors in this framework.
+	 * 
+	 * @param {@link File} scratchworkspace
+	 * @param {@link MovingCodePackage} mcp
+	 * @param {@link PropertyMap} properties
+	 */
+	public AbstractProcessor(final File scratchworkspace, final MovingCodePackage mcp, final PropertyMap properties) {
+		super(mcp);
+		this.scratchWorkspace = scratchworkspace;
+		this.mcPackage = mcp;
+		this.properties = properties;
+	}
 
 }
