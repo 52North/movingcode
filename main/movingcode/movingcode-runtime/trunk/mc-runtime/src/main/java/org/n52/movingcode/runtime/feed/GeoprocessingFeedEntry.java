@@ -24,6 +24,9 @@
 
 package org.n52.movingcode.runtime.feed;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Date;
 
 import net.opengis.wps.x100.ProcessDescriptionType;
@@ -44,11 +47,10 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * @author Matthias Mueller, TU Dresden
  *
- * TODO: make all methods protected
  * TODO: Should be used by {@link GeoprocessingFeed} class only.
  * 
  */
-public final class GeoprocessingFeedEntry {
+final class GeoprocessingFeedEntry {
 
 	private Entry entry;
 
@@ -94,8 +96,6 @@ public final class GeoprocessingFeedEntry {
 			ProcessDescriptionType wpsDesc = packageDesc.getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
 			this.entry = makeNewEntry();
 
-			String identifier = wpsDesc.getIdentifier().getStringValue();
-
 			// String title = wpsDesc.getTitle().getStringValue();
 
 			// String summary = null;
@@ -140,7 +140,7 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @return {@link String}
 	 */
-	public String getIdentifier() {
+	protected String getIdentifier() {
 		return entry.getId().toString();
 	}
 	
@@ -149,7 +149,7 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @param entryID {@link String}
 	 */
-	public void setIdentifier(final String entryID){
+	protected void setIdentifier(final String entryID){
 		entry.setId(entryID);
 	}
 
@@ -158,7 +158,7 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @return {@link Date}
 	 */
-	public Date getPublished() {
+	protected Date getPublished() {
 		return entry.getPublished();
 	}
 	
@@ -167,7 +167,7 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @param pubDate {@link Date}
 	 */
-	public void setPublished(Date pubDate){
+	protected void setPublished(Date pubDate){
 		entry.setPublished(pubDate);
 	}
 
@@ -176,7 +176,7 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @return {@link Date}
 	 */
-	public Date getUpdated() {
+	protected Date getUpdated() {
 		return entry.getUpdated();
 	}
 	
@@ -185,7 +185,7 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @param upDate {@link Date}
 	 */
-	public void setUpdated(Date upDate){
+	protected void setUpdated(Date upDate){
 		entry.setUpdated(upDate);
 	}
 
@@ -194,8 +194,33 @@ public final class GeoprocessingFeedEntry {
 	 * 
 	 * @return {@link Entry}
 	 */
-	public Entry getAtomEntry() {
+	protected Entry getAtomEntry() {
 		return this.entry;
+	}
+	
+	/**
+	 * Returns the URL of the referenced Code Package 
+	 * 
+	 * @return {@link URL} - the URL; will be <code>null</code> if the entryID is invalid, or if the package URL in the feed is incorrect
+	 */
+	protected URL getZipPackageURL(){
+		for (Link currentLink : entry.getLinks()){
+			String rel = currentLink.getRel();
+			String mt = currentLink.getMimeType().toString();
+			if (rel.equals(GeoprocessingFeed.PACKAGE_LINK_REL)
+					&& mt.equals(GeoprocessingFeed.PACKAGE_MIMETYPE)){
+				try {
+					return currentLink.getHref().toURL();
+				} catch (MalformedURLException e) {
+					logger.error("Wrong package URL: " + currentLink.getHref().toString());
+					return null;
+				} catch (URISyntaxException e) {
+					logger.error("Wrong package URL: " + currentLink.getHref().toString());
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -206,34 +231,6 @@ public final class GeoprocessingFeedEntry {
 	private static Entry makeNewEntry() {
 		return Abdera.getInstance().newEntry();
 	}
-
-	/**
-	 * Updates this entry with the contents of a newer one. Procedure is as follows:
-	 * 
-	 * If the otherEntry is newer: 1. its contents will be copied to this entry 2. the old publication date
-	 * will be kept
-	 * 
-	 * @param otherEntry
-	 *        {@link GeoprocessingFeedEntry}
-	 */
-	public void updateWith(GeoprocessingFeedEntry otherEntry) {
-		// check if other entry is newer
-		if (otherEntry.getUpdated().after(this.entry.getUpdated())) {
-			// replace with newer entry but keep old PublishedDate
-			Date published = this.getPublished();
-			this.entry = otherEntry.getAtomEntry();
-			this.entry.setPublished(published);
-			logger.info("Updating feed entry for: " + this.getIdentifier());
-		}
-		// if it is not newer - just keep the old one!
-	}
-
-	// private static Content makeContent(String packageURL){
-	// Content content = Abdera.getInstance().getFactory().newContent();
-	// content.setMimeType(PACKAGE_MIMETYPE);
-	// content.setSrc(packageURL);
-	// return content;
-	// }
 
 	/**
 	 * Static helper method that creates an Atom {@link Link} object from a given package URL.
@@ -269,8 +266,7 @@ public final class GeoprocessingFeedEntry {
 	 * Generates a human-readable description from a PackageDescriptionDocument. This description is return as
 	 * an Atom content object.
 	 * 
-	 * @param wpsDesc
-	 *        {@link ProcessDescriptionType}
+	 * @param wpsDesc {@link ProcessDescriptionType}
 	 * @return {@link Content}
 	 */
 	private static Content generateHTMLContent(final ProcessDescriptionType wpsDesc) {

@@ -41,7 +41,7 @@ public class ValidatePackage extends MCRuntimeTestConfig {
         logger.info(packageIdentifier);
 
         // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+        MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 
         // Assert
         Assert.assertTrue(mcPackage.isValid());
@@ -52,11 +52,9 @@ public class ValidatePackage extends MCRuntimeTestConfig {
 
         // Arrange
         File packageFile = new File("src/test/resources/testpackages/py_copy.zip");
-        String packageIdentifier = packageFile.getAbsolutePath();
-        logger.info(packageIdentifier);
 
         // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+        MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 
         // Assert
         Assert.assertTrue(mcPackage.isValid());
@@ -67,11 +65,9 @@ public class ValidatePackage extends MCRuntimeTestConfig {
 
         // Arrange
         File packageFile = new File("src/test/resources/testpackages/bad_package_structure.zip");
-        String packageIdentifier = packageFile.getAbsolutePath();
-        logger.info(packageIdentifier);
 
         // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+        MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 
         // Assert
         Assert.assertFalse(mcPackage.isValid());

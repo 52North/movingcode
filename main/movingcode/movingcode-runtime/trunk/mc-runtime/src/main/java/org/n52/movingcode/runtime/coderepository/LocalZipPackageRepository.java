@@ -83,7 +83,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			String id = RepositoryUtils.generateNormalizedIDFromFile(currentFile);
 			logger.trace("Found package: " + currentFile + "; using ID: " + id);
 
-			MovingCodePackage mcPackage = new MovingCodePackage(currentFile, id);
+			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
 
 			// validate
 			// and add to package map

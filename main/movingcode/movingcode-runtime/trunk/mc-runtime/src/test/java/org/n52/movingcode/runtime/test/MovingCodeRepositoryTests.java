@@ -128,12 +128,12 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		String packageIdentifier = tempFile.getPath();
 		logger.info(packageIdentifier);
 
-		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null, packageIdentifier);
+		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null);
 
 		mcp.dumpPackage(tempFile);
 		// close package and reopen
 		mcp = null;
-		mcp = new MovingCodePackage(tempFile, packageIdentifier);
+		mcp = new MovingCodePackage(tempFile);
 
 		// Assert
 		Assert.assertTrue(mcp.isValid());

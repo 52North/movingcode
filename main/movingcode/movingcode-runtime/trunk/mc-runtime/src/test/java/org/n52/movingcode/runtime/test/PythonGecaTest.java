@@ -48,11 +48,9 @@ public class PythonGecaTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		logger.info(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 
 		// Assert
 		Assert.assertTrue(mcPackage.isValid());
@@ -64,11 +62,9 @@ public class PythonGecaTest extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFile = new File(packageFileName);
-		String packageIdentifier = packageFile.getAbsolutePath();
-		logger.info(packageIdentifier);
 
 		// Act
-		MovingCodePackage mcPackage = new MovingCodePackage(packageFile, packageIdentifier);
+		MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
 		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage);
 
 		// add input
