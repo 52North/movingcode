@@ -27,6 +27,7 @@ package org.n52.movingcode.runtime.test;
 import java.io.File;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,6 +36,7 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.IOParameterMap;
+import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
@@ -47,8 +49,6 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 	private static final String workspace = packageFolderName + File.separator + "ztransform/ztransform";
 	private static final String descriptionXML = packageFolderName + File.separator
 	+ "ztransform/packagedescription.xml";
-
-	private static final String tempFolder = "C:\\tmp";
 
 	@Test
 	public void testDirectoryRepository() {
@@ -123,8 +123,13 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(new File(descriptionXML));
 
 		// Act
+		// create a temp folder
+		File tempFolder = new File(FileUtils.getTempDirectory(), AUID.randomAUID());
+		tempFolder.mkdir();
+		tempFolder.deleteOnExit();
+		
 		// create a new zipped package
-		File tempFile = new File(tempFolder + File.separator + UUID.randomUUID().toString() + ".zip");
+		File tempFile = new File(tempFolder + File.separator + AUID.randomAUID() + ".zip");
 		String packageIdentifier = tempFile.getPath();
 		logger.info(packageIdentifier);
 
