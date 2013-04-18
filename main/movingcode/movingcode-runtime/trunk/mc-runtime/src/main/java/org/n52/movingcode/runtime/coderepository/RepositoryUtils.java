@@ -52,7 +52,7 @@ public class RepositoryUtils {
 	private static final String httpPrefix = "http://";
 	
 	// strings that shall be replaces by File.separator
-	private static final String[] separatorReplacements = {":/", ":\\\\", "\\\\", ";"};
+	private static final String[] separatorReplacements = {File.separator, ":/", ":\\\\", "\\\\", ";"};
 	
 	// default extension for zipped packages
 	public static final String defaultZipExtension = ".zip";
@@ -207,43 +207,42 @@ public class RepositoryUtils {
 	 * The following operations are performed:
 	 * 
 	 * 1. remove {@value #httpPrefix}
-	 * 2. replace any of {@value #separatorReplacements} with a {@value File#separator}
-	 * 3. reduce consecutive occurrences of {@link File#separator} to one
-	 * 4. remove a leading {@value File#separator}
+	 * 2. replace any of {@value #separatorReplacements} with a {@value #normalizedFileSeparator}
+	 * 3. collapse consecutive occurrences of {@value #normalizedFileSeparator} to one
+	 * 4. remove a leading {@value #normalizedFileSeparator}
 	 * 5. remove trailing {@value #zipExtension}
-	 * 5. replace all {@value File#separator} with {@value #normalizedFileSeparator}
 	 * 
 	 * @param {@link String} packageID - ID that shall be normalized
 	 * @return {@link String} - the normalized ID
 	 */
-	public static String normalizePackageID(String packageID){
+	public static String normalizePackageID(final String packageID){
 		// 0. clone ID
 		String normalizedID = new String(packageID);
 		
 		
-		// 1. remove http prefix
+		// 1. remove {@value #httpPrefix}
 		if (normalizedID.startsWith(httpPrefix)){
 			normalizedID = normalizedID.substring(httpPrefix.length());
 		}
 		
-		// 2. replace invalid char sequences with File.separator
+		// 2. replace any of {@value #separatorReplacements} with a {@value #normalizedFileSeparator}
 		for (String sequence : separatorReplacements){
 			if (normalizedID.contains(sequence)){
 				StringTokenizer st = new StringTokenizer(normalizedID, sequence);
 				StringBuffer retval = new StringBuffer(st.nextToken());
 				while (st.hasMoreTokens()){
-					retval.append(File.separator + st.nextToken());
+					retval.append(normalizedFileSeparator + st.nextToken());
 				}
 				normalizedID = retval.toString();
 			}
 		}
 		
-		// 3. remove consecutive occurrences of File.separator
+		// 3. reduce consecutive occurrences of {@link File#separator} to one
 		normalizedID = removeConsecutiveFileSeparator(normalizedID);
 		
-		// 4. remove leading File.separator
-		if (normalizedID.startsWith(File.separator)){
-			normalizedID = normalizedID.substring(File.separator.length());
+		// 4. remove leading normalizedFileSeparator
+		if (normalizedID.startsWith(normalizedFileSeparator)){
+			normalizedID = normalizedID.substring(normalizedFileSeparator.length());
 		}
 		
 		// 5. replace invalid char sequences with File.separator
@@ -251,16 +250,6 @@ public class RepositoryUtils {
 			if (normalizedID.endsWith(ext)){
 				normalizedID = normalizedID.substring(0, normalizedID.lastIndexOf(ext));
 			}
-		}
-		
-		// 6. replace all File.separator with "/"
-		if (normalizedID.contains(File.separator)){
-			StringTokenizer st = new StringTokenizer(normalizedID, File.separator);
-			StringBuffer retval = new StringBuffer(st.nextToken());
-			while (st.hasMoreTokens()){
-				retval.append(normalizedFileSeparator + st.nextToken());
-			}
-			normalizedID = retval.toString();
 		}
 		
 		return normalizedID;
