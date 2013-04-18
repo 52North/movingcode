@@ -30,15 +30,21 @@ import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
 public class RepoUtilsTest extends MCRuntimeTestConfig{
 	
-	private static final String someNastyPID = "C:\\global//repo//ID;http://141.30.100.173/my/package/folder/package.for.some.function.zip";
+	private static final String someNastyPID1 = "C:\\global//repo//ID;http://141.30.100.173/my/package/folder/package.for.some.function.zip";
+	private static final String someNastyPID2 = "tada//tada";
 	
-	private static final String normalizedNastyPID = "C/global/repo/ID/http/141.30.100.173/my/package/folder/package.for.some.function";
+	private static final String normalizedNastyPID1 = "C/global/repo/ID/http/141.30.100.173/my/package/folder/package.for.some.function";
+	private static final String normalizedNastyPID2 = "tada/tada";
 	
 	@Test
 	public void packageIdNormalizationTest(){
-		logger.trace(someNastyPID);
-		String normID = RepositoryUtils.normalizePackageID(someNastyPID);
+		logger.trace(someNastyPID1);
+		String normID = RepositoryUtils.normalizePackageID(someNastyPID1);
 		logger.trace(normID);
-		Assert.assertEquals(normalizedNastyPID, normID);
+		Assert.assertEquals(normalizedNastyPID1, normID);
+		logger.trace(someNastyPID2);
+		normID = RepositoryUtils.normalizePackageID(someNastyPID2);
+		logger.trace(normID);
+		Assert.assertEquals(normalizedNastyPID2, normID);
 	}
 }
