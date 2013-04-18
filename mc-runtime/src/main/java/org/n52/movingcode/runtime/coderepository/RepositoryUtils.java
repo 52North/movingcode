@@ -52,7 +52,7 @@ public class RepositoryUtils {
 	private static final String httpPrefix = "http://";
 	
 	// strings that shall be replaces by File.separator
-	private static final String[] separatorReplacements = {File.separator, ":/", ":\\\\", "\\\\", ";"};
+	private static final String[] separatorReplacements = {"\\", File.separator, ":/", ":\\\\", "\\\\", ";"};
 	
 	// default extension for zipped packages
 	public static final String defaultZipExtension = ".zip";
