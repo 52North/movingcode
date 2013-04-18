@@ -25,7 +25,6 @@
 package org.n52.movingcode.runtime.test;
 
 import java.io.File;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
