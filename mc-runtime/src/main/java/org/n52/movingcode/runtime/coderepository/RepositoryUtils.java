@@ -60,7 +60,9 @@ public class RepositoryUtils {
 	// typical extensions for zipped packages
 	public static final String[] zipExtension = {defaultZipExtension};
 	
+	// common separator char in nomalizedPackageID is a slash [/]
 	public static final String normalizedFileSeparator = "/";
+	public static final char normalizedFileSeparatorChar = '/';
 	
 	/**
 	 * Conversion method that creates a new {@link LocalZipPackageRepository} repository from any given {@link IMovingCodeRepository}.
@@ -135,7 +137,7 @@ public class RepositoryUtils {
 		boolean previousWasFileSep = false;
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
-			if (c == File.separatorChar) {
+			if (c == normalizedFileSeparatorChar) {
 				if (!previousWasFileSep) {
 					res.append(c);
 					previousWasFileSep = true;
