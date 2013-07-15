@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.n52.mc</groupId>
 		<artifactId>movingcode-runtime-parent</artifactId>
-		<version>0.6</version>
+		<version>0.7-SNAPSHOT</version>
 	</parent>
 	<artifactId>mc-runtime</artifactId>
 	<packaging>jar</packaging>
@@ -45,9 +45,9 @@
 	</developers>
 	<scm>
 		<!-- Specification of the Source-Content-Managementsystem -->
-		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/tags/movingcode-runtime-0.6/trunk</connection>
-		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/tags/movingcode-runtime-0.6/trunk</developerConnection>
-		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/tags/movingcode-runtime-0.6/trunk</url>
+		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</connection>
+		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
+		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
 	</scm>
 
 	<repositories>
