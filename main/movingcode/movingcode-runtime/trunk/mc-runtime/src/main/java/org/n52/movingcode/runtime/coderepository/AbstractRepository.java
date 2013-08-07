@@ -23,6 +23,8 @@
  */
 package org.n52.movingcode.runtime.coderepository;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -30,7 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -149,11 +154,29 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		returnReadLock();	
 		return retval;
 	}
-
+	
 	@Override
 	public PackageDescriptionDocument getPackageDescription(String packageID) {
 		acquireReadLock();
-		PackageDescriptionDocument retval = this.packages.get(packageID).getDescription();
+		// 1. Create an *immutable* copy of the original package description
+		// 2. return only this copy
+		// (Having an immutable copy means that later modifications of this repo will not alter the returned object.)
+		PackageDescriptionDocument originalDescription = this.packages.get(packageID).getDescription();
+		PackageDescriptionDocument retval = null;
+		try {
+			StringWriter writer = new StringWriter();  
+			originalDescription.save(writer);
+			String immutableCopy = writer.toString();
+			retval = PackageDescriptionDocument.Factory.parse(immutableCopy);
+		} catch (XmlException e) {
+			// should not occur since we had everything validated before ...
+			logger.error("Could not read ProcessDescription from String.\n" + e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			// should not occur since writing to a new String should always be possible ...
+			logger.error("Could not copy Process Description to String.\n" + e.getMessage());
+			e.printStackTrace();
+		}
 		returnReadLock();
 		return retval;
 	}

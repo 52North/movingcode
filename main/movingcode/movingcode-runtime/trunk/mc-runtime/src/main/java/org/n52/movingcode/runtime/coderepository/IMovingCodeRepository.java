@@ -85,6 +85,7 @@ public interface IMovingCodeRepository {
 
 	/**
 	 * returns package description for a given package ID
+	 * the returned packageDescription shall be an exclusive copy
 	 */
 	public PackageDescriptionDocument getPackageDescription(String packageID);
 	
