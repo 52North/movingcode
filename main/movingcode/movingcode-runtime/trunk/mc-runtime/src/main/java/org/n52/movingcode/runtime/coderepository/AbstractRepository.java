@@ -170,12 +170,15 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 			retval = PackageDescriptionDocument.Factory.parse(immutableCopy);
 		} catch (XmlException e) {
 			// should not occur since we had everything validated before ...
-			logger.error("Could not read ProcessDescription from String.\n" + e.getMessage());
+			logger.error("Could not read PackageDescription from String.\n" + e.getMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			// should not occur since writing to a new String should always be possible ...
-			logger.error("Could not copy Process Description to String.\n" + e.getMessage());
+			// should not occur since writing a valid XML document to a new String is always possible ...
+			logger.error("Could not copy PackageDescription to String.\n" + e.getMessage());
 			e.printStackTrace();
+		} catch (NullPointerException e){
+			logger.debug("PackageDescription not found for packageID " + packageID + "\n(Package is either unavailable or has disapperared temporarily.)");
+			retval = null;
 		}
 		returnReadLock();
 		return retval;
