@@ -1,4 +1,4 @@
-package org.n52.movingcode.runtime;
+package org.n52.movingcode.runtime.processors.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.n52.movingcode.runtime.processorconfig2.ProcessorDescription;
+
+
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -15,10 +16,12 @@ import com.fasterxml.jackson.core.JsonToken;
 
 import static com.fasterxml.jackson.core.JsonToken.*;
 
-public class NewProcessorConfig {
+public class ProcessorConfig {
 	
 	static final String KEY_PROCESSORS = "processors";
 	static final String KEY_DEFAULTS = "defaults";
+	
+	public static final String randomTempDirToken = "$TEMP$";
 	
 	static final String KEY_ID = "id";
 	static final String KEY_SUPPORTED_CONTAINER = "supportedContainer";
@@ -31,7 +34,7 @@ public class NewProcessorConfig {
 	static final String configFile = "processors.json";
 	private static final HashMap<String, ProcessorDescription> processors = readProperties();
 	
-	private static transient Logger logger = Logger.getLogger(NewProcessorConfig.class);
+	private static transient Logger logger = Logger.getLogger(ProcessorConfig.class);
 	
 	
 	/**
@@ -63,13 +66,35 @@ public class NewProcessorConfig {
 	}
 	
 	
-	public static final HashMap<String, String> getProperties(String processorID){
-		return processors.get(processorID).getProperties();
+	public static final HashMap<String, String> getProperties(String processorId){
+		return processors.get(processorId).getProperties();
 	}
 	
 	public static final String getDefaultWorkspace(){
-		ProcessorDescription ret = processors.get(DEFAULT_PROCESSOR_CONFIG_ID);
-		return ret.getTempWorkspace();
+		return processors.get(DEFAULT_PROCESSOR_CONFIG_ID).getTempWorkspace();
+	}
+	
+	public static final String getWorkspace(String processorId){
+		// use default if empty
+		String ws = processors.get(processorId).getTempWorkspace();
+		if ( ws == null || processors.get(processorId).getTempWorkspace().isEmpty()){
+			return getDefaultWorkspace();
+		} else {
+			return ws;
+		}
+	}
+	
+	public static final String[] getSupportedPlatforms(String processorId){
+		String[] platforms = processors.get(processorId).getPlatforms();
+		if (platforms == null){
+			return getDefaultPlatforms();
+		} else {
+			return platforms;
+		}
+	}
+	
+	public static final String[] getSupportedContainers(String processorId){
+		return processors.get(processorId).getContainers();
 	}
 	
 	public static final String[] getDefaultPlatforms(){

@@ -27,8 +27,6 @@
 
 package org.n52.movingcode.runtime.processors;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -37,11 +35,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.n52.movingcode.runtime.ProcessorConfig;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.processorconfig.ProcessorType;
-import org.n52.movingcode.runtime.processorconfig.ProcessorsDocument;
-import org.n52.movingcode.runtime.processorconfig.PropertyType;
+import org.n52.movingcode.runtime.processors.config.ProcessorConfig;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument.PackageDescription;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PlatformType;
@@ -55,16 +50,12 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PlatformType;
  */
 public class ProcessorFactory {
 	
-	public static final String randomTempDirToken = "$TEMP$";
-	
 	private static ProcessorFactory instance;
 
 	private Map<String, String[]> supportedContainers;
-	private String[] availablePlatforms = null;
+	private String[] availablePlatforms = ProcessorConfig.getDefaultPlatforms();
 	private Map<String, File> scratchworkspaceMap;
 	private Map<String, PropertyMap> processorProperties;
-
-	private String defaultWorkspace = null;
 
 	Logger logger = Logger.getLogger(ProcessorFactory.class);
 
@@ -117,67 +108,38 @@ public class ProcessorFactory {
 		this.processorProperties = new HashMap<String, PropertyMap>();
 
 		try {
-			ProcessorsDocument processors = ProcessorConfig.getInstance().getConfig();
-
-			// deal with defaults
-			this.defaultWorkspace = processors.getProcessors().getDefaults().getTempWorkspace();
-			this.availablePlatforms = processors.getProcessors().getDefaults().getAvailablePlatformArray();
 
 			// deal with individual processors
-			for (ProcessorType processor : processors.getProcessors().getProcessorArray()) {
-				this.supportedContainers.put(processor.getId(), processor.getSupportedContainerArray());
-				if (processor.isSetTempWorkspace()) {
-					// create and check temp workspace
-					// register this temp WS in the private Map
-					File scratchWS;
-					// check for $TEMP$ token
-					if (processor.getTempWorkspace().equals(randomTempDirToken)){
-						scratchWS = newTempDir();
-					} else {
-						scratchWS = new File(processor.getTempWorkspace());
-						// attempt to create directories if they don't exist
-						scratchWS.mkdirs();
-					}
-					// TODO: check if temp dir really exists; if not: throw an error
-					
-					this.scratchworkspaceMap.put(processor.getId(), scratchWS);
+			for (String processorId : ProcessorConfig.getRegisteredProcessorIDs()) {
+				this.supportedContainers.put(processorId, ProcessorConfig.getSupportedContainers(processorId));
+				String workspace = ProcessorConfig.getWorkspace(processorId);
+				
+				// create and check temp workspace
+				// register this temp WS in the private Map
+				File scratchWS;
+				// check for $TEMP$ token
+				if (workspace.equals(ProcessorConfig.randomTempDirToken)){
+					scratchWS = newTempDir();
+				} else {
+					scratchWS = new File(workspace);
+					// attempt to create directories if they don't exist
+					scratchWS.mkdirs();
 				}
-				else {
-					File scratchWS;
-					// check for $TEMP$ token
-					if (this.defaultWorkspace.equals(randomTempDirToken)){
-						scratchWS = newTempDir();
-					} else {
-						scratchWS = new File(this.defaultWorkspace);
-						// attempt to create directories if they don't exist
-						scratchWS.mkdirs();
-					}
-					// TODO: check if temp dir really exists; if not: throw an error
-					
-					this.scratchworkspaceMap.put(processor.getId(), scratchWS);
-				}
+				// TODO: check if temp dir really exists; if not: throw an error
+				
+				this.scratchworkspaceMap.put(processorId, scratchWS);
 
 				PropertyMap pMap = new PropertyMap();
+				pMap.putAll(ProcessorConfig.getProperties(processorId));
 
-				for (PropertyType property : processor.getPropertyArray()) {
-					pMap.put(property.getKey(), property.getValue());
-				}
-
-				this.processorProperties.put(processor.getId(), pMap);
+				this.processorProperties.put(processorId, pMap);
 			}
 
 		}
 		catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-
-		ProcessorConfig.getInstance().addPropertyChangeListener(ProcessorConfig.PROCESSORCONFIG_UPDATE_EVENT_NAME,
-				new PropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
-				initConfig();
-			}
-		});
-
+		
 	}
 
 	/**
