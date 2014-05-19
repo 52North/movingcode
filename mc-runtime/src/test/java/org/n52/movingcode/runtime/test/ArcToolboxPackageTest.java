@@ -37,7 +37,7 @@ import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
-public class ArcToolboxPackageTest extends MCRuntimeTestConfig {
+public class ArcToolboxPackageTest extends MCRuntimeTestConfig{
 
 	private static final String packageFileName = "src/test/resources/testpackages/arcgis_ndvi_tbx.zip";
 
