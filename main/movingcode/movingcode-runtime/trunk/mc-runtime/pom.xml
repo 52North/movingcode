@@ -102,6 +102,12 @@
 			<artifactId>commons-logging</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<!-- Apache commons lang, e.g. for StringUtils -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-bundle</artifactId>
