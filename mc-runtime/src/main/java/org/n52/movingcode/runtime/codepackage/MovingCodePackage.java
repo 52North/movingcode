@@ -174,6 +174,13 @@ public class MovingCodePackage {
 		this.archive = new PlainPackage(workspace, packageDescription);
 
 	}
+	
+	// TODO: refactor MCP to use PackageID instead of old naming scheme
+	public MovingCodePackage(final File workspace,
+			final PackageDescriptionDocument packageDescription,
+			final PackageID packageId) {
+		// TODO!
+	}
 
 	/**
 	 * Dump workspace to a given directory. Used to create copies from a template for execution or further
