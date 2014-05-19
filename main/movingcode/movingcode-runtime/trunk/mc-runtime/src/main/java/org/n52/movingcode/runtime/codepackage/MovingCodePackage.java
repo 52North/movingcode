@@ -55,7 +55,7 @@ public class MovingCodePackage {
 	private static final Logger logger = Logger.getLogger(MovingCodePackage.class);
 
 	public static enum FunctionalType {
-		WPS100, WSDL10, WSDL20
+		WPS100, WSDL10, WSDL20, WPS200
 	};
 
 	// common name of the package description XML file

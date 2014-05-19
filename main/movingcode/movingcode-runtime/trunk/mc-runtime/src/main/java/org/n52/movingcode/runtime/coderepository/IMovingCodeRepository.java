@@ -162,7 +162,7 @@ public interface IMovingCodeRepository {
 		 * @return {@link IMovingCodeRepository} - an new repository
 		 */
 		public static final IMovingCodeRepository createFromPlainFolder(File sourceDirectory){
-			return new LocalZipPackageRepository(sourceDirectory);
+			return new LocalPlainRepository(sourceDirectory);
 		}
 		
 		/**
