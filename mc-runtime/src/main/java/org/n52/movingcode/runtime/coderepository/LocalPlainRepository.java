@@ -33,6 +33,7 @@ import java.util.TimerTask;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.xmlbeans.XmlException;
+import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
@@ -65,8 +66,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  *
  */
 public final class LocalPlainRepository extends AbstractRepository {
-	// valid name for the package description XML file
-	private static final String PACKAGE_DESCRIPTION_XML = "packagedescription.xml";
+	
 	private final File directory;
 	
 	private String fingerprint;
@@ -100,7 +100,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 * private method that encapsulates the logic for loading zipped
 	 * MovingCode packages from a local folder.  
 	 */
-	private void load(){
+	private final void load(){
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> packageFolders = scanForFolders(directory);
 
@@ -110,7 +110,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 		for (File currentFolder : packageFolders) {
 			
 			// attempt to read packageDescription XML
-			File packageDescriptionFile = new File(currentFolder, PACKAGE_DESCRIPTION_XML);
+			File packageDescriptionFile = new File(currentFolder, Constants.PACKAGE_DESCRIPTION_XML);
 			if (!packageDescriptionFile.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
@@ -164,7 +164,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 * @param directory {@link File} - parent directory to scan.
 	 * @return {@link Collection} of {@link File} - the directories found
 	 */
-	private static Collection<File> scanForFolders(File directory) {
+	private static final Collection<File> scanForFolders(File directory) {
 		return FileUtils.listFiles(directory, FileFilterUtils.directoryFileFilter(), null);
 	}
 
@@ -176,7 +176,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 * @param directory {@link File} - the directory to be scanned
 	 * @return 
 	 */
-	private static long lastFileModified(File directory) {
+	private static final long lastFileModified(File directory) {
 		// recursively find all files in subdirectory 
 		Collection<File> files = FileUtils.listFiles(directory, null, true);
 		
