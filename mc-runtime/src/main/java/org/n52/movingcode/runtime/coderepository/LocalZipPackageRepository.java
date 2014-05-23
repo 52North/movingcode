@@ -25,11 +25,15 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.PackageID;
 
 /**
  * This class implements an {@link IMovingCodeRepository} for local zipped packages, stored
@@ -80,11 +84,13 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
 
 		for (File currentFile : zipFiles) {
-			String id = RepositoryUtils.generateNormalizedIDFromFile(currentFile);
-			logger.trace("Found package: " + currentFile + "; using ID: " + id);
+			logger.debug("Found package: " + currentFile);
 
 			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
-
+			PackageID id = makeId(null, currentFile, mcPackage.getTimestamp());
+			
+			logger.debug("Registered package: " + currentFile + "; using ID: " + id);	
+			
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
@@ -131,5 +137,80 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 				informRepositoryChangeListeners();
 			}			
 		}
+	}
+	
+	private static final PackageID makeId(String codeSpace, File zipFile, DateTime timeStamp){
+		return new PackageID(codeSpace, toNormalizedLocalPath(zipFile), timeStamp.toString());
+	}
+	
+	/**
+	 * Normalizes any given packageID so that it can be used to create a local file path.
+	 * The following operations are performed:
+	 * 
+	 * 1. remove {@value #httpPrefix}
+	 * 2. replace any of {@value #separatorReplacements} with a {@value #normalizedFileSeparator}
+	 * 3. collapse consecutive occurrences of {@value #normalizedFileSeparator} to one
+	 * 4. remove a leading {@value #normalizedFileSeparator}
+	 * 5. remove trailing {@value #zipExtension}
+	 * 
+	 * @param {@link String} packageID - some String ID that shall be normalized
+	 * @return {@link String} - the normalized ID
+	 */
+	private static String toNormalizedLocalPath(File file){
+		// 0. get as string
+		String normalizedID = file.getAbsolutePath();
+		
+		// 2. replace any of {@value #separatorReplacements} with a {@value #normalizedFileSeparator}
+		for (String sequence : Constants.separatorReplacements){
+			if (normalizedID.contains(sequence)){
+				StringTokenizer st = new StringTokenizer(normalizedID, sequence);
+				StringBuffer retval = new StringBuffer(st.nextToken());
+				while (st.hasMoreTokens()){
+					retval.append(Constants.normalizedFileSeparator + st.nextToken());
+				}
+				normalizedID = retval.toString();
+			}
+		}
+		
+		// 3. reduce consecutive occurrences of {@link File#separator} to one
+		normalizedID = removeConsecutiveFileSeparator(normalizedID);
+		
+		// 4. remove leading normalizedFileSeparator
+		if (normalizedID.startsWith(Constants.normalizedFileSeparator)){
+			normalizedID = normalizedID.substring(Constants.normalizedFileSeparator.length());
+		}
+		
+		// 5. replace invalid char sequences with File.separator
+		for (String ext : Constants.zipExtensions){
+			if (normalizedID.endsWith(ext)){
+				normalizedID = normalizedID.substring(0, normalizedID.lastIndexOf(ext));
+			}
+		}
+		
+		return normalizedID;
+	}
+	
+	/**
+	 * Remove consecutive occurrences of file separator character in s
+	 * 
+	 * @param s the string to parse.
+	 * @return s without consecutive occurrences of file separator character
+	 */
+	private static String removeConsecutiveFileSeparator(final String s) {
+		StringBuffer res = new StringBuffer();
+		boolean previousWasFileSep = false;
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if (c == Constants.normalizedFileSeparatorChar) {
+				if (!previousWasFileSep) {
+					res.append(c);
+					previousWasFileSep = true;
+				}
+			} else {
+				previousWasFileSep = false;
+				res.append(c);
+			}
+		}
+		return res.toString();
 	}
 }

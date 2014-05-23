@@ -28,7 +28,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +35,9 @@ import java.util.Map;
 
 import net.opengis.wps.x100.ProcessDescriptionType;
 
+import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.PackageID;
 import org.n52.movingcode.runtime.coderepository.CachedRemoteFeedRepository;
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
@@ -65,8 +66,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	// separator for global process IDs: <global>+<separator>+<localPID>
 	private static final String separator = File.pathSeparator;
-
-	//Collections.synchronizedMap() is not really thread-safe.... do it with synchronized blocks
+	
 	private Map<String, IMovingCodeRepository> repositories = new HashMap<String, IMovingCodeRepository>();
 	
 	// registered changeListerners
@@ -105,7 +105,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		final String repoID = directory;
 			
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
+		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(repoID, new File(directory)); 
 		return registerRepo(repoID, repo);
 	}
 	
@@ -123,7 +123,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		final String repoID = directory;
 			
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
+		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(repoID, new File(directory)); 
 		return registerRepo(repoID, repo);
 
 	}
@@ -232,7 +232,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 * @param identifier
 	 * @return int - multiplicity
 	 */
-	public int checkMultiplicityOfPackage(final String identifier) {
+	public int checkMultiplicityOfPackage(final PackageID identifier) {
 		int counter = 0;
 
 		for (IMovingCodeRepository repo : repositories.values()) {
@@ -288,36 +288,36 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 	
 	@Override
-	public synchronized MovingCodePackage getPackage(final String packageID) {
-		return repositories.get(repoID(packageID)).getPackage(localPID(packageID));
+	public synchronized MovingCodePackage getPackage(final PackageID packageId) {
+		for(IMovingCodeRepository currentRepo : repositories.values()){
+			if (currentRepo.containsPackage(packageId)){
+				currentRepo.getPackage(packageId);
+			}
+		}
+		return null;
 	}
 
 	@Override
-	public String[] getPackageIDs() {
+	public PackageID[] getPackageIDs() {
 		ArrayList<String> globalPIDs = new ArrayList<String>();
 		for (String currentRepoID : repositories.keySet()){
 
-			for (String pid : repositories.get(currentRepoID).getPackageIDs()){
+			for (PackageID pid : repositories.get(currentRepoID).getPackageIDs()){
 				globalPIDs.add(currentRepoID + separator + pid);
 			}
 		}
 
-		return globalPIDs.toArray(new String[globalPIDs.size()]);
+		return globalPIDs.toArray(new PackageID[globalPIDs.size()]);
 	}
 
 	@Override
-	public boolean containsPackage(final String packageID) {
-		// -- begin validity check --
-		String repoID = repoID(packageID);
-		if (repoID == null){
-			return false;
+	public boolean containsPackage(final PackageID packageId) {
+		for(IMovingCodeRepository currentRepo : repositories.values()){
+			if (currentRepo.containsPackage(packageId)){
+				return true;
+			}
 		}
-		String localPID = localPID(packageID);
-		if (localPID == null){
-			return false;
-		}
-		// -- end validity check --
-		return repositories.get(repoID).containsPackage(localPID);
+		return false;
 	}
 
 	@Override
@@ -333,13 +333,23 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	@Override
-	public Date getPackageTimestamp(final String packageID) {
-		return repositories.get(repoID(packageID)).getPackageTimestamp(localPID(packageID)); 
+	public DateTime getPackageTimestamp(final PackageID packageId) {
+		for(IMovingCodeRepository currentRepo : repositories.values()){
+			if (currentRepo.containsPackage(packageId)){
+				currentRepo.getPackage(packageId).getTimestamp();
+			}
+		}
+		return null; 
 	}
 
 	@Override
-	public PackageDescriptionDocument getPackageDescription(String packageID) {
-		return repositories.get(repoID(packageID)).getPackageDescription(localPID(packageID));
+	public PackageDescriptionDocument getPackageDescription(PackageID packageId) {
+		for(IMovingCodeRepository currentRepo : repositories.values()){
+			if (currentRepo.containsPackage(packageId)){
+				currentRepo.getPackage(packageId).getTimestamp();
+			}
+		}
+		return null; 
 	}
 
 	@Override
@@ -371,51 +381,51 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		}
 	}
 	
-	/**
-	 * Private convenience method that filters the repoID from a global packageID
-	 * of the form <repoid>+<separator>+<localPID>.
-	 * 
-	 * If no repo with a matching ID was found this methods return null
-	 * 
-	 * @param packageID {@link String}
-	 * @return a valid repo id {@link String} 
-	 */
-	private final String repoID(final String packageID){
-		for (String currentRepoID : repositories.keySet()){
-			// <prefix> = <repoid>+"/"
-			String prefix = currentRepoID + separator;
-			// if packageID starts with  <prefix>
-			if ( packageID.startsWith(prefix) ){
-				return currentRepoID;
-			}
-		}
-		return null;
-	}
+//	/**
+//	 * Private convenience method that filters the repoID from a global packageID
+//	 * of the form <repoid>+<separator>+<localPID>.
+//	 * 
+//	 * If no repo with a matching ID was found this methods return null
+//	 * 
+//	 * @param packageID {@link String}
+//	 * @return a valid repo id {@link String} 
+//	 */
+//	private final PackageID repoID(final PackageID packageID){
+//		for (String currentRepoID : repositories.keySet()){
+//			// <prefix> = <repoid>+"/"
+//			String prefix = currentRepoID + separator;
+//			// if packageID starts with  <prefix>
+//			if ( packageID.startsWith(prefix) ){
+//				return currentRepoID;
+//			}
+//		}
+//		return null;
+//	}
 	
-	/**
-	 * Private convenience method that filters the local Package ID (localPID) from a
-	 * global packageID of the form <repoid>+<separator>+<localPID>.
-	 * The local package ID is the package ID that was assigned to a package by the 
-	 * particular repository.
-	 * 
-	 * @param packageID {@link String}
-	 * @return a localPID {@link String} 
-	 */
-	private final String localPID(final String packageID){
-		String repoID = repoID(packageID);
-		// safety check to avoid null pointers
-		// should not happen during regular operation
-		if (repoID == null){
-			return null;
-		}
-		// <prefix> = <repoid>+"/"
-		String prefix = repoID + separator;
-		// if packageID starts with  <prefix>
-		if ( packageID.startsWith(prefix) ){
-			return packageID.substring(prefix.length());
-		} else {
-			return null;
-		}
-	}
+//	/**
+//	 * Private convenience method that filters the local Package ID (localPID) from a
+//	 * global packageID of the form <repoid>+<separator>+<localPID>.
+//	 * The local package ID is the package ID that was assigned to a package by the 
+//	 * particular repository.
+//	 * 
+//	 * @param packageID {@link String}
+//	 * @return a localPID {@link String} 
+//	 */
+//	private final String localPID(final String packageID){
+//		String repoID = repoID(packageID);
+//		// safety check to avoid null pointers
+//		// should not happen during regular operation
+//		if (repoID == null){
+//			return null;
+//		}
+//		// <prefix> = <repoid>+"/"
+//		String prefix = repoID + separator;
+//		// if packageID starts with  <prefix>
+//		if ( packageID.startsWith(prefix) ){
+//			return packageID.substring(prefix.length());
+//		} else {
+//			return null;
+//		}
+//	}
 
 }

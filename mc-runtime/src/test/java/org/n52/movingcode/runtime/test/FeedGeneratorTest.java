@@ -32,11 +32,11 @@ import org.n52.movingcode.runtime.feed.FeedUtils;
 
 public class FeedGeneratorTest extends MCRuntimeTestConfig {
 	
-	@Test
-	public void generateFeedTest(){
-		String folderName = "D:\\feed1";
-		File feedFolder = new File (folderName);
-		FeedUtils.updateFeed(feedFolder);
-	}
+//	@Test
+//	public void generateFeedTest(){
+//		String folderName = "D:\\feed1";
+//		File feedFolder = new File (folderName);
+//		FeedUtils.updateFeed(feedFolder);
+//	}
 
 }

@@ -113,8 +113,10 @@ final class ZippedPackage implements ICodePackage {
             ZipEntry entry;
 
             while ( (entry = zis.getNextEntry()) != null) {
-                if (entry.getName().equalsIgnoreCase(MovingCodePackage.descriptionFileName)) {
-                    return PackageDescriptionDocument.Factory.parse(zis);
+                if (entry.getName().equalsIgnoreCase(Constants.PACKAGE_DESCRIPTION_XML)) {
+                	PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(zis);
+                	zis.close();
+                    return doc;
                 }
                 zis.closeEntry();
             }

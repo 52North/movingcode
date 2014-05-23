@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.n52.movingcode.runtime.codepackage.PackageID;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
@@ -43,104 +44,106 @@ import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
  * 
  * 
  * @author Matthias Mueller, TU Dresden
+ * 
+ * TODO: move or refactor
  *
  */
 public class FeedUtils {
 	
 	static Logger logger = Logger.getLogger(FeedUtils.class);
 	
-	/**
-	 * Static method to update an AtomFeed file in a zipped feed directory. (Supports nested folders etc.)
-	 * The AtomFeed file must reside in the root of the <code>feedFolderDirectory</code> and must be
-	 * named {@value GeoprocessingFeed#atomFeedFileName}. If this file is not present it will be created. In this case,
-	 * it will surely lack some mandatory information such as title, author, etc. In this case the logger
-	 * will print a warning and you must manually fix the file. 
-	 * 
-	 * @param feedFolderDirectory {@link File} - a folder containing the zipped packages in a nested
-	 *        structure as well as the AtomFeed XML file, named {@value GeoprocessingFeed#atomFeedFileName} 
-	 */
-	public static final boolean updateFeed(final File feedFolderDirectory){
-		// 1. create a local repo on the paticular folder
-		LocalZipPackageRepository repo = new LocalZipPackageRepository(feedFolderDirectory);
-		
-		// 2. attempt to access "feed.xml"
-		File feedFile = new File(feedFolderDirectory.getAbsolutePath() + File.separator + GeoprocessingFeed.atomFeedFileName);
-		GeoprocessingFeed gpFeed = readOrCreateFeed(feedFile);
-		
-		// 3. do the content update
-		List<String> zipFilePIDs = Arrays.asList(repo.getPackageIDs());
-		List<String> feedPIDs = Arrays.asList(gpFeed.getEntryIDs());
-		List<String> checkedFeedPIDs = new ArrayList<String>();
-		
-		for (String currentZipPID: zipFilePIDs){
-			// 1. build and normalize folder PID
-			// remove leading feedFolder String, i.e. D:\feed1
-			String feedPID = currentZipPID.substring(feedFolderDirectory.getAbsolutePath().length());
-			feedPID = RepositoryUtils.normalizePackageID(feedPID);
-			if (feedPID.startsWith("/")){
-				feedPID = feedPID.substring(1, feedPID.length());
-			}
-			
-			// 2. for each local package: check if it was previously present in AtomFeed
-			if (feedPIDs.contains(feedPID)){
-				Date folderTimeStamp = repo.getPackageTimestamp(currentZipPID);
-				Date feedTimeStamp = gpFeed.getEntryUpdatedTimeStamp(feedPID);
-				// 2.a if so: check time stamp to determine if it was updated
-				if (folderTimeStamp.after(feedTimeStamp)){
-					// set new update timestamp
-					gpFeed.setEntryUpdatedTimeStamp(feedPID, folderTimeStamp);
-					// write out new packagedescription
-					String currentXMLFileName = currentZipPID + ".xml";
-					File currentXMLFile = new File(currentXMLFileName);
-					repo.getPackage(currentZipPID).dumpDescription(currentXMLFile);
-					// TODO: do we have to update even more information?
-				}
-				// indicate that we have updated/checked this local PID
-				checkedFeedPIDs.add(feedPID);
-			}
-			// 2.b if not: just add the current package
-			else {
-				String currentXMLFileName = currentZipPID + ".xml";
-				// write out new packagedescription
-				File currentXMLFile = new File(currentXMLFileName);
-				repo.getPackage(currentZipPID).dumpDescription(currentXMLFile);
-				gpFeed.addEntry(feedPID, repo.getPackage(currentZipPID));
-			}
-		}
-		
-		// 3. report unsafe packages (?)
-		// TODO: delete packages, if it really makes sense,
-		// maybe have a trigger or so
-
-		feedPIDs.removeAll(checkedFeedPIDs);
-		if(feedPIDs.size() != 0){
-			StringBuffer report = new StringBuffer("\n");
-			report.append(
-					"Package folder updated. The following packages are no longer present in the remote feed."
-					+ "However, they will be kept in the local mirror until you manually delete them.\n"
-			);
-			for (String currentPID : feedPIDs){
-				report.append(currentPID + "\n");
-			}
-			logger.info(report.toString());
-		}
-		
-		// write feed back to disk
-		logger.info("Writing new Feed to disk.");
-        try {
-        	OutputStream os = new FileOutputStream(feedFile);
-			gpFeed.write(os);
-			os.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			logger.error("Could write feed file " + feedFile.getAbsolutePath());
-		} catch (IOException e) {
-			logger.error("Could write feed file " + feedFile.getAbsolutePath());
-		}
-		
-		// this code is only reached if an exception is thrown
-		return false;
-	}
+//	/**
+//	 * Static method to update an AtomFeed file in a zipped feed directory. (Supports nested folders etc.)
+//	 * The AtomFeed file must reside in the root of the <code>feedFolderDirectory</code> and must be
+//	 * named {@value GeoprocessingFeed#atomFeedFileName}. If this file is not present it will be created. In this case,
+//	 * it will surely lack some mandatory information such as title, author, etc. In this case the logger
+//	 * will print a warning and you must manually fix the file. 
+//	 * 
+//	 * @param feedFolderDirectory {@link File} - a folder containing the zipped packages in a nested
+//	 *        structure as well as the AtomFeed XML file, named {@value GeoprocessingFeed#atomFeedFileName} 
+//	 */
+//	public static final boolean updateFeed(final File feedFolderDirectory){
+//		// 1. create a local repo on the paticular folder
+//		LocalZipPackageRepository repo = new LocalZipPackageRepository(feedFolderDirectory);
+//		
+//		// 2. attempt to access "feed.xml"
+//		File feedFile = new File(feedFolderDirectory.getAbsolutePath() + File.separator + GeoprocessingFeed.atomFeedFileName);
+//		GeoprocessingFeed gpFeed = readOrCreateFeed(feedFile);
+//		
+//		// 3. do the content update
+//		List<PackageID> zipFilePIDs = Arrays.asList(repo.getPackageIDs());
+//		List<String> feedPIDs = Arrays.asList(gpFeed.getEntryIDs());
+//		List<String> checkedFeedPIDs = new ArrayList<String>();
+//		
+//		for (PackageID currentZipPID: zipFilePIDs){
+//			// 1. build and normalize folder PID
+//			// remove leading feedFolder String, i.e. D:\feed1
+//			String feedPID = currentZipPID.substring(feedFolderDirectory.getAbsolutePath().length());
+//			feedPID = RepositoryUtils.normalizePackageID(feedPID);
+//			if (feedPID.startsWith("/")){
+//				feedPID = feedPID.substring(1, feedPID.length());
+//			}
+//			
+//			// 2. for each local package: check if it was previously present in AtomFeed
+//			if (feedPIDs.contains(feedPID)){
+//				Date folderTimeStamp = repo.getPackageTimestamp(currentZipPID);
+//				Date feedTimeStamp = gpFeed.getEntryUpdatedTimeStamp(feedPID);
+//				// 2.a if so: check time stamp to determine if it was updated
+//				if (folderTimeStamp.after(feedTimeStamp)){
+//					// set new update timestamp
+//					gpFeed.setEntryUpdatedTimeStamp(feedPID, folderTimeStamp);
+//					// write out new packagedescription
+//					String currentXMLFileName = currentZipPID + ".xml";
+//					File currentXMLFile = new File(currentXMLFileName);
+//					repo.getPackage(currentZipPID).dumpDescription(currentXMLFile);
+//					// TODO: do we have to update even more information?
+//				}
+//				// indicate that we have updated/checked this local PID
+//				checkedFeedPIDs.add(feedPID);
+//			}
+//			// 2.b if not: just add the current package
+//			else {
+//				String currentXMLFileName = currentZipPID + ".xml";
+//				// write out new packagedescription
+//				File currentXMLFile = new File(currentXMLFileName);
+//				repo.getPackage(currentZipPID).dumpDescription(currentXMLFile);
+//				gpFeed.addEntry(feedPID, repo.getPackage(currentZipPID));
+//			}
+//		}
+//		
+//		// 3. report unsafe packages (?)
+//		// TODO: delete packages, if it really makes sense,
+//		// maybe have a trigger or so
+//
+//		feedPIDs.removeAll(checkedFeedPIDs);
+//		if(feedPIDs.size() != 0){
+//			StringBuffer report = new StringBuffer("\n");
+//			report.append(
+//					"Package folder updated. The following packages are no longer present in the remote feed."
+//					+ "However, they will be kept in the local mirror until you manually delete them.\n"
+//			);
+//			for (String currentPID : feedPIDs){
+//				report.append(currentPID + "\n");
+//			}
+//			logger.info(report.toString());
+//		}
+//		
+//		// write feed back to disk
+//		logger.info("Writing new Feed to disk.");
+//        try {
+//        	OutputStream os = new FileOutputStream(feedFile);
+//			gpFeed.write(os);
+//			os.close();
+//			return true;
+//		} catch (FileNotFoundException e) {
+//			logger.error("Could write feed file " + feedFile.getAbsolutePath());
+//		} catch (IOException e) {
+//			logger.error("Could write feed file " + feedFile.getAbsolutePath());
+//		}
+//		
+//		// this code is only reached if an exception is thrown
+//		return false;
+//	}
 	
 	/**
 	 * Private helper method that tries to read a {@link GeoprocessingFeed} from an AtomFeed XML file.

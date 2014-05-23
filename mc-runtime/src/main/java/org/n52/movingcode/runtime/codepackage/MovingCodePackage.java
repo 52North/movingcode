@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -37,9 +36,11 @@ import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
+import org.joda.time.DateTime;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.FunctionalDescriptionsListType;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
+import static org.n52.movingcode.runtime.codepackage.Constants.*;
 
 /**
  * This class provides methods for handling MovingCode Packages. This includes methods for validation,
@@ -54,13 +55,6 @@ public class MovingCodePackage {
 
 	private static final Logger logger = Logger.getLogger(MovingCodePackage.class);
 
-	public static enum FunctionalType {
-		WPS100, WSDL10, WSDL20, WPS200
-	};
-
-	// common name of the package description XML file
-	public static final String descriptionFileName = "packagedescription.xml";
-
 	// the physical instance of this package
 	private final ICodePackage archive;
 
@@ -71,7 +65,7 @@ public class MovingCodePackage {
 	private final String functionIdentifier;
 
 	// Package time stamp, i.e. date of creation or last modification
-	private final Date timeStamp;
+	private final DateTime timeStamp;
 
 	private final List<FunctionalType> supportedFuncTypes;
 
@@ -112,7 +106,7 @@ public class MovingCodePackage {
 	 * @param packageID
 	 * @param packageStamp
 	 */
-	public MovingCodePackage(final URL zipPackageURL, final String packageID, final Date packageTimeStamp) {
+	public MovingCodePackage(final URL zipPackageURL, final PackageID packageID, final DateTime packageTimeStamp) {
 
 		PackageDescriptionDocument packageDescription = null;
 		ZippedPackage archive = null;
@@ -144,12 +138,12 @@ public class MovingCodePackage {
 	 * @param {@link File} workspace - the directory where the code and possibly some related data is stored.
 	 * @param {@link PackageDescriptionDocument} packageDescription - the XML document that contains the
 	 *        description of the provided logic
-	 * @param {@link Date} lastModified - the date of latest modification. This value is optional. If NULL,
+	 * @param {@link DateTime} lastModified - the date of latest modification. This value is optional. If NULL,
 	 *        the lastModified date is obtained from the workspace's content.
 	 */
 	public MovingCodePackage(final File workspace,
 			final PackageDescriptionDocument packageDescription,
-			final Date timestamp) {
+			final DateTime timestamp) {
 
 		this.packageDescription = packageDescription;
 
@@ -173,13 +167,6 @@ public class MovingCodePackage {
 		
 		this.archive = new PlainPackage(workspace, packageDescription);
 
-	}
-	
-	// TODO: refactor MCP to use PackageID instead of old naming scheme
-	public MovingCodePackage(final File workspace,
-			final PackageDescriptionDocument packageDescription,
-			final PackageID packageId) {
-		// TODO!
 	}
 
 	/**
@@ -284,9 +271,9 @@ public class MovingCodePackage {
 	 * Returns the timestamp of this package. The timestamp indicates the last update of the package content
 	 * and can be used as a simple versioning machanism.
 	 * 
-	 * @return {@link Date} package timestamp
+	 * @return {@link DateTime} package timestamp
 	 */
-	public Date getTimestamp() {
+	public DateTime getTimestamp() {
 		return this.timeStamp;
 	}
 
@@ -295,10 +282,10 @@ public class MovingCodePackage {
 	 * 
 	 * @param file
 	 *        - the file
-	 * @return Date - date of last modification
+	 * @return DateTime - date of last modification
 	 */
-	private static Date getTimestamp(File file) {
-		return new Date(file.lastModified());
+	private static DateTime getTimestamp(File file) {
+		return new DateTime(file.lastModified());
 	}
 
 	/**
@@ -328,12 +315,12 @@ public class MovingCodePackage {
 	 * 
 	 * @param directory
 	 *        {@link File}
-	 * @return last modification date {@link Date}
+	 * @return last modification date {@link DateTime}
 	 */
-	private Date getLastModified(File directory) {
+	private DateTime getLastModified(File directory) {
 		List<File> files = new ArrayList<File>(FileUtils.listFiles(directory, null, true));
 		Collections.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
-		return new Date(files.get(0).lastModified());
+		return new DateTime(files.get(0).lastModified());
 	}
 
 	@Override
