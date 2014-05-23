@@ -25,14 +25,22 @@
 package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.PackageID;
 
 /**
  * This class implements an {@link IMovingCodeRepository} for Remote Geoprocessing Feeds
@@ -49,7 +57,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	private final File cacheDirectory;
 
 	private RemoteFeedRepository remoteRepo;
-	private IMovingCodeRepository localRepoMirror;
+	private LocalVersionedFileRepository localRepoMirror;
 
 	private Date mirrorTimestamp;
 
@@ -112,10 +120,10 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 */
 	private void registerLocalPackages(){
 		// 1. init local mirror and load contents from disk
-		localRepoMirror = new LocalZipPackageRepository(cacheDirectory);
+		localRepoMirror = new LocalVersionedFileRepository(cacheDirectory);
 
 		// 2. Add all processes in the localRepoMirror to our list
-		for (String currentPID : localRepoMirror.getPackageIDs()){
+		for (PackageID currentPID : localRepoMirror.getPackageIDs()){
 			register(localRepoMirror.getPackage(currentPID), currentPID);
 		}
 	}
@@ -139,25 +147,29 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		localRepoMirror = null;
 		
 		// perform the content update
-		List<String> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
-		List<String> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
-		List<String> checkedLocalPIDs = new ArrayList<String>();
-		for (String currentRemotePID : remotePIDs){
-			String normalizedRemotePID = RepositoryUtils.normalizePackageID(currentRemotePID);
+		List<PackageID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
+		List<PackageID> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
+		List<PackageID> checkedLocalPIDs = new ArrayList<PackageID>();
+		
+		for (PackageID currentRemotePID : remotePIDs){
+			
 			// 1. for each remote package: check if it was previously present in mirror
-			if (localPIDs.contains(normalizedRemotePID)){
-				Date remoteTimeStamp = remoteRepo.getPackageTimestamp(currentRemotePID);
-				Date localTimeStamp = localRepoMirror.getPackageTimestamp(normalizedRemotePID);
-				// 2.a if so: check time stamp to determine if it was updated
-				if (remoteTimeStamp.after(localTimeStamp)){
-					replaceZipPackage(normalizedRemotePID, remoteRepo.getPackage(currentRemotePID));
+			// compare without version since this possibly holds a timestamp
+			
+			if (isInMirror(currentRemotePID)){
+				// 2.a if so: check time stamp to determine if it there was a silent update
+				DateTime remoteTimeStamp = remoteRepo.getPackageTimestamp(currentRemotePID);
+				DateTime localTimeStamp = localRepoMirror.getPackageTimestamp(currentRemotePID);
+				if (remoteTimeStamp.isAfter(localTimeStamp)){
+					localRepoMirror.removePackage(currentRemotePID);
 				}
 				// indicate that we have updated/checked this local PID
-				checkedLocalPIDs.add(normalizedRemotePID);
+				checkedLocalPIDs.add(currentRemotePID);
 			} 
 			// 2. if not: just dump the new package to folder
 			else {
-				addNewZipPackage(currentRemotePID, remoteRepo.getPackage(currentRemotePID));
+				// TODO: refactor
+				localRepoMirror.addPackage(remoteRepo.getPackage(currentRemotePID), currentRemotePID);
 			}
 
 		}
@@ -173,7 +185,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 					"Package folder updated. The following packages are no longer present in the remote feed."
 					+ "However, they will be kept in the local mirror until you manually delete them.\n"
 			);
-			for (String currentPID : localPIDs){
+			for (PackageID currentPID : localPIDs){
 				report.append(currentPID + "\n");
 			}
 			logger.info(report.toString());
@@ -223,56 +235,21 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			}
 		}
 	}
-
+	
+	
 	/**
-	 * Private method that is invoked during the update process of the local mirror directory
+	 * Does an unversioned comparison.
 	 * 
-	 * @param localPackageID
-	 * @param mcPackage
-	 * @return success <code>true|false</code>
+	 * @param candidate
+	 * @return
 	 */
-	private boolean replaceZipPackage(String localPackageID, MovingCodePackage mcPackage){
-		String zipFileName = localPackageID + RepositoryUtils.zipExtension;
-		zipFileName = cacheDirectory.getAbsolutePath() + File.separator + localPackageID;
-		File zipFile = new File(zipFileName);
-		// Try to delete old package
-		if (zipFile.delete()){
-			// dump new package
-			if (mcPackage.dumpPackage(zipFile)){
-				// set its time stamp to package time stamp
-				zipFile.setLastModified(mcPackage.getTimestamp().getTime());
+	private boolean isInMirror(PackageID candidate){
+		for (PackageID id : localRepoMirror.getPackageIDs()){
+			if(id.getId().equalsIgnoreCase(candidate.getId())){
 				return true;
-			} else {
-				return false;
 			}
-		} else {
-			return false;
 		}
-	}
-
-	/**
-	 * Private method that is invoked during the update process of the local mirror directory
-	 *  
-	 * @param localPackageID
-	 * @param mcPackage
-	 * @return success <code>true|false</code>
-	 */
-	private boolean addNewZipPackage(String localPackageID, MovingCodePackage mcPackage){
 		
-		// create file and missing directories
-		String zipFileName = localPackageID + RepositoryUtils.zipExtension;
-		zipFileName = cacheDirectory.getAbsolutePath() + File.separator + localPackageID;
-		File zipFile = new File(zipFileName);
-		zipFile.mkdirs(); // put into if-condition?
-		
-		// dump new package
-		if (mcPackage.dumpPackage(zipFile)){
-			// set its time stamp to package time stamp
-			zipFile.setLastModified(mcPackage.getTimestamp().getTime());
-			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
-
 }

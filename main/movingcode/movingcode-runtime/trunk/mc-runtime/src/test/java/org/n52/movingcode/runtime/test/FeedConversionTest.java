@@ -54,7 +54,7 @@ public class FeedConversionTest extends MCRuntimeTestConfig {
 			
 			logger.info("Using temp dir " + tmpDir.getAbsolutePath());
 
-			RepositoryUtils.materializeAsLocalZipRepo(repo, tmpDir);
+//			RepositoryUtils.materializeAsLocalZipRepo(repo, tmpDir);
 
 		}
 		catch (MalformedURLException e) {

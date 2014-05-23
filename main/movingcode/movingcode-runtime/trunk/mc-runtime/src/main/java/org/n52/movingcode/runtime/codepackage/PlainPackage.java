@@ -120,7 +120,7 @@ final class PlainPackage implements ICodePackage {
 		try {
 			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZipFile));
 			// add package description to zipFile
-			zos.putNextEntry(new ZipEntry(MovingCodePackage.descriptionFileName));
+			zos.putNextEntry(new ZipEntry(Constants.PACKAGE_DESCRIPTION_XML));
 			IOUtils.copy(plainDescription.newInputStream(), zos);
 			zos.closeEntry();
 

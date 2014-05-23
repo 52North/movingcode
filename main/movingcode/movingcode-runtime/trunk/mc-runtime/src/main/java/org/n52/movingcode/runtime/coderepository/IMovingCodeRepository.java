@@ -25,9 +25,10 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Date;
 
+import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.PackageID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -48,7 +49,7 @@ public interface IMovingCodeRepository {
 	 * 
 	 * @return Array of packageIDs {@link String}
 	 */
-	public String[] getPackageIDs();
+	public PackageID[] getPackageIDs();
 	
 	/**
 	 * method to determine whether a package with the given ID is provided by this repository
@@ -56,15 +57,15 @@ public interface IMovingCodeRepository {
 	 * @param packageID {@link String} - the internal (unique) identifier of package. 
 	 * @return boolean - true if a package with the given ID is provided by this repository.
 	 */
-	public boolean containsPackage(String packageID);
+	public boolean containsPackage(PackageID packageID);
 	
 	/**
 	 * returns a package matching a given packageID
 	 * 
-	 * @param {@link String} packageID - the (unique) ID of the package
+	 * @param {@link String} packageId - the (unique) ID of the package
 	 * 
 	 */
-	public MovingCodePackage getPackage(String packageID);
+	public MovingCodePackage getPackage(PackageID packageId);
 	
 	/**
 	 * Returns a package matching a given functionID.
@@ -81,13 +82,13 @@ public interface IMovingCodeRepository {
 	/**
 	 * returns the last known update timestamp of a MovingCodePackage
 	 */
-	public Date getPackageTimestamp(String packageID);
-
+	public DateTime getPackageTimestamp(PackageID packageId);
+	
 	/**
 	 * returns package description for a given package ID
 	 * the returned packageDescription shall be an exclusive copy
 	 */
-	public PackageDescriptionDocument getPackageDescription(String packageID);
+	public PackageDescriptionDocument getPackageDescription(PackageID packageID);
 	
 	/**
 	 * Public method to determine whether this repository instance provides a certain functionality
@@ -158,11 +159,12 @@ public interface IMovingCodeRepository {
 		 * Creates a {@link IMovingCodeRepository} from a local folder with plain packages. This folder may contain an arbitrary
 		 * number of plain packages. The packages <b>cannot<b> be nested in sub-directories.
 		 * 
+		 * @param codeSpace{{@link String} - code space prefix used to create package identifiers
 		 * @param sourceDirectory {@link File} - the source directory, which contains all the zipped packages.
 		 * @return {@link IMovingCodeRepository} - an new repository
 		 */
-		public static final IMovingCodeRepository createFromPlainFolder(File sourceDirectory){
-			return new LocalPlainRepository(sourceDirectory);
+		public static final IMovingCodeRepository createFromPlainFolder(String codeSpace, File sourceDirectory){
+			return new LocalPlainRepository(codeSpace, sourceDirectory);
 		}
 		
 		/**

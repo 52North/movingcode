@@ -27,16 +27,15 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
+import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.PackageID;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -60,10 +59,10 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 public abstract class AbstractRepository implements IMovingCodeRepository{
 
 	// registered packages - KVP (packageID, mPackage)
-	private Map<String, MovingCodePackage> packages = new HashMap<String, MovingCodePackage>();
+	private Map<PackageID, MovingCodePackage> packages = new HashMap<PackageID, MovingCodePackage>();
 
 	// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
-	private Multimap<String, String> fIDpID_Lookup = ArrayListMultimap.create();
+	private Multimap<String, PackageID> fIDpID_Lookup = ArrayListMultimap.create();
 
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
@@ -81,7 +80,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * 
 	 * @param mcPackage {@link MovingCodePackage}
 	 */
-	protected void register(MovingCodePackage mcPackage, String packageID) {
+	protected void register(MovingCodePackage mcPackage, PackageID packageID) {
 		acquireWriteLock();
 		this.packages.put(packageID, mcPackage);
 		this.fIDpID_Lookup.put(mcPackage.getFunctionIdentifier(), packageID);
@@ -96,7 +95,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * 
 	 * @param packageID
 	 */
-	protected void unregister(String packageID){
+	protected void unregister(PackageID packageID){
 		acquireWriteLock();
 		if (fIDpID_Lookup.containsValue(packageID)){
 			String fID = getPackage(packageID).getFunctionIdentifier();
@@ -116,7 +115,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	}
 
 	@Override
-	public boolean containsPackage(String packageID) {
+	public boolean containsPackage(PackageID packageID) {
 		acquireReadLock();
 		boolean retval = this.packages.containsKey(packageID);
 		returnReadLock();
@@ -132,15 +131,15 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	}
 
 	@Override
-	public String[] getPackageIDs() {
+	public PackageID[] getPackageIDs() {
 		acquireReadLock();
-		String[] retval = this.packages.keySet().toArray(new String[this.packages.keySet().size()]);
+		PackageID[] retval = this.packages.keySet().toArray(new PackageID[this.packages.keySet().size()]);
 		returnReadLock();
 		return retval;
 	}
 
 	@Override
-	public MovingCodePackage getPackage(String packageID) {
+	public MovingCodePackage getPackage(PackageID packageID) {
 		acquireReadLock();
 		MovingCodePackage retval = this.packages.get(packageID);
 		returnReadLock();
@@ -148,15 +147,15 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	}
 
 	@Override
-	public Date getPackageTimestamp(String packageID) {
+	public DateTime getPackageTimestamp(PackageID packageID) {
 		acquireReadLock();
-		Date retval = this.packages.get(packageID).getTimestamp();
+		DateTime retval = this.packages.get(packageID).getTimestamp();
 		returnReadLock();	
 		return retval;
 	}
 	
 	@Override
-	public PackageDescriptionDocument getPackageDescription(String packageID) {
+	public PackageDescriptionDocument getPackageDescription(PackageID packageID) {
 		acquireReadLock();
 		// 1. Create an *immutable* copy of the original package description
 		// 2. return only this copy
@@ -187,10 +186,10 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	@Override
 	public MovingCodePackage[] getPackageByFunction(String functionID){
 		acquireReadLock(); // acquire lock
-		Collection<String> packageIDs = this.fIDpID_Lookup.get(functionID);
+		Collection<PackageID> packageIDs = this.fIDpID_Lookup.get(functionID);
 		if (packageIDs.size() != 0){
 			ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
-			for (String currentPID : packageIDs){
+			for (PackageID currentPID : packageIDs){
 				resultSet.add(packages.get(currentPID));
 			}
 			returnReadLock(); // return lock
@@ -228,7 +227,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		acquireWriteLock();
 
 		// registered packages - KVP (packageID, mPackage)
-		this.packages = new HashMap<String, MovingCodePackage>();
+		this.packages = new HashMap<PackageID, MovingCodePackage>();
 
 		// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
 		this.fIDpID_Lookup = ArrayListMultimap.create();
