@@ -291,7 +291,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public synchronized MovingCodePackage getPackage(final PackageID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
-				currentRepo.getPackage(packageId);
+				return currentRepo.getPackage(packageId);
 			}
 		}
 		return null;
@@ -299,11 +299,11 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	@Override
 	public PackageID[] getPackageIDs() {
-		ArrayList<String> globalPIDs = new ArrayList<String>();
+		ArrayList<PackageID> globalPIDs = new ArrayList<PackageID>();
 		for (String currentRepoID : repositories.keySet()){
 
 			for (PackageID pid : repositories.get(currentRepoID).getPackageIDs()){
-				globalPIDs.add(currentRepoID + separator + pid);
+				globalPIDs.add(pid);
 			}
 		}
 
