@@ -7,19 +7,6 @@
 		{
 			"id" : "org.n52.movingcode.runtime.processors.python.PythonCLIProcessor",
 			"supportedContainer" : "http://gis.geo.tu-dresden.de/movingcode/containerregistry/pythonscript-2.5"
-		},
-		{
-			"id" : "org.n52.movingcode.runtime.processors.arctoolbox.ArcServerProcessor",
-			"supportedContainer" : "http://gis.geo.tu-dresden.de/movingcode/containerregistry/arctoolbox-10.0",
-			"properties" :
-				[
-					{"IP" : "**"},
-					{"DOMAIN" : "**"},
-					{"USER" : "**"},
-					{"PASS" : "**"},
-					{"DCOM_NATIVE" : "TRUE"},
-					{"ARCOBJECTSJAR" : "**"}
-				]
 		}
 	], 
 	
