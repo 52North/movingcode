@@ -125,7 +125,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		MovingCodePackage mcp = new MovingCodePackage(workspace, pd, new DateTime(pid.getVersion()));
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
-		mcp.dumpDescription(targetDir);
+		mcp.dumpDescription(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
 		pid.dump(targetDir);
 		
 		// 6. register package
@@ -137,8 +137,8 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	public synchronized void addPackage(MovingCodePackage mcp, PackageID pid){
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
-		mcp.dumpDescription(targetDir);
-		pid.dump(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
+		mcp.dumpDescription(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
+		pid.dump(targetDir);
 		
 		// finally: register package
 		register(mcp, pid);
