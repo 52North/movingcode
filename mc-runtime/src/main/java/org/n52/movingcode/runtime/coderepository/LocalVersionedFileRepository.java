@@ -138,7 +138,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
 		mcp.dumpDescription(targetDir);
-		pid.dump(targetDir);
+		pid.dump(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
 		
 		// finally: register package
 		register(mcp, pid);
