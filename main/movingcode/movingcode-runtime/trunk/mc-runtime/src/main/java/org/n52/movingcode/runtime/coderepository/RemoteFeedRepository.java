@@ -33,7 +33,6 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
 import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
 
 /**
@@ -92,20 +91,15 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				MovingCodePackage mcp = feed.getPackage(currentEntryID);
 				logger.trace("Loading package for feed entry " + currentEntryID);
 				
-				// we cannot know the components of the packageId
-				// --> set codespace and version NULL
-				PackageID pid = new PackageID(null, currentEntryID, null);
-				
-				
 				// validate
 				// and add to package map
 				// and add current file to zipFiles map
 				if (mcp.isValid()) {
-					register(mcp, pid);
+					register(mcp);
 				}
 				else {
 					logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
-							+ pid);
+							+ mcp.getVersionedPackageId().toString());
 				}
 			}
 

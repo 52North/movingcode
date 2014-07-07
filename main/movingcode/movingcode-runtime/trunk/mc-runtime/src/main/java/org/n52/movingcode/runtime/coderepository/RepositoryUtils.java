@@ -24,19 +24,20 @@
 package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+
+
+
+
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.n52.movingcode.runtime.codepackage.Constants;
-import org.n52.movingcode.runtime.codepackage.PackageID;
-import org.n52.movingcode.runtime.processors.ProcessorFactory;
+import org.joda.time.DateTime;
+import org.n52.movingcode.runtime.codepackage.PID;
+
+import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 
 /**
@@ -81,6 +82,27 @@ public class RepositoryUtils {
 			return null;
 		}
 		
+	}
+	
+	/**
+	 * Extracts a packageId from a process Description.
+	 * 
+	 * Does a safe extract, in case the description is invalid, partially valid or null
+	 * 
+	 * 
+	 * @param pdd
+	 * @return
+	 */
+	public static final PID extractId(PackageDescriptionDocument pdd){
+		if (pdd == null){
+			return new PID(null,null);
+		} else {
+			try {
+				return new PID(pdd.getPackageDescription().getPackageId(), new DateTime(pdd.getPackageDescription().getTimestamp()));
+			} catch (Exception e){
+				return new PID(null,null);
+			}
+		}
 	}
 	
 //	/**

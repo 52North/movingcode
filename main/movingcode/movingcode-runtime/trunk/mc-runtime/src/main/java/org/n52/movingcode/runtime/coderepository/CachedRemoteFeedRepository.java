@@ -33,7 +33,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-import org.n52.movingcode.runtime.codepackage.PackageID;
+import org.n52.movingcode.runtime.codepackage.PID;
 
 /**
  * This class implements an {@link IMovingCodeRepository} for Remote Geoprocessing Feeds
@@ -116,8 +116,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		localRepoMirror = new LocalVersionedFileRepository(cacheDirectory);
 
 		// 2. Add all processes in the localRepoMirror to our list
-		for (PackageID currentPID : localRepoMirror.getPackageIDs()){
-			register(localRepoMirror.getPackage(currentPID), currentPID);
+		for (PID currentPID : localRepoMirror.getPackageIDs()){
+			register(localRepoMirror.getPackage(currentPID));
 		}
 	}
 
@@ -140,11 +140,11 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		localRepoMirror = null;
 		
 		// perform the content update
-		List<PackageID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
-		List<PackageID> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
-		List<PackageID> checkedLocalPIDs = new ArrayList<PackageID>();
+		List<PID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
+		List<PID> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
+		List<PID> checkedLocalPIDs = new ArrayList<PID>();
 		
-		for (PackageID currentRemotePID : remotePIDs){
+		for (PID currentRemotePID : remotePIDs){
 			
 			// 1. for each remote package: check if it was previously present in mirror
 			// compare without version since this possibly holds a timestamp
@@ -162,7 +162,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			// 2. if not: just dump the new package to folder
 			else {
 				// TODO: refactor
-				localRepoMirror.addPackage(remoteRepo.getPackage(currentRemotePID), currentRemotePID);
+				localRepoMirror.addPackage(remoteRepo.getPackage(currentRemotePID));
 			}
 
 		}
@@ -178,7 +178,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 					"Package folder updated. The following packages are no longer present in the remote feed."
 					+ "However, they will be kept in the local mirror until you manually delete them.\n"
 			);
-			for (PackageID currentPID : localPIDs){
+			for (PID currentPID : localPIDs){
 				report.append(currentPID + "\n");
 			}
 			logger.info(report.toString());
@@ -231,14 +231,14 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	
 	
 	/**
-	 * Does an unversioned comparison.
+	 * Does a versioned comparison.
 	 * 
 	 * @param candidate
 	 * @return
 	 */
-	private boolean isInMirror(PackageID candidate){
-		for (PackageID id : localRepoMirror.getPackageIDs()){
-			if(id.getId().equalsIgnoreCase(candidate.getId())){
+	private boolean isInMirror(PID candidate){
+		for (PID id : localRepoMirror.getPackageIDs()){
+			if(id.equals(candidate)){
 				return true;
 			}
 		}

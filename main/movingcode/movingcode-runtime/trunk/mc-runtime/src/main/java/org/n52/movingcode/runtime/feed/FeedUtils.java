@@ -26,18 +26,9 @@ package org.n52.movingcode.runtime.feed;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.n52.movingcode.runtime.codepackage.PackageID;
-import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
-import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
 
 /**
  * This class contains static utility methods that are used to create and update AtomFeeds for MC

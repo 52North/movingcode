@@ -37,7 +37,7 @@ import org.apache.xmlbeans.XmlException;
 import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
+import org.n52.movingcode.runtime.codepackage.PID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -91,7 +91,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	private String fingerprint;
 	private Timer timerDaemon;
 	
-	private static final HashMap<PackageID,String> packageFolders = new HashMap<PackageID,String>();
+	private static final HashMap<PID,String> packageFolders = new HashMap<PID,String>();
 	
 	/**
 	 * 
@@ -115,33 +115,31 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
 	}
 	
-	public synchronized void addPackage(File workspace, PackageDescriptionDocument pd, PackageID pid){
+	public synchronized void addPackage(File workspace, PackageDescriptionDocument pd){
 		// 1. create moving code packe object
 		// 2. make new directory with UUID
 		// 3. put packagedescription XML in place
 		// 4. dump workspace to repo
 		// 5. dump packageid to repo
 		
-		MovingCodePackage mcp = new MovingCodePackage(workspace, pd, new DateTime(pid.getVersion()));
+		MovingCodePackage mcp = new MovingCodePackage(workspace, pd);
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
 		mcp.dumpDescription(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
-		pid.dump(targetDir);
 		
 		// 6. register package
-		register(mcp, pid);
-		packageFolders.put(pid, targetDir.getAbsolutePath());
+		register(mcp);
+		packageFolders.put(mcp.getVersionedPackageId(), targetDir.getAbsolutePath());
 		
 	}
 	
-	public synchronized void addPackage(MovingCodePackage mcp, PackageID pid){
+	public synchronized void addPackage(MovingCodePackage mcp){
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
 		mcp.dumpDescription(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
-		pid.dump(targetDir);
 		
 		// finally: register package
-		register(mcp, pid);
+		register(mcp);
 	}
 	
 	/**
@@ -150,7 +148,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 * @param pid
 	 * @return
 	 */
-	public boolean removePackage(PackageID pid){
+	public boolean removePackage(PID pid){
 		
 		// 1. unregister package, so it cannot be found any longer
 		// 2. remove directory
@@ -204,12 +202,8 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 				continue;
 			}
 			
-			// attempt to read package.id
-			File packageIdFile = new File(currentFolder, Constants.PACKAGE_ID_FILE);
-			PackageID packageId = PackageID.parse(packageIdFile);
-			
 			// packageID = absolute path
-			logger.info("Found package: " + currentFolder + "; using ID: " + packageId.toString());
+			logger.info("Found package: " + currentFolder + "; using ID: " + RepositoryUtils.extractId(pd).toString());
 			
 			// attempt to access workspace root folder
 			String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
@@ -221,14 +215,14 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 				continue; // skip this and immediately jump to the next iteration
 			}
 
-			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd, null);
+			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir);
 			
 			
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage, packageId);
+				register(mcPackage);
 			}
 			else {
 				logger.error(currentFolder.getAbsolutePath() + " is an invalid package.");

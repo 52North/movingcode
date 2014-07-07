@@ -63,8 +63,8 @@ public class MovingCodePackage {
 	// identifier of the provided functionality (e.g. WPS process identifier)
 	private final String functionIdentifier;
 
-	// Package time stamp, i.e. date of creation or last modification
-	private final DateTime timeStamp;
+	// Package id and time stamp, i.e. date of creation or last modification
+	private final PID packageID;
 
 	private final List<FunctionalType> supportedFuncTypes;
 
@@ -77,16 +77,22 @@ public class MovingCodePackage {
 
 		this.archive = new ZippedPackage(zipFile);
 		this.packageDescription = this.archive.getDescription();
+		
 
 		if (this.packageDescription != null) {
 			this.functionIdentifier = this.packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
 			this.supportedFuncTypes = getFunctionalTypes(this.packageDescription);
+			
+			DateTime timestamp = new DateTime(this.packageDescription.getPackageDescription().getTimestamp());
+			String id = this.packageDescription.getPackageDescription().getPackageId();
+			this.packageID = new PID(id, timestamp);
 		}
 		else {
 			this.functionIdentifier = null;
 			this.supportedFuncTypes = null;
+			this.packageID = null;
 		}
-		this.timeStamp = getTimestamp(zipFile);
+		
 	}
 	
 	
@@ -104,7 +110,7 @@ public class MovingCodePackage {
 	 * @param packageID
 	 * @param packageStamp
 	 */
-	public MovingCodePackage(final URL zipPackageURL, final PackageID packageID, final DateTime packageTimeStamp) {
+	public MovingCodePackage(final URL zipPackageURL) {
 
 		PackageDescriptionDocument packageDescription = null;
 		ZippedPackage archive = null;
@@ -118,13 +124,17 @@ public class MovingCodePackage {
 		if (packageDescription != null) {
 			this.functionIdentifier = packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
 			this.supportedFuncTypes = getFunctionalTypes(packageDescription);
+						
+			DateTime timestamp = new DateTime(this.packageDescription.getPackageDescription().getTimestamp());
+			String id = this.packageDescription.getPackageDescription().getPackageId();
+			this.packageID = new PID(id, timestamp);
 		}
 		else {
 			this.functionIdentifier = null;
 			this.supportedFuncTypes = null;
+			this.packageID = null;
 		}
 		
-		this.timeStamp = packageTimeStamp;
 		this.archive = archive;
 
 	}
@@ -139,26 +149,22 @@ public class MovingCodePackage {
 	 *        the lastModified date is obtained from the workspace's content.
 	 */
 	public MovingCodePackage(final File workspace,
-			final PackageDescriptionDocument packageDescription,
-			final DateTime timestamp) {
+			final PackageDescriptionDocument packageDescription) {
 
 		this.packageDescription = packageDescription;
 
 		if (packageDescription != null) {
 			this.functionIdentifier = packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
 			this.supportedFuncTypes = getFunctionalTypes(packageDescription);
+			
+			DateTime timestamp = new DateTime(this.packageDescription.getPackageDescription().getTimestamp());
+			String id = this.packageDescription.getPackageDescription().getPackageId();
+			this.packageID = new PID(id, timestamp);
 		}
 		else {
 			this.functionIdentifier = null;
 			this.supportedFuncTypes = null;
-		}
-
-		// set timestamp
-		if (timestamp != null) {
-			this.timeStamp = timestamp;
-		}
-		else {
-			this.timeStamp = getLastModified(workspace);
+			this.packageID = null;
 		}
 		
 		this.archive = new PlainPackage(workspace, packageDescription);
@@ -211,7 +217,12 @@ public class MovingCodePackage {
 			return false;
 		}
 	}
-
+	
+	
+	public PID getVersionedPackageId(){
+		return packageID;
+	}
+	
 	/**
 	 * Returns the PackageDescription
 	 * 
@@ -270,7 +281,7 @@ public class MovingCodePackage {
 	 * @return {@link DateTime} package timestamp
 	 */
 	public DateTime getTimestamp() {
-		return this.timeStamp;
+		return this.packageID.timestamp;
 	}
 
 	/**
@@ -326,10 +337,10 @@ public class MovingCodePackage {
 		builder.append(this.archive);
 		builder.append(", packageDescription=");
 		builder.append(this.packageDescription);
-		builder.append(", functionalIdentifier=");
-		builder.append(this.functionIdentifier);
+		builder.append(", PackageID=");
+		builder.append(this.packageID.id);
 		builder.append(", timeStamp=");
-		builder.append(this.timeStamp);
+		builder.append(this.packageID.timestamp.toString());
 		builder.append(", supportedFuncTypes=");
 		builder.append(this.supportedFuncTypes);
 		builder.append("]");

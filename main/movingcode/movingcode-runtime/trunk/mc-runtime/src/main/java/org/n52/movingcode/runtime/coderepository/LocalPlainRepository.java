@@ -35,7 +35,7 @@ import org.apache.xmlbeans.XmlException;
 import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
+import org.n52.movingcode.runtime.codepackage.PID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -140,20 +140,14 @@ public final class LocalPlainRepository extends AbstractRepository {
 				continue; // skip this and immediately jump to the next iteration
 			}
 			
-			// guess timestamp
-			DateTime timestamp = new DateTime(lastFileModified(currentFolder));
-			
-			// packageID = absolute path
-			PackageID pid = new PackageID(codeSpace, currentFolder.getPath(), timestamp.toString());
-			
-			logger.info("Found package: " + currentFolder + "; using ID: " + pid.getId());
+			logger.info("Found package: " + currentFolder + "; using ID: " + pd.getPackageDescription().getPackageId());
 
-			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd, timestamp);
+			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd);
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage, pid);
+				register(mcPackage);
 			}
 			else {
 				logger.error(currentFolder.getAbsolutePath() + " is an invalid package.");

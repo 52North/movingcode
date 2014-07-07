@@ -43,9 +43,7 @@ import org.apache.abdera.model.Link;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
 
 /**
  * A {@link GeoprocessingFeed} is a class that provides access to a set of {@link GeoprocessingFeedEntry}.
@@ -183,8 +181,7 @@ public final class GeoprocessingFeed {
 		} 
 		// else: return new package
 		else {
-			PackageID pid = new PackageID(null, entryID, null);
-			return new MovingCodePackage(gpfe.getZipPackageURL(), pid, new DateTime(gpfe.getUpdated()));
+			return new MovingCodePackage(gpfe.getZipPackageURL());
 		}
 	}
 
