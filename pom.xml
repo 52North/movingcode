@@ -13,6 +13,7 @@
 
 	<modules>
 		<module>mc-runtime</module>
+		<module>mc-schema</module>
 	</modules>
 
 	<properties>
