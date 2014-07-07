@@ -30,10 +30,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
 
 /**
  * This class implements an {@link IMovingCodeRepository} for local zipped packages, stored
@@ -87,15 +85,14 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			logger.debug("Found package: " + currentFile);
 
 			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
-			PackageID id = makeId(null, currentFile, mcPackage.getTimestamp());
 			
-			logger.debug("Registered package: " + currentFile + "; using ID: " + id);	
+			logger.debug("Registered package: " + currentFile + "; using ID: " + mcPackage.getVersionedPackageId().toString());	
 			
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage, id);
+				register(mcPackage);
 			}
 			else {
 				logger.error(currentFile.getAbsolutePath() + " is an invalid package.");
@@ -137,10 +134,6 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 				informRepositoryChangeListeners();
 			}			
 		}
-	}
-	
-	private static final PackageID makeId(String codeSpace, File zipFile, DateTime timeStamp){
-		return new PackageID(codeSpace, toNormalizedLocalPath(zipFile), timeStamp.toString());
 	}
 	
 	/**

@@ -28,7 +28,7 @@ import java.net.URL;
 
 import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
+import org.n52.movingcode.runtime.codepackage.PID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -49,7 +49,7 @@ public interface IMovingCodeRepository {
 	 * 
 	 * @return Array of packageIDs {@link String}
 	 */
-	public PackageID[] getPackageIDs();
+	public PID[] getPackageIDs();
 	
 	/**
 	 * method to determine whether a package with the given ID is provided by this repository
@@ -57,7 +57,7 @@ public interface IMovingCodeRepository {
 	 * @param packageID {@link String} - the internal (unique) identifier of package. 
 	 * @return boolean - true if a package with the given ID is provided by this repository.
 	 */
-	public boolean containsPackage(PackageID packageID);
+	public boolean containsPackage(PID packageID);
 	
 	/**
 	 * returns a package matching a given packageID
@@ -65,7 +65,7 @@ public interface IMovingCodeRepository {
 	 * @param {@link String} packageId - the (unique) ID of the package
 	 * 
 	 */
-	public MovingCodePackage getPackage(PackageID packageId);
+	public MovingCodePackage getPackage(PID packageId);
 	
 	/**
 	 * Returns a package matching a given functionID.
@@ -82,13 +82,13 @@ public interface IMovingCodeRepository {
 	/**
 	 * returns the last known update timestamp of a MovingCodePackage
 	 */
-	public DateTime getPackageTimestamp(PackageID packageId);
+	public DateTime getPackageTimestamp(PID packageId);
 	
 	/**
 	 * returns package description for a given package ID
 	 * the returned packageDescription shall be an exclusive copy
 	 */
-	public PackageDescriptionDocument getPackageDescription(PackageID packageID);
+	public PackageDescriptionDocument getPackageDescription(PID packageID);
 	
 	/**
 	 * Public method to determine whether this repository instance provides a certain functionality

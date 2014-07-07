@@ -37,7 +37,7 @@ import net.opengis.wps.x100.ProcessDescriptionType;
 
 import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PackageID;
+import org.n52.movingcode.runtime.codepackage.PID;
 import org.n52.movingcode.runtime.coderepository.CachedRemoteFeedRepository;
 import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
@@ -63,9 +63,6 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	private static GlobalRepositoryManager instance;
-
-	// separator for global process IDs: <global>+<separator>+<localPID>
-	private static final String separator = File.pathSeparator;
 	
 	private Map<String, IMovingCodeRepository> repositories = new HashMap<String, IMovingCodeRepository>();
 	
@@ -232,7 +229,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 * @param identifier
 	 * @return int - multiplicity
 	 */
-	public int checkMultiplicityOfPackage(final PackageID identifier) {
+	public int checkMultiplicityOfPackage(final PID identifier) {
 		int counter = 0;
 
 		for (IMovingCodeRepository repo : repositories.values()) {
@@ -288,7 +285,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 	
 	@Override
-	public synchronized MovingCodePackage getPackage(final PackageID packageId) {
+	public synchronized MovingCodePackage getPackage(final PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
 				return currentRepo.getPackage(packageId);
@@ -298,20 +295,20 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	@Override
-	public PackageID[] getPackageIDs() {
-		ArrayList<PackageID> globalPIDs = new ArrayList<PackageID>();
+	public PID[] getPackageIDs() {
+		ArrayList<PID> globalPIDs = new ArrayList<PID>();
 		for (String currentRepoID : repositories.keySet()){
 
-			for (PackageID pid : repositories.get(currentRepoID).getPackageIDs()){
+			for (PID pid : repositories.get(currentRepoID).getPackageIDs()){
 				globalPIDs.add(pid);
 			}
 		}
 
-		return globalPIDs.toArray(new PackageID[globalPIDs.size()]);
+		return globalPIDs.toArray(new PID[globalPIDs.size()]);
 	}
 
 	@Override
-	public boolean containsPackage(final PackageID packageId) {
+	public boolean containsPackage(final PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
 				return true;
@@ -333,7 +330,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	@Override
-	public DateTime getPackageTimestamp(final PackageID packageId) {
+	public DateTime getPackageTimestamp(final PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
 				currentRepo.getPackage(packageId).getTimestamp();
@@ -343,7 +340,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	@Override
-	public PackageDescriptionDocument getPackageDescription(PackageID packageId) {
+	public PackageDescriptionDocument getPackageDescription(PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
 				currentRepo.getPackage(packageId).getTimestamp();
