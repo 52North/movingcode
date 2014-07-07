@@ -132,7 +132,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		String packageIdentifier = tempFile.getPath();
 		logger.info(packageIdentifier);
 
-		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc, null);
+		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc);
 
 		mcp.dumpPackage(tempFile);
 		// close package and reopen
