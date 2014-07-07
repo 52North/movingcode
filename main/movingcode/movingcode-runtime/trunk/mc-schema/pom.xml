@@ -140,7 +140,7 @@
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
 							<connectionUrl>
-								scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode-schema/trunk/
+								scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/
 							</connectionUrl>
 							<preparationGoals>clean</preparationGoals>
                             <!-- make use of system prop set by hudson -->
