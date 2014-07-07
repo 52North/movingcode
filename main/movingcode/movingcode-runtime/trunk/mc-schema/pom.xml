@@ -6,7 +6,6 @@
 		<artifactId>movingcode-runtime-parent</artifactId>
 		<version>0.7-SNAPSHOT</version>
 	</parent>
-	<groupId>org.n52.mc</groupId>
 	<artifactId>mc-schema</artifactId>
 	<packaging>jar</packaging>
 	
