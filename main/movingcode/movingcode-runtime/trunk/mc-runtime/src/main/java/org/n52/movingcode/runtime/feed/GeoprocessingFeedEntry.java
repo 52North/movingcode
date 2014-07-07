@@ -92,8 +92,7 @@ final class GeoprocessingFeedEntry {
 			String packageURL,
 			String descriptionURL) {
 
-		if (packageDesc.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-			ProcessDescriptionType wpsDesc = packageDesc.getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
+			ProcessDescriptionType wpsDesc = packageDesc.getPackageDescription().getFunctionality().getWps100ProcessDescription();
 			this.entry = makeNewEntry();
 
 			// String title = wpsDesc.getTitle().getStringValue();
@@ -128,10 +127,6 @@ final class GeoprocessingFeedEntry {
 			// e.g. <link rel="alternate" href="http://www.gtfs-data-exchange.com/meta/6195524"
 			// type="text/html"/>
 			// use DETAILED_DESCRIPTION_LINK_REL
-		}
-		else {
-			// TODO: support other descriptions, e.g. WSDL
-		}
 
 	}
 

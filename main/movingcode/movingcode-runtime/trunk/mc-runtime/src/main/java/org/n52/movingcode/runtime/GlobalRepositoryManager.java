@@ -220,7 +220,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public ProcessDescriptionType getProcessDescription(final String functionIdentifier) {
 		MovingCodePackage[] mcpArray = getPackageByFunction(functionIdentifier);
 		if (mcpArray != null && mcpArray.length > 0){
-			return mcpArray[0].getDescription().getPackageDescription().getContractedFunctionality().getWpsProcessDescription();
+			return mcpArray[0].getDescription().getPackageDescription().getFunctionality().getWps100ProcessDescription();
 		} else {
 			return null;
 		}
