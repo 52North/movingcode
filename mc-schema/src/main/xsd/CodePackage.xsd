@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+Description Schema for Moving Code Packages
+Author: Matthias Mueller, TU Dresden
+Website: http://tu-dresden.de/fgh/geo/gis
+Project Site: http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/forschung/projekt/georepAppstore
+
+Version: 1.1.0
+-->
+
+<xs:schema 	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:wps100="http://www.opengis.net/wps/1.0.0"
+			targetNamespace="http://gis.geo.tu-dresden.de/movingcode/1.1.0"
+			xmlns:mcp="http://gis.geo.tu-dresden.de/movingcode/1.1.0"
+			elementFormDefault="qualified"
+			attributeFormDefault="qualified">
+	
+	<xs:import namespace="http://www.opengis.net/wps/1.0.0" schemaLocation="./wps/1.0.0/wpsDescribeProcess_response.xsd"/>
+	
+	<xs:element name="packageDescription">
+		<xs:annotation>
+				<xs:documentation>Deployment Description for a Moving Code Package. Contains platform specific information and the functional description.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="functionality">
+					<xs:annotation>
+						<xs:documentation>Structure describing the functional part of the moving code package. Contains functional parameters whose Identifiers must match with the parameters in the non-functional description.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:annotation>
+								<xs:documentation>
+									A list of supported functional descriptions.
+									Currently implements only a WPS 1.0.0 process description, but can be extended by other functional description types.
+									I/O Identifiers used in the functional description need to match those in the parameter mapping in the workspace description.
+									Identifiers for the provided logic MUST be identical in all functional descriptions.
+								</xs:documentation>
+							</xs:annotation>
+							<xs:element ref="mcp:wps100ProcessDescription"/>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="platform" type="mcp:platformType" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>This element contains a list of supported runtime platforms</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="infrastructure" type="mcp:infrastructureType">
+					<xs:annotation>
+						<xs:documentation>This element contains the infrastructure/hardware requirements</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="exploitationRights" type="mcp:exploitationRightsType">
+					<xs:annotation>
+						<xs:documentation>This element holds information about exploitation rights and liabilities associated with a Moving Code Package.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="workspace" type="mcp:workspaceDescriptionType">
+					<xs:annotation>
+						<xs:documentation>Structure describing the non-functional part of the moving code package. Contains platform-specific information and parameter mapping to the functional description.</xs:documentation>
+					</xs:annotation>				
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="packageId" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>
+						Global identifier for this package.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="timestamp" type="xs:dateTime" use="required">
+				<xs:annotation>
+					<xs:documentation>
+						Date of creation or last modification.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	
+	<!-- ========================================================================== -->
+	<!-- Type Definition - Platform -->
+	<!-- ========================================================================== -->
+	<xs:complexType name="platformType">
+		<xs:annotation>
+			<xs:documentation>A list of valid runtime configurations for this executable.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="requiredRuntimeComponent" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>URN referencing a required component of the processing platform, e.g. urn:n52:platform:python:2.5:gdal:1.8.0</xs:documentation>
+					<xs:appinfo>Identifier of component of a processing platform. Use to describe a non-standardizes / custom platform.</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="platformId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Applicable for identifying standardizes platforms</xs:documentation>
+				<xs:appinfo>Use for "standardized" platforms, i.e. a pre-defined set of components that make a platform.</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+
+	<!-- ========================================================================== -->
+	<!-- Type Definition - Hardware/Infrastructure -->
+	<!-- ========================================================================== -->
+	<xs:complexType name="infrastructureType">
+		<xs:annotation>
+			<xs:documentation>Infrastructure/hardware requirements at runtime.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="occi.compute.architecture" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>Required computing architecture (Optional. Omit if it doesn't matter)</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="occi.compute.cores" type="xs:integer" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>Required number of cores (Optional. Omit if it doesn't matter)</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="occi.compute.memory" type="xs:float" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>Required amount of memory for execution (Encouraged, but optional. Omit if this value cannot be estimated)</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="occi.compute.speed" type="xs:float" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>Required CPU clock speed in Gigahertz. (Optional. Omit if it doesn't matter)</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="occi.storage.size" type="xs:float" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>Required disk space during execution, e.g. to create temporary files of a significant size. (Optinal)</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- ========================================================================== -->
+	<!-- Element Definitions - Functionality -->
+	<!-- ========================================================================== -->
+	<xs:element name="wps100ProcessDescription" type="wps100:ProcessDescriptionType">
+		<xs:annotation>
+			<xs:documentation>
+				Structure describing the functional part of the moving code package. Based on WPS 1.0.0 ProcessDescriptionType.
+				WPS 1.0 does not define an element, so we need to create one.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	
+	<!-- ========================================================================== -->
+	<!-- Type Definition - Exploitation Rights -->
+	<!-- ========================================================================== -->
+	<xs:complexType name="exploitationRightsType">
+		<xs:annotation>
+			<xs:documentation>
+				Reference to a legal document indicating exploitation rights (e.g. a license)
+				and liabilities. Though this schema version is designed towards Creative Commons
+				license types and human readable documents, the choice structure below may be extended
+				to support other strutures for legal documentation.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="creativeCommonsLicense">
+				<xs:annotation>
+					<xs:documentation>
+						A reference to a Creative Commons License.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="cc.license" type="xs:anyURI">
+							<xs:annotation>
+								<xs:appinfo>Common persistent URL referencing a Creative Commons License, e.g. http://creativecommons.org/licenses/by/3.0/</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="dct.title" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:appinfo>The title of the work you are licensing.</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="cc.attributionName" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:appinfo>The name users of the work should give attribution to. For example, the name of the work's author.</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="cc.attributionURL" type="xs:anyURI" minOccurs="0">
+							<xs:annotation>
+								<xs:appinfo>The URL users of the work should link to. For example, the work's page on the author's site.</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="dct.source" type="xs:anyURI" minOccurs="0">
+						<xs:annotation>
+								<xs:appinfo>A work another is derived from.</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="cc.morePermissions" type="xs:anyURI" minOccurs="0">
+						<xs:annotation>
+								<xs:appinfo>A URL where a user can obtain information about clearing rights that are not pre-cleared by your CC license.</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="traditionalLicenseDocument" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>
+						Reference to a human-readable license, http://www.opensource.org/licenses/mit-license.php.
+						A list of common Open Source licenses can be found here: http://www.opensource.org/licenses.
+						The licenser is responsible for maintaining the referenced resource.
+					</xs:documentation>
+					<xs:appinfo>(Persistent) URL referencing a human-readable license, e.g. http://www.opensource.org/licenses/mit-license.php</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	
+	
+	<!-- ========================================================================== -->
+	<!-- Type Definitions - Workspace description -->	
+	<!-- ========================================================================== -->
+	<xs:complexType name="workspaceDescriptionType">
+		<xs:annotation>
+			<xs:documentation>Deployment Description for a Moving Code Package. Contains platform specific information and the functional description.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="workspaceRoot" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>workspace location relative to the package root, e.g. "./scriptworkspace"</xs:documentation>
+					<xs:appinfo>Workspace location relative to the package root, e.g. "./scriptworkspace"</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="executableLocation" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>location of the executable; relative to the workspace root.</xs:documentation>
+					<xs:appinfo>Location of the executable relative to the workspace root. E.g. ./myAlgorithm.py</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="executableMethodCall" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>points to some location within the container, e.g. toolset1/toolA</xs:documentation>
+					<xs:appinfo>If your algorithm resides in an internal method call this should be stated here. E.g myToolset1/myTool for ArcToolboxes.</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="containerType" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>URN referencing the format (aka "container") of the executable, e.g. urn:n52:container:python:2.5</xs:documentation>
+					<xs:appinfo>The container type of the executable. E.g. urn:n52:container:python:2.5 for a python script or urn:n52:container:arctoolbox:10.0 for an ArcGIS Toolbox.</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="executionParameters">
+				<xs:annotation>
+					<xs:documentation>A collection of the execution parameters</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="parameter" type="mcp:ExecutionParameterType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>The tool's parameters</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ========================================================================== -->
+	<xs:complexType name="ExecutionParameterType">
+		<xs:annotation>
+			<xs:documentation>Structure for a parameter description.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="prefixString" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A prefix string that shall be added before this parameter, e.g. "-p("</xs:documentation>
+					<xs:appinfo>A prefix string that shall be added before this parameter, e.g. "-p("</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="suffixString" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A suffix string that shall be added before this parameter, e.g. ")"</xs:documentation>
+					<xs:appinfo>A suffix string that shall be added before this parameter, e.g. ")"</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="separatorString" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A string that acts as a separator between individual parameter values, e.g. " " for SPACE</xs:documentation>
+					<xs:appinfo>In case the parameter has a multiplicity greater than one: A string that acts as a separator between individual parameter values, e.g. " " for SPACE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>
+						The Legacy ID by which the parameters are defined in the Legacy environment. Use legacyIntID for sequential parameters, legacyStrindID for named parameters
+						positionID => legacy parameters are addressed by their position (1st, 2nd, 3rd, ...) in a method call
+						stringID => legacy parameters are addressed by their legacy name
+					</xs:documentation>
+				</xs:annotation>
+				<xs:element name="positionID" type="mcp:PositionIDType"/>
+				<xs:element name="stringID" type="mcp:StringIDType"/>
+			</xs:choice>
+			<xs:element name="functionalInputID" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Input ID this parameter shall be mapped to.</xs:documentation>
+					<xs:appinfo>The Input ID this parameter shall be mapped to. Omit if this parameter is output-only.</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="functionalOutputID" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Output ID this parameter shall be mapped to.</xs:documentation>
+					<xs:appinfo>The Output ID this parameter shall be mapped to. Omit if this parameter is input-only.</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="optional" use="optional" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>
+					indicates whether this parameter is optional for container execution.
+					(e.g. can be omitted in a command line execution or left out in an
+					args[] array if not set)
+				</xs:documentation>
+				<xs:appinfo>If 1) your parameter is optional and 2) your executable requires this parameter to be set even if it is empty, set to TRUE. Omit otherwise (this is the usual case)</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- ========================================================================== -->
+	<xs:simpleType name="PositionIDType">
+		<xs:annotation>
+			<xs:documentation>Positive integer indicating the position of this parameter.</xs:documentation>
+			<xs:appinfo>Positive integer indicating the position of this parameter in the argument array passed to the executable.</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:positiveInteger"/>
+	</xs:simpleType>
+	<!-- ========================================================================== -->
+	<xs:simpleType name="StringIDType">
+		<xs:annotation>
+			<xs:documentation>String indicating the name of this parameter.</xs:documentation>
+			<xs:appinfo>String indicating the name of this parameter in the argument map passed to the executable.</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<!-- ========================================================================== -->
+</xs:schema>
