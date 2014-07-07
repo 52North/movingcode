@@ -286,7 +286,7 @@ public class ProcessorFactory {
 	 */
 	private String findCompatibleProcessor(final PackageDescription description) {
 
-		PlatformType[] validPlatforms = description.getContractedPlatformArray();
+		PlatformType[] validPlatforms = description.getPlatformArray();
 
 		// 1. Do we have some required platforms in place?
 		boolean inPlace = false;

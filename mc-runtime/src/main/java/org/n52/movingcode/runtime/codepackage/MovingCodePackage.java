@@ -38,7 +38,6 @@ import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 import org.joda.time.DateTime;
 
-import de.tudresden.gis.geoprocessing.movingcode.schema.FunctionalDescriptionsListType;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 import static org.n52.movingcode.runtime.codepackage.Constants.*;
 
@@ -79,9 +78,8 @@ public class MovingCodePackage {
 		this.archive = new ZippedPackage(zipFile);
 		this.packageDescription = this.archive.getDescription();
 
-		if (this.packageDescription != null
-				&& this.packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-			this.functionIdentifier = this.packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+		if (this.packageDescription != null) {
+			this.functionIdentifier = this.packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
 			this.supportedFuncTypes = getFunctionalTypes(this.packageDescription);
 		}
 		else {
@@ -117,9 +115,8 @@ public class MovingCodePackage {
 		this.packageDescription = packageDescription;
 		// TODO: Information from the feed might lag during updates
 		// how can deal with that?
-		if (packageDescription != null
-				&& packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-			this.functionIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+		if (packageDescription != null) {
+			this.functionIdentifier = packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
 			this.supportedFuncTypes = getFunctionalTypes(packageDescription);
 		}
 		else {
@@ -147,9 +144,8 @@ public class MovingCodePackage {
 
 		this.packageDescription = packageDescription;
 
-		if (packageDescription != null
-				&& packageDescription.getPackageDescription().getContractedFunctionality().isSetWpsProcessDescription()) {
-			this.functionIdentifier = packageDescription.getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getIdentifier().getStringValue();
+		if (packageDescription != null) {
+			this.functionIdentifier = packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
 			this.supportedFuncTypes = getFunctionalTypes(packageDescription);
 		}
 		else {
@@ -300,13 +296,13 @@ public class MovingCodePackage {
 	 *         WSDL, ...).
 	 */
 	private static final List<FunctionalType> getFunctionalTypes(final PackageDescriptionDocument description) {
+		
 		ArrayList<FunctionalType> availableFunctionalDescriptions = new ArrayList<FunctionalType>();
-
+		
 		// retrieve functional description types
-		FunctionalDescriptionsListType funcDescArray = description.getPackageDescription().getContractedFunctionality();
-		if (funcDescArray.isSetWpsProcessDescription()) {
-			availableFunctionalDescriptions.add(FunctionalType.WPS100);
-		}
+		// TODO: make fit for WPS 2.0?
+		availableFunctionalDescriptions.add(FunctionalType.WPS100);
+		
 		return availableFunctionalDescriptions;
 	}
 

@@ -34,7 +34,6 @@ import net.opengis.wps.x100.OutputDescriptionType;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
 import de.tudresden.gis.geoprocessing.movingcode.schema.ExecutionParameterType;
-import de.tudresden.gis.geoprocessing.movingcode.schema.FunctionalDescriptionsListType;
 
 public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements IIOParameterMap {
 
@@ -50,18 +49,18 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
         }
 
         // retrieve functional description types
-        FunctionalDescriptionsListType funcDescArray = mcp.getDescription().getPackageDescription().getContractedFunctionality();
-        this.isWPSdescription = funcDescArray.isSetWpsProcessDescription();
+        // TODO: rework resolution mechanism for WPS 1.0 cs 2.0
+        this.isWPSdescription = true;
 
         // create input index
         Map<String, InputDescriptionType> inputs = new HashMap<String, InputDescriptionType>();
-        for (InputDescriptionType input : mcp.getDescription().getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getDataInputs().getInputArray()) {
+        for (InputDescriptionType input : mcp.getDescription().getPackageDescription().getFunctionality().getWps100ProcessDescription().getDataInputs().getInputArray()) {
             inputs.put(input.getIdentifier().getStringValue(), input);
         }
 
         // create output index
         Map<String, OutputDescriptionType> outputs = new HashMap<String, OutputDescriptionType>();
-        for (OutputDescriptionType output : mcp.getDescription().getPackageDescription().getContractedFunctionality().getWpsProcessDescription().getProcessOutputs().getOutputArray()) {
+        for (OutputDescriptionType output : mcp.getDescription().getPackageDescription().getFunctionality().getWps100ProcessDescription().getProcessOutputs().getOutputArray()) {
             outputs.put(output.getIdentifier().getStringValue(), output);
         }
 
