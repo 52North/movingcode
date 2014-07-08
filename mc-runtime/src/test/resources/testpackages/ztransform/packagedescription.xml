@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Description for zTransformation process Author: Matthias Mueller, TU 
 	Dresden; Website: http://tu-dresden.de/fgh/geo/gis -->
-<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
+<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.1.0"
 	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.0.0
-						http://gis.geo.tu-dresden.de/movingcode/1.0.0/descriptions/MovingCodePackage.xsd">
-	<mc:contractedFunctionality>
-		<mc:wpsProcessDescription wps:processVersion="1">
+	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.1.0
+						http://gis.geo.tu-dresden.de/movingcode/1.1.0/CodePackage.xsd"
+	mc:packageId="org.n52.movingcode.runtime.test.ztransform"
+	mc:timestamp="2014-07-08T09:00:00Z">
+	<mc:functionality>
+		<mc:wps100ProcessDescription wps:processVersion="org.n52.movingcode.runtime.test.ztransform::2014-07-08T09:00:00Z">
 			<ows:Identifier>de.tu-dresden.geo.gis.algorithms.raster.ztransform</ows:Identifier>
 			<ows:Title>z-Transformation for raster data (cell wise)</ows:Title>
 			<ows:Abstract>Computes a z-transform cell by cell</ows:Abstract>
@@ -67,23 +69,23 @@
 					</ComplexOutput>
 				</Output>
 			</ProcessOutputs>
-		</mc:wpsProcessDescription>
-	</mc:contractedFunctionality>
-	<mc:contractedPlatform>
+		</mc:wps100ProcessDescription>
+	</mc:functionality>
+	<mc:platform>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.6</mc:requiredRuntimeComponent>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</mc:requiredRuntimeComponent>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.6</mc:requiredRuntimeComponent>
-	</mc:contractedPlatform>
-	<mc:contractedPlatform>
+	</mc:platform>
+	<mc:platform>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.7</mc:requiredRuntimeComponent>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8</mc:requiredRuntimeComponent>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/gdal-1.8-python-2.7</mc:requiredRuntimeComponent>
-	</mc:contractedPlatform>
-	<mc:contractedInfrastructure>
+	</mc:platform>
+	<mc:infrastructure>
 		<mc:occi.compute.cores>1</mc:occi.compute.cores>
 		<mc:occi.compute.memory>0.1</mc:occi.compute.memory>
 		<mc:occi.storage.size>0.1</mc:occi.storage.size>
-	</mc:contractedInfrastructure>
+	</mc:infrastructure>
 	<mc:exploitationRights>
 		<mc:creativeCommonsLicense>
 			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>
