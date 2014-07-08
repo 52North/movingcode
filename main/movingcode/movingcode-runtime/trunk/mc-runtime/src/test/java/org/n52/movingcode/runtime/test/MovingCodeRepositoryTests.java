@@ -46,11 +46,10 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 	private static final String packageFolderName = "src/test/resources/testpackages";
 
 	private static final String workspace = packageFolderName + File.separator + "ztransform/ztransform";
-	private static final String descriptionXML = packageFolderName + File.separator
-	+ "ztransform/packagedescription.xml";
+	private static final String descriptionXML = packageFolderName + File.separator + "ztransform/packagedescription.xml";
 
 	@Test
-	public void testDirectoryRepository() {
+	public void localZipRepoTest() {
 		// create string buffer for the package report
 		StringBuffer report = new StringBuffer(CR);
 		
@@ -60,6 +59,57 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 		// Act
 		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
+
+		// Assert
+		Assert.assertTrue(mcRep.providesFunction(zTransformFunctionID));
+		report.append("Information for package: " + zTransformFunctionID + CR);
+		
+		MovingCodePackage pack = mcRep.getPackageByFunction(zTransformFunctionID)[0]; // get the test package
+		Assert.assertFalse(pack == null); // make sure it is not null
+		report.append("Package Timestamp is: " + pack.getTimestamp() + CR);
+
+		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty
+		// parameter Map
+		Assert.assertFalse(paramsMap == null); // make sure it is not null
+
+		report.append("--- Parameters ---" + CR);
+		for (IOParameter param : paramsMap.values()) {
+			report.append(
+					"Parameter "
+					+ param.getIdentifier().getHarmonizedValue()
+					+ ": "
+					+ param.getMinMultiplicity()
+					+ ".."
+					+ param.getMaxMultiplicity()
+					+ CR
+			);
+			
+			if (param.isMessageIn()) {
+				report.append("ServiceInputID: " + param.getMessageInputIdentifier() + CR);
+			}
+			if (param.isMessageOut()) {
+				report.append("ServiceOutputID: " + param.getMessageOutputIdentifier() + CR);
+			}
+			
+			report.append("Internal Type: " + param.getType().toString() + CR);
+		}
+		
+		// show report
+		logger.info(report.toString());
+	}
+	
+	
+	@Test
+	public void localPlainRepoTest() {
+		// create string buffer for the package report
+		StringBuffer report = new StringBuffer(CR);
+		
+		// Arrange
+		File packageFolder = new File(packageFolderName);
+		logger.info("Adding plain folder repo: " + packageFolder.getAbsolutePath());
+
+		// Act
+		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromPlainFolder(packageFolder);
 
 		// Assert
 		Assert.assertTrue(mcRep.providesFunction(zTransformFunctionID));
