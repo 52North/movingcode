@@ -39,7 +39,7 @@ import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
 public class ArcToolboxPackageTest extends MCRuntimeTestConfig{
 
-	private static final String packageFileName = "src/test/resources/testpackages/arcgis_ndvi_tbx.zip";
+	private static final String packageFileName = "src/test/resources/testpackages/arctoolbox_ndvi.zip";
 
 	private static final String nir_data = "src/test/resources/testpackages/arctoolbox_ndvi/testdata/nir.tif";
 	private static final String nir_id = "NIR";

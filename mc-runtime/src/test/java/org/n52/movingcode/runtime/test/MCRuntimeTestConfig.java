@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 
 public class MCRuntimeTestConfig {
 
-	static final String feedURL = "http://141.30.100.178/gpfeed/gpfeed.xml";
+	static final String feedURL = "http://141.30.100.178/gpfeed2/gpfeed.xml";
 
 	static Logger logger = Logger.getLogger(MCRuntimeTestConfig.class);
 	
