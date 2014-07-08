@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Description for zTransformation process Author: Matthias Mueller, TU 
+	Dresden Website: http://tu-dresden.de/fgh/geo/gis -->
+<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.1.0"
+	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.1.0
+						http://gis.geo.tu-dresden.de/movingcode/1.1.0/CodePackage.xsd"
+	mc:packageId="org.n52.movingcode.runtime.test.bad_package_structure"
+	mc:timestamp="2014-07-08T09:00:00Z">
+	<mc:functionality>
+		<mc:wps100ProcessDescription
+			wps:processVersion="org.n52.movingcode.runtime.test.bad_package_structure::2014-07-08T09:00:00Z">
+			<ows:Identifier>de.tu-dresden.geo.gis.algorithms.raster.ztransform</ows:Identifier>
+			<ows:Title>z-Transformation for raster data (cell wise)</ows:Title>
+			<ows:Abstract>Computes a z-transform cell by cell</ows:Abstract>
+			<DataInputs>
+				<Input minOccurs="2" maxOccurs="1000">
+					<ows:Identifier>STATS_RASTER</ows:Identifier>
+					<ows:Title>Statistics Rasters</ows:Title>
+					<ows:Abstract>collection of single band rasters to compute a reference sigma and mean from</ows:Abstract>
+					<ComplexData>
+						<Default>
+							<Format>
+								<MimeType>application/geotiff</MimeType>
+								<Schema></Schema>
+							</Format>
+						</Default>
+						<Supported>
+							<Format>
+								<MimeType>application/geotiff</MimeType>
+								<Schema></Schema>
+							</Format>
+						</Supported>
+					</ComplexData>
+				</Input>
+				<Input minOccurs="1" maxOccurs="1">
+					<ows:Identifier>REFERENCE_RASTER</ows:Identifier>
+					<ows:Title>Reference Raster X</ows:Title>
+					<ows:Abstract>A single band raster that shall be z-transformed</ows:Abstract>
+					<ComplexData>
+						<Default>
+							<Format>
+								<MimeType>application/geotiff</MimeType>
+								<Schema></Schema>
+							</Format>
+						</Default>
+						<Supported>
+							<Format>
+								<MimeType>application/geotiff</MimeType>
+								<Schema></Schema>
+							</Format>
+						</Supported>
+					</ComplexData>
+				</Input>
+			</DataInputs>
+			<ProcessOutputs>
+				<Output>
+					<ows:Identifier>ZTRANSFORM</ows:Identifier>
+					<ows:Title>z-transformed reference raster X</ows:Title>
+					<ows:Abstract>a z-transformed single band raster</ows:Abstract>
+					<ComplexOutput>
+						<Default>
+							<Format>
+								<MimeType>application/geotiff</MimeType>
+								<Schema></Schema>
+							</Format>
+						</Default>
+						<Supported>
+							<Format>
+								<MimeType>application/geotiff</MimeType>
+								<Schema></Schema>
+							</Format>
+						</Supported>
+					</ComplexOutput>
+				</Output>
+			</ProcessOutputs>
+		</mc:wps100ProcessDescription>
+	</mc:functionality>
+	<mc:platform>
+		<mc:requiredRuntimeComponent>urn:n52:lib:python:2.6</mc:requiredRuntimeComponent>
+		<mc:requiredRuntimeComponent>urn:n52:lib:gdal:1.8</mc:requiredRuntimeComponent>
+	</mc:platform>
+	<mc:platform>
+		<mc:requiredRuntimeComponent>urn:n52:lib:python:2.5</mc:requiredRuntimeComponent>
+		<mc:requiredRuntimeComponent>urn:n52:lib:gdal:1.8</mc:requiredRuntimeComponent>
+	</mc:platform>
+	<mc:infrastructure>
+		<mc:occi.compute.memory>0.1</mc:occi.compute.memory>
+	</mc:infrastructure>
+	<mc:exploitationRights>
+		<mc:creativeCommonsLicense>
+			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>
+			<mc:dct.title>de.tu-dresden.geo.gis.algorithms.raster.ztransform</mc:dct.title>
+			<mc:cc.attributionName>Matthias Mueller</mc:cc.attributionName>
+			<mc:cc.attributionURL>http://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_forst_geo_und_hydrowissenschaften/fachrichtung_geowissenschaften/gis/professur/team/mitarbeiter/mueller.m</mc:cc.attributionURL>
+		</mc:creativeCommonsLicense>
+	</mc:exploitationRights>
+	<mc:workspace>
+		<mc:workspaceRoot>./ztransform</mc:workspaceRoot>
+		<mc:executableLocation>./ztransform.py</mc:executableLocation>
+		<mc:containerType>urn:n52:container:python:2.5</mc:containerType>
+		<mc:executionParameters>
+			<!-- Inputs -->
+			<mc:parameter>
+				<mc:prefixString />
+				<mc:suffixString />
+				<mc:separatorString>
+				</mc:separatorString>
+				<mc:positionID>3</mc:positionID>
+				<mc:functionalInputID>STATS_RASTER</mc:functionalInputID>
+				<mc:functionalOutputID />
+			</mc:parameter>
+			<mc:parameter>
+				<mc:prefixString />
+				<mc:suffixString />
+				<mc:separatorString />
+				<mc:positionID>2</mc:positionID>
+				<mc:functionalInputID>REFERENCE_RASTER</mc:functionalInputID>
+				<mc:functionalOutputID />
+			</mc:parameter>
+			<!-- Outputs -->
+			<mc:parameter>
+				<mc:prefixString />
+				<mc:suffixString />
+				<mc:separatorString />
+				<mc:positionID>1</mc:positionID>
+				<mc:functionalInputID />
+				<mc:functionalOutputID>ZTRANSFORM</mc:functionalOutputID>
+			</mc:parameter>
+		</mc:executionParameters>
+	</mc:workspace>
+</mc:packageDescription>

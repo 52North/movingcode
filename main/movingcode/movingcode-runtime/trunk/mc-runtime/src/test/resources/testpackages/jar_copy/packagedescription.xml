@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Description for echo process Author: Matthias Mueller, TU 
 	Dresden Website: http://tu-dresden.de/fgh/geo/gis -->
-<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
+<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.1.0"
 	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.0.0
-						http://gis.geo.tu-dresden.de/movingcode/1.0.0/descriptions/MovingCodePackage.xsd">
-	<mc:contractedFunctionality>
-		<mc:wpsProcessDescription
-			wps:processVersion="1">
+	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.1.0
+						http://gis.geo.tu-dresden.de/movingcode/1.1.0/CodePackage.xsd"
+	mc:packageId="org.n52.movingcode.runtime.test.jar_copy"
+	mc:timestamp="2014-07-08T09:00:00Z">
+	<mc:functionality>
+		<mc:wps100ProcessDescription
+			wps:processVersion="org.n52.movingcode.runtime.test.jar_copy::2014-07-08T09:00:00Z">
 			<ows:Identifier>de.tu-dresden.geo.gis.algorithms.test.echo</ows:Identifier>
 			<ows:Title>Echo process</ows:Title>
 			<ows:Abstract>Returns the input</ows:Abstract>
@@ -51,13 +53,13 @@
 					</ComplexOutput>
 				</Output>
 			</ProcessOutputs>
-		</mc:wpsProcessDescription>
-	</mc:contractedFunctionality>
-	<mc:contractedPlatform mc:platformId="http://gis.geo.tu-dresden.de/movingcode/platformregistry/platform/java-1.6"/>
-	<mc:contractedInfrastructure>
+		</mc:wps100ProcessDescription>
+	</mc:functionality>
+	<mc:platform mc:platformId="http://gis.geo.tu-dresden.de/movingcode/platformregistry/platform/java-1.6"/>
+	<mc:infrastructure>
 		<mc:occi.compute.memory>0.1</mc:occi.compute.memory>
 		<mc:occi.storage.size>0.01</mc:occi.storage.size>
-	</mc:contractedInfrastructure>
+	</mc:infrastructure>
 	<mc:exploitationRights>
 		<mc:creativeCommonsLicense>
 			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>

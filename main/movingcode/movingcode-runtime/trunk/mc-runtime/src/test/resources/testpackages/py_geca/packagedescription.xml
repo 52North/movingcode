@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.0.0"
+<mc:packageDescription xmlns:mc="http://gis.geo.tu-dresden.de/movingcode/1.1.0"
 	xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.0.0
-						http://gis.geo.tu-dresden.de/movingcode/1.0.0/descriptions/MovingCodePackage.xsd">
-	<mc:contractedFunctionality>
-		<mc:wpsProcessDescription
-			wps:processVersion="1">
+	xsi:schemaLocation="http://gis.geo.tu-dresden.de/movingcode/1.1.0
+						http://gis.geo.tu-dresden.de/movingcode/1.1.0/CodePackage.xsd"
+	mc:packageId="org.n52.movingcode.runtime.test.py_geca"
+	mc:timestamp="2014-07-08T09:00:00Z">
+	<mc:functionality>
+		<mc:wps100ProcessDescription
+			wps:processVersion="org.n52.movingcode.runtime.test.py_geca::2014-07-08T09:00:00Z">
 			<ows:Identifier>org.geoviqua.geca.intercomparison</ows:Identifier>
 			<ows:Title>GECA-Intercomparison</ows:Title>
 			<ows:Abstract>GECA Satellite Data Intercomparison</ows:Abstract>
@@ -108,18 +110,18 @@
 					</ComplexOutput>
 				</Output>
 			</ProcessOutputs>
-		</mc:wpsProcessDescription>
-	</mc:contractedFunctionality>
-	<mc:contractedPlatform>
+		</mc:wps100ProcessDescription>
+	</mc:functionality>
+	<mc:platform>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.6</mc:requiredRuntimeComponent>
-	</mc:contractedPlatform>
-	<mc:contractedPlatform>
+	</mc:platform>
+	<mc:platform>
 		<mc:requiredRuntimeComponent>http://gis.geo.tu-dresden.de/movingcode/platformregistry/component/python-2.7</mc:requiredRuntimeComponent>
-	</mc:contractedPlatform>
-	<mc:contractedInfrastructure>
+	</mc:platform>
+	<mc:infrastructure>
 		<mc:occi.compute.memory>0.1</mc:occi.compute.memory>
 		<mc:occi.storage.size>0.5</mc:occi.storage.size>
-	</mc:contractedInfrastructure>
+	</mc:infrastructure>
 	<mc:exploitationRights>
 		<mc:creativeCommonsLicense>
 			<mc:cc.license>http://creativecommons.org/licenses/by-sa/3.0/</mc:cc.license>
