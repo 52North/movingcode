@@ -26,13 +26,18 @@ package org.n52.movingcode.runtime.coderepository;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
 
 
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.PID;
@@ -103,6 +108,30 @@ public class RepositoryUtils {
 				return new PID(null,null);
 			}
 		}
+	}
+	
+	/**
+	 * Helper method: returns the modification date of a given file.
+	 * 
+	 * @param file
+	 *        - the file
+	 * @return DateTime - date of last modification
+	 */
+	public static final DateTime getTimestamp(File file) {
+		return new DateTime(file.lastModified());
+	}
+	
+	/**
+	 * Static helper method to determine when a directory or its content has been modified last time.
+	 * 
+	 * @param directory
+	 *        {@link File}
+	 * @return last modification date {@link DateTime}
+	 */
+	public static final DateTime getLastModified(File directory) {
+		List<File> files = new ArrayList<File>(FileUtils.listFiles(directory, null, true));
+		Collections.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
+		return new DateTime(files.get(0).lastModified());
 	}
 	
 //	/**
