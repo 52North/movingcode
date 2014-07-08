@@ -25,17 +25,19 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.xmlbeans.XmlException;
-import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -74,8 +76,6 @@ public final class LocalPlainRepository extends AbstractRepository {
 	
 	private Timer timerDaemon;
 	
-	private final String codeSpace;
-	
 	
 	/**
 	 * 
@@ -86,8 +86,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 * @param sourceDirectory {@link File} - the directory to be scanned for Moving Code Packages.
 	 * 
 	 */
-	public LocalPlainRepository(String codeSpace, File sourceDirectory) {
-		this.codeSpace = codeSpace;
+	public LocalPlainRepository(File sourceDirectory) {
 		this.directory = sourceDirectory;
 		// compute directory fingerprint
 		fingerprint = RepositoryUtils.directoryFingerprint(directory);
@@ -106,20 +105,21 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 */
 	private final void load(){
 		// recursively obtain all zipfiles in sourceDirectory
-		Collection<File> packageFolders = scanForFolders(directory);
+		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
+		Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
 
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
 		
 		
-		for (File currentFolder : packageFolders) {
+		for (Path currentFolder : potentialPackageFolders) {
 			
 			// attempt to read packageDescription XML
-			File packageDescriptionFile = new File(currentFolder, Constants.PACKAGE_DESCRIPTION_XML);
+			File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
 			if (!packageDescriptionFile.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
 			
-			PackageDescriptionDocument pd;
+			PackageDescriptionDocument pd = null;
 			try {
 				pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
 			} catch (XmlException e) {
@@ -135,12 +135,10 @@ public final class LocalPlainRepository extends AbstractRepository {
 			if (workspace.startsWith("./")){
 				workspace = workspace.substring(2); // remove leading "./" if it exists
 			}
-			File workspaceDir = new File(currentFolder, workspace);
+			File workspaceDir = new File(currentFolder.toFile(), workspace);
 			if (!workspaceDir.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
-			
-			logger.info("Found package: " + currentFolder + "; using ID: " + pd.getPackageDescription().getPackageId());
 
 			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd);
 			// validate
@@ -148,22 +146,60 @@ public final class LocalPlainRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				register(mcPackage);
+				logger.info("Found package: " + currentFolder + "; using ID: " + pd.getPackageDescription().getPackageId());
 			}
 			else {
-				logger.error(currentFolder.getAbsolutePath() + " is an invalid package.");
+				logger.error(currentFolder + " is an invalid package.");
 			}
 		}
 	}
 	
-	/**
-	 * Scans a directory for subfolders (i.e. immediate child folders) and adds them
-	 * to the resulting Collection.
-	 * 
-	 * @param directory {@link File} - parent directory to scan.
-	 * @return {@link Collection} of {@link File} - the directories found
-	 */
-	private static final Collection<File> scanForFolders(File directory) {
-		return FileUtils.listFiles(directory, FileFilterUtils.directoryFileFilter(), null);
+	
+//	/**
+//	 * Scans a directory for subfolders (i.e. immediate child folders) and adds their absolute paths
+//	 * to the resulting Collection.
+//	 * 
+//	 * 
+//	 * @param rootDir - directory to scan.
+//	 * @param recursive - if <code>true</code> a recursive scan is perfomed
+//	 * @return - the directories found
+//	 */
+//	private static final Collection<String> listSubdirs(String rootDir, boolean recursive){
+//		
+//		
+//		File root = new File(rootDir);
+//		File[] folders = root.listFiles((FileFilter)(FileFilterUtils.directoryFileFilter()));
+//		
+//		for(File folder : folders){
+//			dirs.addAll(listSubdirs(folder.getAbsolutePath(), true));
+//		}
+//		
+//		root = null;
+//		folders = null;
+//		
+//		return dirs;
+//	}
+	
+	
+	private static final Collection<Path> listSubdirs(Path path) {
+		Collection<Path> dirs = new HashSet<Path>();
+		DirectoryStream<Path> stream;
+		try {
+			stream = Files.newDirectoryStream(path);
+			for (Path entry : stream) {
+		        if (Files.isDirectory(entry)) {
+		        	dirs.add(entry);
+		            dirs.addAll(listSubdirs(entry));
+		        }
+//		        files.add(entry);
+		    }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+	    
+	    return dirs;
 	}
 
 	/**

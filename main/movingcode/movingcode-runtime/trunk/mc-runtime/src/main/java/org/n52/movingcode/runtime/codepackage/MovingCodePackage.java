@@ -238,7 +238,11 @@ public class MovingCodePackage {
 	 * @return boolean - true if content is valid, false if not
 	 */
 	public boolean isValid() {
-
+		
+		if(this.packageDescription == null){
+			return false;
+		}
+		
 		// a valid MovingCodePackage MUST have an identifier
 		if (this.functionIdentifier == null) {
 			return false;
