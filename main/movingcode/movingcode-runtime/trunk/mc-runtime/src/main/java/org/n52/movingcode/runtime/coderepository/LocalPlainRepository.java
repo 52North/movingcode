@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
@@ -43,7 +42,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 
 /**
  * This class implements an {@link IMovingCodeRepository} for local plain (unzipped) packages, stored
- * in a flat folder structure. This folder structure shall have the following appearance:
+ * in a nested folder structure. This folder structure shall have the following appearance:
  * 
  * <absPath>-<folder1>-<packagedescription.xml>
  *          |         \<workspacefolder1>
@@ -59,10 +58,11 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  *          -<folderN>-<processdescriptionN>
  *                    \<workspacefolderN>
  * 
- * For any sub-folders found in <absPath> it will be assumed that it contains a plain (unzipped)
- * Moving Code package.
+ * For any sub-folder found in <absPath> it will be assumed that it potentially contains a plain (unzipped)
+ * Code Package. Thus, if the parser encounters any <packagedescription.xml> file, it will attempt an
+ * interpretation as a package description.
  * 
- * Performs occasional checks for updated content.
+ * This Repo performs occasional checks for updated content.
  * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
  * 
  * @author Matthias Mueller, TU Dresden
@@ -200,29 +200,6 @@ public final class LocalPlainRepository extends AbstractRepository {
 	    
 	    
 	    return dirs;
-	}
-
-	/**
-	 * Finds the last modified date of a directory by scanning it's contents
-	 * 
-	 * TODO: does this also check the modification date of directories?
-	 * 
-	 * @param directory {@link File} - the directory to be scanned
-	 * @return 
-	 */
-	private static final long lastFileModified(File directory) {
-		// recursively find all files in subdirectory 
-		Collection<File> files = FileUtils.listFiles(directory, null, true);
-		
-		// initialize with modification date of the directory argument
-		long lastMod = directory.lastModified(); 
-		
-		for (File file : files) {
-			if (file.lastModified() > lastMod) {
-				lastMod = file.lastModified();
-			}
-		}
-		return lastMod;
 	}
 	
 	/**

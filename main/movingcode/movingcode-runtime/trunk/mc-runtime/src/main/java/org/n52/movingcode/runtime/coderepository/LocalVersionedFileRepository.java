@@ -34,7 +34,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.jackrabbit.uuid.UUID;
 import org.apache.xmlbeans.XmlException;
-import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
@@ -47,21 +46,17 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * in a flat folder structure. This folder structure shall have the following appearance:
  * 
  * <absPath>-<folder1>-<packagedescription.xml>
- * 			|         \<package.id>
  *          |         \<workspacefolder1>
  *          |
  *          -<folder2>-<packagedescription.xml>
- *          |         \<package.id>
  *          |         \<workspacefolder2>
  *          |
  *          -<folder3>-<packagedescription.xml>
- *          |         \<package.id>
  *          |         \<workspacefolder3>
  *          |
  *          ...
  *          |
  *          -<folderN>-<processdescriptionN>
- *                    \<package.id>
  *                    \<workspacefolderN>
  * 
  * For any sub-folders found in <absPath> it will be assumed that it contains a plain (unzipped)
@@ -69,17 +64,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * The file <packagedescription.xml> contains the description of the MovingCode package.
  * 
- * The file <package.id> contains the hierarchical ID of that package, usually a URL path or path fragment.
- * The following layout / mapping is used:
- * (mapping to {@link PackageID})
- * 
- * <packageroot>/<username>/<collectionname>/<packagename>/<timestamp>
- * 
- * pageroot => namespace
- * identifier => <username>/<collectionname>/<packagename>
- * timestamp => version
- * 
- * Performs occasional checks for updated content.
+ * This Repo performs occasional checks for updated content.
  * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
  * 
  * @author Matthias Mueller, TU Dresden

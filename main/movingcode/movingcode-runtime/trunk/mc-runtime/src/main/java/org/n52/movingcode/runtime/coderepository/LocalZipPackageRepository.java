@@ -25,19 +25,39 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
-import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 /**
  * This class implements an {@link IMovingCodeRepository} for local zipped packages, stored
- * in a folder structure.
+ * in a possibly nested folder structure.
  * 
- * Performs occasional checks for updated content.
+ * <absPath>-<folder1>\<zip1.1>
+ *          |         \<zip1.2>
+ *          |         \<zip1.3>
+ *          |
+ *          -<folder2>\<zip2.1>
+ *          |         \<zip2.2>
+ *          |
+ *          -<folder3>\<zip3.1>
+ *          |         \<zip1.2>
+ *          |         \<zip1.3>
+ *          |         \<zip1.4>
+ *          |         \<zip1.5>
+ *          |
+ *          ...
+ *          |
+ *          -<folderN>\<zipN.1>
+ *                    \<zipN.2>
+ * 
+ * For any zip file found in <absPath> it will be assumed that it potentially contains a zipped
+ * Code Package. Thus, if the parser encounters a zip file, it will attempt an
+ * interpretation as a Code Package.
+ * 
+ * This Repo performs occasional checks for updated content.
  * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
  * 
  * @author Matthias Mueller, TU Dresden
@@ -135,74 +155,4 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		}
 	}
 	
-	/**
-	 * Normalizes any given packageID so that it can be used to create a local file path.
-	 * The following operations are performed:
-	 * 
-	 * 1. remove {@value #httpPrefix}
-	 * 2. replace any of {@value #separatorReplacements} with a {@value #normalizedFileSeparator}
-	 * 3. collapse consecutive occurrences of {@value #normalizedFileSeparator} to one
-	 * 4. remove a leading {@value #normalizedFileSeparator}
-	 * 5. remove trailing {@value #zipExtension}
-	 * 
-	 * @param {@link String} packageID - some String ID that shall be normalized
-	 * @return {@link String} - the normalized ID
-	 */
-	private static String toNormalizedLocalPath(File file){
-		// 0. get as string
-		String normalizedID = file.getAbsolutePath();
-		
-		// 2. replace any of {@value #separatorReplacements} with a {@value #normalizedFileSeparator}
-		for (String sequence : Constants.separatorReplacements){
-			if (normalizedID.contains(sequence)){
-				StringTokenizer st = new StringTokenizer(normalizedID, sequence);
-				StringBuffer retval = new StringBuffer(st.nextToken());
-				while (st.hasMoreTokens()){
-					retval.append(Constants.normalizedFileSeparator + st.nextToken());
-				}
-				normalizedID = retval.toString();
-			}
-		}
-		
-		// 3. reduce consecutive occurrences of {@link File#separator} to one
-		normalizedID = removeConsecutiveFileSeparator(normalizedID);
-		
-		// 4. remove leading normalizedFileSeparator
-		if (normalizedID.startsWith(Constants.normalizedFileSeparator)){
-			normalizedID = normalizedID.substring(Constants.normalizedFileSeparator.length());
-		}
-		
-		// 5. replace invalid char sequences with File.separator
-		for (String ext : Constants.zipExtensions){
-			if (normalizedID.endsWith(ext)){
-				normalizedID = normalizedID.substring(0, normalizedID.lastIndexOf(ext));
-			}
-		}
-		
-		return normalizedID;
-	}
-	
-	/**
-	 * Remove consecutive occurrences of file separator character in s
-	 * 
-	 * @param s the string to parse.
-	 * @return s without consecutive occurrences of file separator character
-	 */
-	private static String removeConsecutiveFileSeparator(final String s) {
-		StringBuffer res = new StringBuffer();
-		boolean previousWasFileSep = false;
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			if (c == Constants.normalizedFileSeparatorChar) {
-				if (!previousWasFileSep) {
-					res.append(c);
-					previousWasFileSep = true;
-				}
-			} else {
-				previousWasFileSep = false;
-				res.append(c);
-			}
-		}
-		return res.toString();
-	}
 }

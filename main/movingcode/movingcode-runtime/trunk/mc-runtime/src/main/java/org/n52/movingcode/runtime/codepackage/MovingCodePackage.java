@@ -28,11 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
@@ -289,17 +286,6 @@ public class MovingCodePackage {
 	}
 
 	/**
-	 * Helper method: returns the modification date of a given file.
-	 * 
-	 * @param file
-	 *        - the file
-	 * @return DateTime - date of last modification
-	 */
-	private static DateTime getTimestamp(File file) {
-		return new DateTime(file.lastModified());
-	}
-
-	/**
 	 * Static internal method to evaluate a {@link PackageDescriptionDocument} and return the type (i.e. the
 	 * schema) of the functional description.
 	 * 
@@ -319,19 +305,6 @@ public class MovingCodePackage {
 		availableFunctionalDescriptions.add(FunctionalType.WPS100);
 		
 		return availableFunctionalDescriptions;
-	}
-
-	/**
-	 * Static helper method to determine when a directory or its content has been modified last time.
-	 * 
-	 * @param directory
-	 *        {@link File}
-	 * @return last modification date {@link DateTime}
-	 */
-	private DateTime getLastModified(File directory) {
-		List<File> files = new ArrayList<File>(FileUtils.listFiles(directory, null, true));
-		Collections.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
-		return new DateTime(files.get(0).lastModified());
 	}
 
 	@Override
