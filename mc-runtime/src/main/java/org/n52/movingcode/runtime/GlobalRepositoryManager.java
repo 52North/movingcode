@@ -100,9 +100,9 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 */
 	public boolean addLocalPlainRepository(final String directory) {
 		final String repoID = directory;
-			
+		
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(repoID, new File(directory)); 
+		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
 		return registerRepo(repoID, repo);
 	}
 	
@@ -120,7 +120,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		final String repoID = directory;
 			
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(repoID, new File(directory)); 
+		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromZipFilesFolder(new File(directory)); 
 		return registerRepo(repoID, repo);
 
 	}

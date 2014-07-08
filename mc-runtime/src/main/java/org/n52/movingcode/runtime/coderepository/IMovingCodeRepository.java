@@ -163,8 +163,8 @@ public interface IMovingCodeRepository {
 		 * @param sourceDirectory {@link File} - the source directory, which contains all the zipped packages.
 		 * @return {@link IMovingCodeRepository} - an new repository
 		 */
-		public static final IMovingCodeRepository createFromPlainFolder(String codeSpace, File sourceDirectory){
-			return new LocalPlainRepository(codeSpace, sourceDirectory);
+		public static final IMovingCodeRepository createFromPlainFolder( File sourceDirectory){
+			return new LocalPlainRepository(sourceDirectory);
 		}
 		
 		/**
