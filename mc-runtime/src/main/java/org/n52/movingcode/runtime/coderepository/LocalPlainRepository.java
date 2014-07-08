@@ -146,7 +146,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				register(mcPackage);
-				logger.info("Found package: " + currentFolder + "; using ID: " + pd.getPackageDescription().getPackageId());
+				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getVersionedPackageId().toString());
 			}
 			else {
 				logger.error(currentFolder + " is an invalid package.");
