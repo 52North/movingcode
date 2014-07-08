@@ -145,14 +145,6 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		returnReadLock();
 		return retval;
 	}
-
-	@Override
-	public DateTime getPackageTimestamp(PID packageID) {
-		acquireReadLock();
-		DateTime retval = this.packages.get(packageID).getTimestamp();
-		returnReadLock();	
-		return retval;
-	}
 	
 	@Override
 	public PackageDescriptionDocument getPackageDescription(PID packageID) {

@@ -26,7 +26,6 @@ package org.n52.movingcode.runtime.coderepository;
 import java.io.File;
 import java.net.URL;
 
-import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
 
@@ -78,11 +77,6 @@ public interface IMovingCodeRepository {
 	 * 
 	 */
 	public MovingCodePackage[] getPackageByFunction(String functionID);
-
-	/**
-	 * returns the last known update timestamp of a MovingCodePackage
-	 */
-	public DateTime getPackageTimestamp(PID packageId);
 	
 	/**
 	 * returns package description for a given package ID

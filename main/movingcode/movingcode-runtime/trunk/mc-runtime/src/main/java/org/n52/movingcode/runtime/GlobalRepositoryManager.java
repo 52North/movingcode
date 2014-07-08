@@ -330,16 +330,6 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	@Override
-	public DateTime getPackageTimestamp(final PID packageId) {
-		for(IMovingCodeRepository currentRepo : repositories.values()){
-			if (currentRepo.containsPackage(packageId)){
-				currentRepo.getPackage(packageId).getTimestamp();
-			}
-		}
-		return null; 
-	}
-
-	@Override
 	public PackageDescriptionDocument getPackageDescription(PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){

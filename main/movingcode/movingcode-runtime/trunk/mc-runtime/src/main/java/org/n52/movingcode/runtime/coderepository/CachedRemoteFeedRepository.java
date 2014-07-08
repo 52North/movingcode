@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.PID;
 
 /**
@@ -81,6 +80,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * MovingCode packages.  
 	 */
 	private void load(){
+		
 		// 1. check if directory exists
 		//    if not: create and set lastModifiedDate to zero
 		if (!cacheDirectory.exists()){
@@ -124,8 +124,11 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	/**
 	 * Private update method. Updates the content of the local mirror. Usually
 	 * triggered if the remote repository has received an update.
+	 * 
+	 * Synchronized method to avoid race conditions in update threads.
+	 * 
 	 */
-	private void updateLocalMirror(){
+	private synchronized void updateLocalMirror(){
 
 		// clear the mirrors visible contents during the update process
 		// this will inform all change listeners that this repository 
@@ -135,9 +138,6 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		// Since we are the exclusive owner of the localRepoMirror
 		// and no change listener is registered with the local repository,
 		// the update of the underlying content can safely take place
-
-		// release the old mirror - it will be reactivated later on
-		localRepoMirror = null;
 		
 		// perform the content update
 		List<PID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
@@ -147,21 +147,12 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		for (PID currentRemotePID : remotePIDs){
 			
 			// 1. for each remote package: check if it was previously present in mirror
-			// compare without version since this possibly holds a timestamp
-			
 			if (isInMirror(currentRemotePID)){
-				// 2.a if so: check time stamp to determine if it there was a silent update
-				DateTime remoteTimeStamp = remoteRepo.getPackageTimestamp(currentRemotePID);
-				DateTime localTimeStamp = localRepoMirror.getPackageTimestamp(currentRemotePID);
-				if (remoteTimeStamp.isAfter(localTimeStamp)){
-					localRepoMirror.removePackage(currentRemotePID);
-				}
 				// indicate that we have updated/checked this local PID
 				checkedLocalPIDs.add(currentRemotePID);
 			} 
 			// 2. if not: just dump the new package to folder
 			else {
-				// TODO: refactor
 				localRepoMirror.addPackage(remoteRepo.getPackage(currentRemotePID));
 			}
 
@@ -207,6 +198,9 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 		@Override
 		public void run() {
+			// 1. check whether there is another thread of this kind running
+			
+			
 			logger.info("Loading remote repository from URL " +  atomFeedURL.toString());
 			// create new remote repo
 			remoteRepo = new RemoteFeedRepository(atomFeedURL);
