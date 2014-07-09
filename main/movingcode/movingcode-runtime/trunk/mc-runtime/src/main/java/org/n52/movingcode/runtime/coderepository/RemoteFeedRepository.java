@@ -77,7 +77,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 		timerDaemon.scheduleAtFixedRate(new CheckFeed(), 0, IMovingCodeRepository.remotePollingInterval);
 	}
 
-	private void load(){
+	private synchronized void load(){
 		InputStream stream = null;
 		try {
 			logger.debug("Create RemoteFeedRepository from " + atomFeedURL);
@@ -145,6 +145,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 					logger.info("Repository content has silently changed. Running update ...");
 
 					// clear contents and reload
+					// TODO: change behaviour: Do it package by package
 					clear();
 					load();
 
