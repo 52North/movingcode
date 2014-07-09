@@ -26,7 +26,6 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -70,8 +69,13 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		this.atomFeedURL = atomFeedURL;
 		this.cacheDirectory = cacheDirectory;
 
-		// load packages
-		load();
+		// init local mirror
+		// also loads previously mirrored content
+		initLocalMirrotMirror();
+		
+		// trigger initial update from remote repo in separate thread
+		Thread tLoadRemote = new UpdateContentThread();
+		tLoadRemote.start();
 
 	}
 
@@ -79,7 +83,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * private method that encapsulates the logic for loading 
 	 * MovingCode packages.  
 	 */
-	private void load(){
+	private void initLocalMirrotMirror(){
 
 		// 1. check if directory exists
 		//    if not: create and set lastModifiedDate to zero
@@ -100,10 +104,6 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 		// 4. now load the directory contents
 		registerLocalPackages();
-
-		// 5. trigger remote repo init in separate thread
-		Thread tLoadRemote = new LoadRepoThread();
-		tLoadRemote.start();
 
 	}
 
@@ -130,61 +130,40 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 */
 	private synchronized void updateLocalMirror(){
 
-		// clear the mirrors visible contents during the update process
-		// this will inform all change listeners that this repository 
-		// currently has no available packages.
-		clear();
-
-		// Since we are the exclusive owner of the localRepoMirror
-		// and no change listener is registered with the local repository,
-		// the update of the underlying content can safely take place
-
-		// perform the content update
 		List<PID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
-		List<PID> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
-		List<PID> checkedLocalPIDs = new ArrayList<PID>();
-
+		
+		boolean changeOccurred = false;
+		
 		for (PID currentRemotePID : remotePIDs){
-
-			// 1. for each remote package: check if it was previously present in mirror
-			if (isInMirror(currentRemotePID)){
-				// indicate that we have updated/checked this local PID
-				checkedLocalPIDs.add(currentRemotePID);
-			} 
-			// 2. if not: just dump the new package to folder
-			else {
+			
+			// no need to perform validity checks since the remote repo
+			// shall only deliver valid packages
+			
+			// add packages that have not yet been downloaded
+			if(!localRepoMirror.containsPackage(currentRemotePID)){
 				localRepoMirror.addPackage(remoteRepo.getPackage(currentRemotePID));
+				changeOccurred = true;
 			}
 
 		}
-
-		// 3. report unsafe packages (?)
-		// TODO: delete packages, if it really makes sense,
-		// maybe have a trigger or so
-
-		localPIDs.removeAll(checkedLocalPIDs);
-		if(localPIDs.size() != 0){
-			StringBuffer report = new StringBuffer("\n");
-			report.append(
-					"Package folder updated. The following packages are no longer present in the remote feed."
-							+ "However, they will be kept in the local mirror until you manually delete them.\n"
-					);
-			for (PID currentPID : localPIDs){
-				report.append(currentPID + "\n");
+		
+		// remove any packages from repo that are no longer provided by the remote repo
+		for (PID pid : getPackageIDs()){
+			if (!remotePIDs.contains(pid)){
+				unregister(pid);
 			}
-			logger.info(report.toString());
 		}
-		// if everything went well:
-		// set new timeStamp for folder and repo
+		
+		// set to latest update dates
 		mirrorTimestamp = ((RemoteFeedRepository)remoteRepo).lastUpdated();
 		cacheDirectory.setLastModified(mirrorTimestamp.getTime());
-
-
-		// now re-read the local folder
-		registerLocalPackages();
-
-		// ... and inform the change listeners
-		informRepositoryChangeListeners();
+		
+		// inform listeners that this repo has changed
+		if (changeOccurred){
+			logger.info("Repository content has changed. Calling Repository Change Listeners.");
+			informRepositoryChangeListeners();
+		}
+		
 	}
 
 	/**
@@ -194,7 +173,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * @author Matthias Mueller
 	 *
 	 */
-	private final class LoadRepoThread extends Thread {
+	private final class UpdateContentThread extends Thread {
 
 		@Override
 		public void run() {
@@ -219,22 +198,5 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 				updateLocalMirror();
 			}
 		}
-	}
-
-
-	/**
-	 * Does a versioned comparison.
-	 * 
-	 * @param candidate
-	 * @return
-	 */
-	private boolean isInMirror(PID candidate){
-		for (PID id : localRepoMirror.getPackageIDs()){
-			if(id.equals(candidate)){
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
