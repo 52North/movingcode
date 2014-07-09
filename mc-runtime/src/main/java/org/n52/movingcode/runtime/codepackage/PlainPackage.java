@@ -45,14 +45,14 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  */
 final class PlainPackage implements ICodePackage {
-	
+
 	// Two elements for a plain (unzipped) package
 	private final File plainWorkspace;
 	private final PackageDescriptionDocument plainDescription;
-	
+
 	// logger
 	static Logger logger = Logger.getLogger(PlainPackage.class);
-	
+
 	/**
 	 * Constructor to create a {@link PlainPackage} from a plain workspace and process description XML.
 	 * 
@@ -64,7 +64,7 @@ final class PlainPackage implements ICodePackage {
 		this.plainWorkspace = workspace;
 		this.plainDescription = descriptionXML;
 	}
-	
+
 	/**
 	 * Constructor to create a {@link PlainPackage} from a plain workspace and process description XML.
 	 * 
@@ -74,7 +74,7 @@ final class PlainPackage implements ICodePackage {
 	protected PlainPackage(final File workspace, final File descriptionXMLFile) {
 		// register workspace
 		this.plainWorkspace = workspace;
-		
+
 		// try to read package description
 		// will be null if reading fails
 		PackageDescriptionDocument doc = null;
@@ -87,10 +87,10 @@ final class PlainPackage implements ICodePackage {
 		} finally {
 			this.plainDescription = doc;
 		}
-		
+
 		assert this.plainDescription != null;
 	}
-	
+
 	@Override
 	public PackageDescriptionDocument getDescription() {
 		return plainDescription;
@@ -136,7 +136,7 @@ final class PlainPackage implements ICodePackage {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Static private helper method that writes contents of a directory (e.g. a workspace)
 	 * to a {@link ZipOutputStream}.
@@ -164,7 +164,7 @@ final class PlainPackage implements ICodePackage {
 			in.close();
 		}
 	}
-	
+
 	/**
 	 * Static private method that removes the <base> part from an absolute path.
 	 * 
@@ -178,5 +178,5 @@ final class PlainPackage implements ICodePackage {
 		final String relFileName = absFileName.substring(rootLength + 1);
 		return relFileName;
 	}
-	
+
 }

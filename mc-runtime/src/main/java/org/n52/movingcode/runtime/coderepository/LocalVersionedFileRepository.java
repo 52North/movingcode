@@ -71,13 +71,13 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  *
  */
 public class LocalVersionedFileRepository extends AbstractRepository {
-	
+
 	private final File directory;
 	private String fingerprint;
 	private Timer timerDaemon;
-	
+
 	private static final HashMap<PID,String> packageFolders = new HashMap<PID,String>();
-	
+
 	/**
 	 * 
 	 * Constructor for file system based repositories. Scans all sub-directories of a given sourceDirectory
@@ -91,42 +91,42 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		this.directory = sourceDirectory;
 		// compute directory fingerprint
 		fingerprint = RepositoryUtils.directoryFingerprint(directory);
-		
+
 		// load packages from folder
 		load();
-		
+
 		// start timer daemon
 		timerDaemon = new Timer(true);
 		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
 	}
-	
+
 	public synchronized void addPackage(File workspace, PackageDescriptionDocument pd){
 		// 1. create moving code packe object
 		// 2. make new directory with UUID
 		// 3. put packagedescription XML in place
 		// 4. dump workspace to repo
 		// 5. dump packageid to repo
-		
+
 		MovingCodePackage mcp = new MovingCodePackage(workspace, pd);
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
 		mcp.dumpDescription(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
-		
+
 		// 6. register package
 		register(mcp);
 		packageFolders.put(mcp.getVersionedPackageId(), targetDir.getAbsolutePath());
-		
+
 	}
-	
+
 	public synchronized void addPackage(MovingCodePackage mcp){
 		File targetDir = makeNewDirectory();
 		mcp.dumpWorkspace(targetDir);
 		mcp.dumpDescription(new File(targetDir.getAbsolutePath() + File.separator + Constants.PACKAGE_DESCRIPTION_XML));
-		
+
 		// finally: register package
 		register(mcp);
 	}
-	
+
 	/**
 	 * Remove a package with a given ID from this repository
 	 * 
@@ -134,13 +134,13 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 * @return
 	 */
 	public boolean removePackage(PID pid){
-		
+
 		// 1. unregister package, so it cannot be found any longer
 		// 2. remove directory
 		// 3. TODO: care for errors in case something goes wrong to make sure we are
 		//    not left in an undefined state 
 		unregister(pid);
-		
+
 		File packageDir = new File(packageFolders.get(pid));
 		try {
 			FileUtils.cleanDirectory(packageDir);
@@ -150,13 +150,13 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		// 4. remove folder from inventory
 		packageFolders.remove(pid);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * private method that encapsulates the logic for loading zipped
 	 * MovingCode packages from a local folder.  
@@ -166,16 +166,16 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		Collection<File> packageFolders = scanForFolders(directory);
 
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
-		
-		
+
+
 		for (File currentFolder : packageFolders) {
-			
+
 			// attempt to read packageDescription XML
 			File packageDescriptionFile = new File(currentFolder, Constants.PACKAGE_DESCRIPTION_XML);
 			if (!packageDescriptionFile.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
-			
+
 			PackageDescriptionDocument pd;
 			try {
 				pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
@@ -186,10 +186,10 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 				// silently skip this and immediately jump to the next iteration
 				continue;
 			}
-			
+
 			// packageID = absolute path
 			logger.info("Found package: " + currentFolder + "; using ID: " + RepositoryUtils.extractId(pd).toString());
-			
+
 			// attempt to access workspace root folder
 			String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
 			if (workspace.startsWith("./")){
@@ -201,8 +201,8 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			}
 
 			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir);
-			
-			
+
+
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
@@ -214,7 +214,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			}
 		}
 	}
-	
+
 	/**
 	 * Scans a directory for subfolders (i.e. immediate child folders) and adds them
 	 * to the resulting Collection.
@@ -225,7 +225,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	private static final Collection<File> scanForFolders(File directory) {
 		return FileUtils.listFiles(directory, FileFilterUtils.directoryFileFilter(), null);
 	}
-	
+
 	/**
 	 * Generate a new directory.
 	 * 
@@ -237,7 +237,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		newDir.mkdirs();
 		return newDir;
 	}
-	
+
 	/**
 	 * A task which re-computes the directory's fingerprint and
 	 * triggers a content reload if required.
@@ -246,7 +246,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 *
 	 */
 	private final class CheckFolder extends TimerTask {
-		
+
 		@Override
 		public void run() {
 			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
@@ -257,7 +257,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 				// clear an reload
 				clear();
 				load();
-				
+
 				logger.info("Reload finished. Calling Repository Change Listeners.");
 				informRepositoryChangeListeners();
 			}			

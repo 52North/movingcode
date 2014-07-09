@@ -66,11 +66,11 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 public final class LocalZipPackageRepository extends AbstractRepository {
 
 	private static final String[] ZIP_EXTENSION = {"zip"};
-	
+
 	private final File directory;
-	
+
 	private String fingerprint;
-	
+
 	private Timer timerDaemon;
 
 	/**
@@ -86,15 +86,15 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		this.directory = sourceDirectory;
 		// compute directory fingerprint
 		fingerprint = RepositoryUtils.directoryFingerprint(directory);
-		
+
 		// load packages from folder
 		load();
-		
+
 		// start timer daemon
 		timerDaemon = new Timer(true);
 		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
 	}
-	
+
 	private void load(){
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> zipFiles = scanForZipFiles(directory);
@@ -105,7 +105,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			logger.debug("Found package: " + currentFile);
 
 			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
-			
+
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
@@ -115,10 +115,10 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			} else {
 				logger.error(currentFile.getAbsolutePath() + " is an invalid package.");
 			}
-			
+
 		}
 	}
-	
+
 	/**
 	 * Scans a directory recursively for zipFiles and adds them to the global Collection "zipFiles".
 	 * 
@@ -128,7 +128,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	public static Collection<File> scanForZipFiles(File directory) {
 		return FileUtils.listFiles(directory, ZIP_EXTENSION, true);
 	}
-	
+
 	/**
 	 * A task which re-computes the directory's fingerprint and
 	 * triggers a content reload if required.
@@ -137,7 +137,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 	 *
 	 */
 	private final class CheckFolder extends TimerTask {
-		
+
 		@Override
 		public void run() {
 			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
@@ -148,11 +148,11 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 				// clear an reload
 				clear();
 				load();
-				
+
 				logger.info("Reload finished. Calling Repository Change Listeners.");
 				informRepositoryChangeListeners();
 			}			
 		}
 	}
-	
+
 }

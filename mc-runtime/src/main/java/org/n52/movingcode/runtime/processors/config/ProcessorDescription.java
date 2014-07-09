@@ -39,12 +39,12 @@ public class ProcessorDescription {
 	ArrayList<String> platforms = new ArrayList<String>();
 	HashMap<String, String> properties = new HashMap<String, String>();
 	String tempWorkspace = null;
-	
-	
+
+
 	public ProcessorDescription() {
 		super();
 	}
-	
+
 	/**
 	 * Setter for processor ID
 	 * 
@@ -53,7 +53,7 @@ public class ProcessorDescription {
 	public void setId(String processorId){
 		this.id = processorId;
 	}
-	
+
 	/**
 	 * Getter for processor ID
 	 * 
@@ -62,7 +62,7 @@ public class ProcessorDescription {
 	public String getId(){
 		return this.id;
 	}
-	
+
 	/**
 	 * Set new properties Map
 	 * 
@@ -71,7 +71,7 @@ public class ProcessorDescription {
 	public void setProperties(HashMap<String, String> properties){
 		this.properties = properties;
 	}
-	
+
 	/**
 	 * Add a new supported container ID
 	 * 
@@ -80,8 +80,8 @@ public class ProcessorDescription {
 	public void addContainer(String containerId){
 		containers.add(containerId);
 	}
-	
-	
+
+
 	/**
 	 * Add a new supported platform ID
 	 * 
@@ -90,7 +90,7 @@ public class ProcessorDescription {
 	public void addPlatform(String platformId){
 		platforms.add(platformId);
 	}
-	
+
 	/**
 	 * Is a particular platform supported by this processor?
 	 * 
@@ -106,7 +106,7 @@ public class ProcessorDescription {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Is a particular container supported by this processor?
 	 * 
@@ -122,21 +122,21 @@ public class ProcessorDescription {
 		}
 		return false;
 	}
-	
-	
+
+
 	public String[] getContainers(){
 		return containers.toArray(new String[containers.size()]);
 	}
-	
+
 	public HashMap<String,String> getProperties(){
 		return properties;
 	}
-	
+
 	public String[] getPlatforms(){
 		return platforms.toArray(new String[platforms.size()]);
 	}
-	
-	
+
+
 	/**
 	 * Getter for processor specific properties.
 	 * 
@@ -146,7 +146,7 @@ public class ProcessorDescription {
 	public String getProperty(String key){
 		return properties.get(key);
 	}
-	
+
 	/**
 	 * @return the tempWorkspace
 	 */
@@ -160,7 +160,7 @@ public class ProcessorDescription {
 	public void setTempWorkspace(String tempWorkspace) {
 		this.tempWorkspace = tempWorkspace;
 	}
-	
-	
-	
+
+
+
 }

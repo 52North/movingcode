@@ -47,198 +47,198 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 final class ZippedPackage implements ICodePackage {
 
-    // local copy of the zipped package
-    private final File zipFile;
+	// local copy of the zipped package
+	private final File zipFile;
 
-    // Web location (URL) of the zipped package
-    private final URL zipURL;
+	// Web location (URL) of the zipped package
+	private final URL zipURL;
 
-    static Logger logger = Logger.getLogger(ZippedPackage.class);
+	static Logger logger = Logger.getLogger(ZippedPackage.class);
 
-    /**
-     * Constructor to create a {@link ZippedPackage} from a local zipfile (i.e. a zipped package).
-     * 
-     * @param zipURL
-     */
-    protected ZippedPackage(final File zipFile) {
-        this.zipFile = zipFile;
-        this.zipURL = null;
-    }
+	/**
+	 * Constructor to create a {@link ZippedPackage} from a local zipfile (i.e. a zipped package).
+	 * 
+	 * @param zipURL
+	 */
+	protected ZippedPackage(final File zipFile) {
+		this.zipFile = zipFile;
+		this.zipURL = null;
+	}
 
-    /**
-     * Constructor to create a {@link ZippedPackage} from a Web location. (Which points to a zipped package)
-     * 
-     * @param zipURL
-     */
-    protected ZippedPackage(final URL zipURL) {
-        this.zipURL = zipURL;
-        this.zipFile = null;
-    }
+	/**
+	 * Constructor to create a {@link ZippedPackage} from a Web location. (Which points to a zipped package)
+	 * 
+	 * @param zipURL
+	 */
+	protected ZippedPackage(final URL zipURL) {
+		this.zipURL = zipURL;
+		this.zipFile = null;
+	}
 
-    @Override
-    public final PackageDescriptionDocument getDescription() {
-        return extractDescription(this);
-    }
+	@Override
+	public final PackageDescriptionDocument getDescription() {
+		return extractDescription(this);
+	}
 
-    @Override
-    public final void dumpPackage(String workspaceDirName, File targetDirectory) {
-        unzipWorkspace(this, workspaceDirName, targetDirectory);
-    }
+	@Override
+	public final void dumpPackage(String workspaceDirName, File targetDirectory) {
+		unzipWorkspace(this, workspaceDirName, targetDirectory);
+	}
 
-    /**
-     * Static private method to extract the description from a package
-     * 
-     * @param archive
-     *        {@link ZippedPackage}
-     * @return {@link PackageDescriptionDocument}
-     */
-    private static PackageDescriptionDocument extractDescription(ZippedPackage archive) {
+	/**
+	 * Static private method to extract the description from a package
+	 * 
+	 * @param archive
+	 *        {@link ZippedPackage}
+	 * @return {@link PackageDescriptionDocument}
+	 */
+	private static PackageDescriptionDocument extractDescription(ZippedPackage archive) {
 
-        // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
-        String archiveName = null;
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
+		String archiveName = null;
 
-        try {
+		try {
 
-            ZipInputStream zis = null;
-            if (archive.zipFile != null) {
-                zis = new ZipInputStream(new FileInputStream(archive.zipFile));
-                archiveName = archive.zipFile.getAbsolutePath();
-            }
-            else if (archive.zipURL != null) {
-                zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
-                archiveName = archive.zipURL.toString();
-            }
+			ZipInputStream zis = null;
+			if (archive.zipFile != null) {
+				zis = new ZipInputStream(new FileInputStream(archive.zipFile));
+				archiveName = archive.zipFile.getAbsolutePath();
+			}
+			else if (archive.zipURL != null) {
+				zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
+				archiveName = archive.zipURL.toString();
+			}
 
-            ZipEntry entry;
+			ZipEntry entry;
 
-            while ( (entry = zis.getNextEntry()) != null) {
-                if (entry.getName().equalsIgnoreCase(Constants.PACKAGE_DESCRIPTION_XML)) {
-                	PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(zis);
-                	zis.close();
-                    return doc;
-                }
-                zis.closeEntry();
-            }
+			while ( (entry = zis.getNextEntry()) != null) {
+				if (entry.getName().equalsIgnoreCase(Constants.PACKAGE_DESCRIPTION_XML)) {
+					PackageDescriptionDocument doc = PackageDescriptionDocument.Factory.parse(zis);
+					zis.close();
+					return doc;
+				}
+				zis.closeEntry();
+			}
 
-        }
-        catch (ZipException e) {
-            logger.error("Error! Could read from archive: " + archiveName);
-        }
-        catch (IOException e) {
-            logger.error("Error! Could not open archive: " + archiveName);
-        }
-        catch (XmlException e) {
-            logger.error("Error! Could not parse package description from archive: " + archiveName);
-        }
-        return null;
-    }
+		}
+		catch (ZipException e) {
+			logger.error("Error! Could read from archive: " + archiveName);
+		}
+		catch (IOException e) {
+			logger.error("Error! Could not open archive: " + archiveName);
+		}
+		catch (XmlException e) {
+			logger.error("Error! Could not parse package description from archive: " + archiveName);
+		}
+		return null;
+	}
 
-    /**
-     * Static private method that creates an unzipped copy of the archive.
-     * 
-     * @param archive
-     *        {@link ZippedPackage}
-     * @param workspaceDirName
-     *        {@link String}
-     * @param targetDirectory
-     *        {@link File}
-     */
-    private static void unzipWorkspace(ZippedPackage archive, String workspaceDirName, File targetDirectory) {
+	/**
+	 * Static private method that creates an unzipped copy of the archive.
+	 * 
+	 * @param archive
+	 *        {@link ZippedPackage}
+	 * @param workspaceDirName
+	 *        {@link String}
+	 * @param targetDirectory
+	 *        {@link File}
+	 */
+	private static void unzipWorkspace(ZippedPackage archive, String workspaceDirName, File targetDirectory) {
 
-        // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
-        String archiveName = null;
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (archive.zipFile == null) && (archive.zipURL == null)));
+		String archiveName = null;
 
-        String wdName = workspaceDirName;
-        if (wdName.startsWith("./") || workspaceDirName.startsWith(".\\")) {
-            wdName = wdName.substring(2);
-        }
+		String wdName = workspaceDirName;
+		if (wdName.startsWith("./") || workspaceDirName.startsWith(".\\")) {
+			wdName = wdName.substring(2);
+		}
 
-        try {
+		try {
 
-            ZipInputStream zis = null;
-            if (archive.zipFile != null) {
-                zis = new ZipInputStream(new FileInputStream(archive.zipFile));
-                archiveName = archive.zipFile.getAbsolutePath();
-            }
-            else if (archive.zipURL != null) {
-                zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
-                archiveName = archive.zipURL.toString();
-            }
+			ZipInputStream zis = null;
+			if (archive.zipFile != null) {
+				zis = new ZipInputStream(new FileInputStream(archive.zipFile));
+				archiveName = archive.zipFile.getAbsolutePath();
+			}
+			else if (archive.zipURL != null) {
+				zis = new ZipInputStream(archive.zipURL.openConnection().getInputStream());
+				archiveName = archive.zipURL.toString();
+			}
 
-            ZipEntry entry;
-            while ( (entry = zis.getNextEntry()) != null) {
-                if (entry.getName().startsWith(wdName)) {
+			ZipEntry entry;
+			while ( (entry = zis.getNextEntry()) != null) {
+				if (entry.getName().startsWith(wdName)) {
 
-                    String fileName = entry.getName();
-                    File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
+					String fileName = entry.getName();
+					File newFile = new File(targetDirectory.getAbsolutePath() + File.separator + fileName);
 
-                    // create all required directories
-                    new File(newFile.getParent()).mkdirs();
+					// create all required directories
+					new File(newFile.getParent()).mkdirs();
 
-                    // if current zip entry is not a directory, do unzip
-                    if ( !entry.isDirectory()) {
-                        FileOutputStream fos = new FileOutputStream(newFile);
-                        IOUtils.copy(zis, fos);
-                        fos.close();
-                    }
-                }
-                zis.closeEntry();
-            }
-            if (zis != null) {
-                zis.close();
-            }
-        }
-        catch (ZipException e) {
-            logger.error("Error! Could read from archive: " + archiveName);
-        }
-        catch (IOException e) {
-            logger.error("Error! Could not open archive: " + archiveName);
-        }
-        catch (NullPointerException e) {
-            logger.error("No archive has been declared. This should not happen ...");
-        }
-    }
+					// if current zip entry is not a directory, do unzip
+					if ( !entry.isDirectory()) {
+						FileOutputStream fos = new FileOutputStream(newFile);
+						IOUtils.copy(zis, fos);
+						fos.close();
+					}
+				}
+				zis.closeEntry();
+			}
+			if (zis != null) {
+				zis.close();
+			}
+		}
+		catch (ZipException e) {
+			logger.error("Error! Could read from archive: " + archiveName);
+		}
+		catch (IOException e) {
+			logger.error("Error! Could not open archive: " + archiveName);
+		}
+		catch (NullPointerException e) {
+			logger.error("No archive has been declared. This should not happen ...");
+		}
+	}
 
-    @Override
-    public boolean dumpPackage(File targetZipFile) {
-        // zipFile and zip url MUST not be null at the same time
-        assert ( ! ( (zipFile == null) && (zipURL == null)));
+	@Override
+	public boolean dumpPackage(File targetZipFile) {
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (zipFile == null) && (zipURL == null)));
 
-        // in case there is a zipped package file on disk
-        if (zipFile != null) {
-            try {
-                FileUtils.copyFile(zipFile, targetZipFile);
-                return true;
-            }
-            catch (Exception e) {
-                return false;
-            }
-            // in case there is no file on disk and but a valid url to a zipped package
-        }
-        else if (zipURL != null) {
-            try {
-                FileUtils.copyURLToFile(zipURL, targetZipFile);
-                return true;
-            }
-            catch (IOException e) {
-                return false;
-            }
-        }
+		// in case there is a zipped package file on disk
+		if (zipFile != null) {
+			try {
+				FileUtils.copyFile(zipFile, targetZipFile);
+				return true;
+			}
+			catch (Exception e) {
+				return false;
+			}
+			// in case there is no file on disk and but a valid url to a zipped package
+		}
+		else if (zipURL != null) {
+			try {
+				FileUtils.copyURLToFile(zipURL, targetZipFile);
+				return true;
+			}
+			catch (IOException e) {
+				return false;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ZippedPackage [zipFile=");
-        builder.append(this.zipFile);
-        builder.append(", zipURL=");
-        builder.append(this.zipURL);
-        builder.append("]");
-        return builder.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ZippedPackage [zipFile=");
+		builder.append(this.zipFile);
+		builder.append(", zipURL=");
+		builder.append(this.zipURL);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

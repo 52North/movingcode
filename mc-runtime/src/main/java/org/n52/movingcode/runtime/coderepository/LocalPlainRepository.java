@@ -31,8 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.Constants;
@@ -69,14 +67,12 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  *
  */
 public final class LocalPlainRepository extends AbstractRepository {
-	
+
 	private final File directory;
-	
-	private String fingerprint;
-	
-	private Timer timerDaemon;
-	
-	
+
+	private final Thread updateThread;
+
+
 	/**
 	 * 
 	 * Constructor for file system based repositories. Scans all sub-directories of a given sourceDirectory
@@ -88,37 +84,34 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 */
 	public LocalPlainRepository(File sourceDirectory) {
 		this.directory = sourceDirectory;
-		// compute directory fingerprint
-		fingerprint = RepositoryUtils.directoryFingerprint(directory);
-		
+
 		// load packages from folder
 		load();
-		
+
 		// start timer daemon
-		timerDaemon = new Timer(true);
-		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
+		updateThread = new UpdateInventoryThread();
 	}
-	
+
 	/**
 	 * private method that encapsulates the logic for loading zipped
 	 * MovingCode packages from a local folder.  
 	 */
 	private final void load(){
-		// recursively obtain all zipfiles in sourceDirectory
+		// recursively obtain all folders in sourceDirectory
 		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
 		Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
 
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
-		
-		
+
+
 		for (Path currentFolder : potentialPackageFolders) {
-			
+
 			// attempt to read packageDescription XML
 			File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
 			if (!packageDescriptionFile.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
-			
+
 			PackageDescriptionDocument pd = null;
 			try {
 				pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
@@ -129,7 +122,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 				// silently skip this and immediately jump to the next iteration
 				continue;
 			}
-			
+
 			// attempt to access workspace root folder
 			String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
 			if (workspace.startsWith("./")){
@@ -153,55 +146,29 @@ public final class LocalPlainRepository extends AbstractRepository {
 			}
 		}
 	}
-	
-	
-//	/**
-//	 * Scans a directory for subfolders (i.e. immediate child folders) and adds their absolute paths
-//	 * to the resulting Collection.
-//	 * 
-//	 * 
-//	 * @param rootDir - directory to scan.
-//	 * @param recursive - if <code>true</code> a recursive scan is perfomed
-//	 * @return - the directories found
-//	 */
-//	private static final Collection<String> listSubdirs(String rootDir, boolean recursive){
-//		
-//		
-//		File root = new File(rootDir);
-//		File[] folders = root.listFiles((FileFilter)(FileFilterUtils.directoryFileFilter()));
-//		
-//		for(File folder : folders){
-//			dirs.addAll(listSubdirs(folder.getAbsolutePath(), true));
-//		}
-//		
-//		root = null;
-//		folders = null;
-//		
-//		return dirs;
-//	}
-	
-	
+
+
 	private static final Collection<Path> listSubdirs(Path path) {
 		Collection<Path> dirs = new HashSet<Path>();
 		DirectoryStream<Path> stream;
 		try {
 			stream = Files.newDirectoryStream(path);
 			for (Path entry : stream) {
-		        if (Files.isDirectory(entry)) {
-		        	dirs.add(entry);
-		            dirs.addAll(listSubdirs(entry));
-		        }
-//		        files.add(entry);
-		    }
+				if (Files.isDirectory(entry)) {
+					dirs.add(entry);
+					dirs.addAll(listSubdirs(entry));
+				}
+				//		        files.add(entry);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
-	    
-	    return dirs;
+
+
+		return dirs;
 	}
-	
+
 	/**
 	 * A task which re-computes the directory's fingerprint and
 	 * triggers a content reload if required.
@@ -209,22 +176,99 @@ public final class LocalPlainRepository extends AbstractRepository {
 	 * @author Matthias Mueller
 	 *
 	 */
-	private final class CheckFolder extends TimerTask {
-		
+	private final class UpdateInventoryThread extends Thread {
+
+		private static final long updateInterval = IMovingCodeRepository.localPollingInterval;
+
 		@Override
 		public void run() {
-			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
-			if (!newFingerprint.equals(fingerprint)){
-				logger.info("Repository content has silently changed. Running update ...");
-				// set new fingerprint
-				fingerprint = newFingerprint;
-				// clear an reload
-				clear();
-				load();
-				
-				logger.info("Reload finished. Calling Repository Change Listeners.");
-				informRepositoryChangeListeners();
-			}			
+
+			while(true){ // spin forever
+
+				logger.debug("Update thread started."
+						+"\nDirectory: " + directory.getAbsolutePath()
+						+ "\nUpdate interval: " + updateInterval + " milliseconds"
+						);
+
+				try {
+					Thread.sleep(updateInterval);
+				} catch (InterruptedException e1) {
+					logger.debug("Interrupt received. Update thread stopped.");
+					this.interrupt();
+				}
+
+				boolean changeOccurred = false;
+
+				// recursively obtain all folders in sourceDirectory
+				Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
+				Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
+				logger.info("Scanning directory: " + directory.getAbsolutePath());
+
+				for (Path currentFolder : potentialPackageFolders) {
+					// attempt to read packageDescription XML
+					File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
+					if (!packageDescriptionFile.exists()){
+						continue; // skip this and immediately jump to the next iteration
+					}
+
+					PackageDescriptionDocument pd = null;
+					try {
+						pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
+					} catch (XmlException e) {
+						// silently skip this and immediately jump to the next iteration
+						continue;
+					} catch (IOException e) {
+						// silently skip this and immediately jump to the next iteration
+						continue;
+					}
+
+					// attempt to access workspace root folder
+					String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
+					if (workspace.startsWith("./")){
+						workspace = workspace.substring(2); // remove leading "./" if it exists
+					}
+					File workspaceDir = new File(currentFolder.toFile(), workspace);
+					if (!workspaceDir.exists()){
+						continue; // skip this and immediately jump to the next iteration
+					}
+
+					MovingCodePackage candidatePackage = new MovingCodePackage(workspaceDir, pd);
+
+					// validate and add to package map if not yet registered
+					if (candidatePackage.isValid()) {
+						if (!containsPackage(candidatePackage.getVersionedPackageId())){
+							register(candidatePackage);
+							logger.info("Found package: " + currentFolder + "; using ID: " + candidatePackage.getVersionedPackageId().toString());
+							changeOccurred = true;
+						}
+					} else {
+						// if validation fails: report
+						logger.error(currentFolder + " is an invalid package.");
+
+						// attempt removal if it was previously registered
+						try{
+							if (containsPackage(candidatePackage.getVersionedPackageId())){
+								unregister(candidatePackage.getVersionedPackageId());
+							}
+						} catch (Exception e){
+							// silent catch since we could encounter any kind of error with invalid packages
+						}
+					}
+				}
+
+				// inform listeners if this repos has changed
+				if (changeOccurred){
+					logger.info("Repository content has changed. Calling Repository Change Listeners.");
+					informRepositoryChangeListeners();
+				}
+			}
+
 		}
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		updateThread.interrupt();
+		super.finalize();
 	}
 }

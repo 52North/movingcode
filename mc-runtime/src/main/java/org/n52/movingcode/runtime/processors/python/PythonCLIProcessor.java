@@ -141,10 +141,10 @@ public class PythonCLIProcessor extends AbstractProcessor {
 
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 		Executor executor = new DefaultExecutor();
-	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-	    ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-	    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, errorStream);
-	    executor.setStreamHandler(streamHandler);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+		PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, errorStream);
+		executor.setStreamHandler(streamHandler);
 
 		// put a watchdog if required
 		if (timeoutSeconds > 0) {
