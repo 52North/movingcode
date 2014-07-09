@@ -255,7 +255,9 @@ public class MovingCodePackage {
 		}
 
 		// TODO: Identifiers of IO data must be unique!
-
+		
+		// TODO: verify path to executable.
+		
 		// check if there exists a package description
 		// and return the validation result
 		//information on validation errors
