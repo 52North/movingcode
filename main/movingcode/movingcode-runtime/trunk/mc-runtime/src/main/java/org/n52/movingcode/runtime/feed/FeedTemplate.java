@@ -32,55 +32,55 @@ package org.n52.movingcode.runtime.feed;
  * TODO: if so, this could be transformed to a value object
  */
 public class FeedTemplate {
-    private String feedTitle;
-    private String feedSubtitle;
-    private String feedAuthorName;
-    private String feedAuthorEmail;
+	private String feedTitle;
+	private String feedSubtitle;
+	private String feedAuthorName;
+	private String feedAuthorEmail;
 
-    private final String feedURL;
+	private final String feedURL;
 
-    public FeedTemplate(String feedURL) {
-        this.feedURL = feedURL;
-    }
+	public FeedTemplate(String feedURL) {
+		this.feedURL = feedURL;
+	}
 
-    public void setFeedTitle(String feedTitle) {
-        this.feedTitle = feedTitle;
-    }
+	public void setFeedTitle(String feedTitle) {
+		this.feedTitle = feedTitle;
+	}
 
-    public String getFeedTitle() {
-        return this.feedTitle;
-    }
+	public String getFeedTitle() {
+		return this.feedTitle;
+	}
 
-    public void setFeedSubtitle(String feedSubtitle) {
-        this.feedSubtitle = feedSubtitle;
-    }
+	public void setFeedSubtitle(String feedSubtitle) {
+		this.feedSubtitle = feedSubtitle;
+	}
 
-    public String getFeedSubtitle() {
-        return this.feedSubtitle;
-    }
+	public String getFeedSubtitle() {
+		return this.feedSubtitle;
+	}
 
-    public void setFeedAuthorName(String feedAuthorName) {
-        this.feedAuthorName = feedAuthorName;
-    }
+	public void setFeedAuthorName(String feedAuthorName) {
+		this.feedAuthorName = feedAuthorName;
+	}
 
-    public String getFeedAuthorName() {
-        return this.feedAuthorName;
-    }
+	public String getFeedAuthorName() {
+		return this.feedAuthorName;
+	}
 
-    public void setFeedAuthorEmail(String feedAuthorEmail) {
-        this.feedAuthorEmail = feedAuthorEmail;
-    }
+	public void setFeedAuthorEmail(String feedAuthorEmail) {
+		this.feedAuthorEmail = feedAuthorEmail;
+	}
 
-    public String getFeedAuthorEmail() {
-        return this.feedAuthorEmail;
-    }
+	public String getFeedAuthorEmail() {
+		return this.feedAuthorEmail;
+	}
 
-    public String getFeedURL() {
-        return this.feedURL;
-    }
+	public String getFeedURL() {
+		return this.feedURL;
+	}
 
-    public String getID() {
-        return this.feedURL;
-    }
+	public String getID() {
+		return this.feedURL;
+	}
 
 }

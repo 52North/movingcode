@@ -31,7 +31,7 @@ package org.n52.movingcode.runtime.coderepository;
  *
  */
 public interface RepositoryChangeListener {
-	
+
 	/**
 	 * callback is triggered when the repository has been updated.
 	 * @param updatedRepo the updated {@link IMovingCodeRepository}

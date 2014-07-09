@@ -59,75 +59,75 @@ import org.n52.movingcode.runtime.processors.IPlatformComponentProbe;
  */
 public class PythonCLIProbe implements IPlatformComponentProbe {
 
-    private static final int timeout_seconds = 10;
-    private static final String versionScriptFile = "version.py";
+	private static final int timeout_seconds = 10;
+	private static final String versionScriptFile = "version.py";
 
-    public String probe() {
-        // is there a python executable?
-        if ( !testExecutable()) {
-            return null;
-        }
+	public String probe() {
+		// is there a python executable?
+		if ( !testExecutable()) {
+			return null;
+		}
 
-        // return the version string
-        return getVersion();
-    }
+		// return the version string
+		return getVersion();
+	}
 
-    public static boolean testExecutable() {
-        CommandLine commandLine = CommandLine.parse(PythonCLIProcessor.pythonExecutable + " --version");
+	public static boolean testExecutable() {
+		CommandLine commandLine = CommandLine.parse(PythonCLIProcessor.pythonExecutable + " --version");
 
-        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-        Executor executor = new DefaultExecutor();
+		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+		Executor executor = new DefaultExecutor();
 
-        // put a watchdog with a timeout
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(new Long(timeout_seconds) * 1000);
-        executor.setWatchdog(watchdog);
+		// put a watchdog with a timeout
+		ExecuteWatchdog watchdog = new ExecuteWatchdog(new Long(timeout_seconds) * 1000);
+		executor.setWatchdog(watchdog);
 
-        try {
-            executor.execute(commandLine, resultHandler);
-            resultHandler.waitFor();
-            int exitVal = resultHandler.getExitValue();
-            if (exitVal != 0) {
-                return false;
-            }
-            return true;
-        }
-        catch (Exception e) {
-            return false;
-        }
-    }
+		try {
+			executor.execute(commandLine, resultHandler);
+			resultHandler.waitFor();
+			int exitVal = resultHandler.getExitValue();
+			if (exitVal != 0) {
+				return false;
+			}
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
 
-    public static String getVersion() {
+	public static String getVersion() {
 
-        try {
-            URL scriptURL = PythonCLIProbe.class.getResource(versionScriptFile);
-            File sf = new File(scriptURL.toURI());
-            String scriptPath = sf.getAbsolutePath();
+		try {
+			URL scriptURL = PythonCLIProbe.class.getResource(versionScriptFile);
+			File sf = new File(scriptURL.toURI());
+			String scriptPath = sf.getAbsolutePath();
 
-            CommandLine commandLine = CommandLine.parse(PythonCLIProcessor.pythonExecutable + " " + scriptPath);
+			CommandLine commandLine = CommandLine.parse(PythonCLIProcessor.pythonExecutable + " " + scriptPath);
 
-            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-            Executor executor = new DefaultExecutor();
+			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+			Executor executor = new DefaultExecutor();
 
-            // put a watchdog with a timeout
-            ExecuteWatchdog watchdog = new ExecuteWatchdog(new Long(timeout_seconds) * 1000);
-            executor.setWatchdog(watchdog);
+			// put a watchdog with a timeout
+			ExecuteWatchdog watchdog = new ExecuteWatchdog(new Long(timeout_seconds) * 1000);
+			executor.setWatchdog(watchdog);
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            PumpStreamHandler psh = new PumpStreamHandler(os);
-            executor.setStreamHandler(psh);
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			PumpStreamHandler psh = new PumpStreamHandler(os);
+			executor.setStreamHandler(psh);
 
-            executor.execute(commandLine, resultHandler);
-            resultHandler.waitFor();
-            int exitVal = resultHandler.getExitValue();
-            if (exitVal != 0) {
-                return null;
-            }
+			executor.execute(commandLine, resultHandler);
+			resultHandler.waitFor();
+			int exitVal = resultHandler.getExitValue();
+			if (exitVal != 0) {
+				return null;
+			}
 
-            return (os.toString());
+			return (os.toString());
 
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
 }

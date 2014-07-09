@@ -86,7 +86,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		returnWriteLock();
 		informRepositoryChangeListeners();
 	}
-	
+
 	/**
 	 * Protected method for un-registering packages with this repository.
 	 * Removes a package from {@link AbstractRepository#packages} and
@@ -100,7 +100,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 			String fID = getPackage(packageID).getFunctionIdentifier();
 			fIDpID_Lookup.remove(fID, packageID);
 		}
-		
+
 		returnWriteLock();
 		informRepositoryChangeListeners();
 	}
@@ -144,7 +144,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		returnReadLock();
 		return retval;
 	}
-	
+
 	@Override
 	public PackageDescriptionDocument getPackageDescription(PID packageID) {
 		acquireReadLock();
@@ -224,7 +224,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 		this.fIDpID_Lookup = ArrayListMultimap.create();
 
 		returnWriteLock();
-		
+
 		// inform change listeners
 		informRepositoryChangeListeners();
 	}

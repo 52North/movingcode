@@ -80,7 +80,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * MovingCode packages.  
 	 */
 	private void load(){
-		
+
 		// 1. check if directory exists
 		//    if not: create and set lastModifiedDate to zero
 		if (!cacheDirectory.exists()){
@@ -138,14 +138,14 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		// Since we are the exclusive owner of the localRepoMirror
 		// and no change listener is registered with the local repository,
 		// the update of the underlying content can safely take place
-		
+
 		// perform the content update
 		List<PID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
 		List<PID> localPIDs = Arrays.asList(localRepoMirror.getPackageIDs());
 		List<PID> checkedLocalPIDs = new ArrayList<PID>();
-		
+
 		for (PID currentRemotePID : remotePIDs){
-			
+
 			// 1. for each remote package: check if it was previously present in mirror
 			if (isInMirror(currentRemotePID)){
 				// indicate that we have updated/checked this local PID
@@ -167,8 +167,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			StringBuffer report = new StringBuffer("\n");
 			report.append(
 					"Package folder updated. The following packages are no longer present in the remote feed."
-					+ "However, they will be kept in the local mirror until you manually delete them.\n"
-			);
+							+ "However, they will be kept in the local mirror until you manually delete them.\n"
+					);
 			for (PID currentPID : localPIDs){
 				report.append(currentPID + "\n");
 			}
@@ -199,8 +199,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		@Override
 		public void run() {
 			// 1. check whether there is another thread of this kind running
-			
-			
+
+
 			logger.info("Loading remote repository from URL " +  atomFeedURL.toString());
 			// create new remote repo
 			remoteRepo = new RemoteFeedRepository(atomFeedURL);
@@ -222,8 +222,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Does a versioned comparison.
 	 * 
@@ -236,7 +236,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }

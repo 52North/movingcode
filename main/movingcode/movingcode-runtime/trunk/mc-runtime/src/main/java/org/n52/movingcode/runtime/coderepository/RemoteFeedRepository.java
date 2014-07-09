@@ -47,17 +47,17 @@ import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
 public final class RemoteFeedRepository extends AbstractRepository {
 
 	static Logger logger = Logger.getLogger(RemoteFeedRepository.class);
-	
+
 	// Atom Feed URL
 	private final URL atomFeedURL;
-	
+
 	// Last known update of the feed
 	private Date lastFeedUpdate;
-	
+
 	// Timer for content updates
 	private final Timer timerDaemon;
-	
-	
+
+
 
 	/**
 	 * 
@@ -76,7 +76,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 		timerDaemon = new Timer(true);
 		timerDaemon.scheduleAtFixedRate(new CheckFeed(), 0, IMovingCodeRepository.remotePollingInterval);
 	}
-	
+
 	private void load(){
 		InputStream stream = null;
 		try {
@@ -90,7 +90,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				// create new moving code package from the entry
 				MovingCodePackage mcp = feed.getPackage(currentEntryID);
 				logger.trace("Loading package for feed entry " + currentEntryID);
-				
+
 				// validate
 				// and add to package map
 				// and add current file to zipFiles map
@@ -121,7 +121,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 
 		logger.trace("Created!");
 	}
-	
+
 	/**
 	 * A task which re-checks the remote feed's last update and
 	 * triggers a content reload if required.
@@ -130,7 +130,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 	 * 
 	 */
 	private final class CheckFeed extends TimerTask {
-		
+
 		@Override
 		public void run() {
 			InputStream stream = null;
@@ -138,18 +138,18 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				// TODO: Do it with Apache HTTPClient
 				stream = atomFeedURL.openStream();
 				GeoprocessingFeed feed = new GeoprocessingFeed(stream);
-				
+
 				// if feed's update time is newer than last known update time
 				// re-init the feed
 				if (feed.lastUpdated().after(lastFeedUpdate)){
 					logger.info("Repository content has silently changed. Running update ...");
-					
+
 					// clear contents and reload
 					clear();
 					load();
-					
+
 					logger.info("Reload finished. Calling Repository Change Listeners.");
-					
+
 					informRepositoryChangeListeners();
 				}
 				stream.close();
@@ -169,7 +169,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			}		
 		}
 	}
-	
+
 	/**
 	 * Returns the time at which the feed was last updated.
 	 * 

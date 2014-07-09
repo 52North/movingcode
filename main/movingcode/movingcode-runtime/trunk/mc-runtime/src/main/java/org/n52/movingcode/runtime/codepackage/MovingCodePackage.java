@@ -236,11 +236,20 @@ public class MovingCodePackage {
 	 */
 	public boolean isValid() {
 		
-		if(this.packageDescription == null){
+		if(this.packageDescription == null || this.packageDescription.isNil()){
 			return false;
 		}
 		
-		// a valid MovingCodePackage MUST have an identifier
+		// a valid Code Package must have a package ID
+		if(packageID.id == null || packageID.equals("")){
+			return false;
+		}
+		// ... and timestamp
+		if(packageID.timestamp == null){
+			return false;
+		}
+		
+		// a valid Code Package MUST have a function (aka process) identifier
 		if (this.functionIdentifier == null) {
 			return false;
 		}
@@ -249,20 +258,15 @@ public class MovingCodePackage {
 
 		// check if there exists a package description
 		// and return the validation result
-		if (this.packageDescription != null) {
-			if ( !this.packageDescription.isNil()) {
-				//information on validation errors
-				if (!this.packageDescription.validate()) {
-					List<XmlError> errors = new ArrayList<XmlError>();
-					this.packageDescription.validate(new XmlOptions().setErrorListener(errors));
-					logger.warn("Package is not valid: "+errors);
-					return false;
-				} else {
-					return true;
-				}
-			}
+		//information on validation errors
+		if (!this.packageDescription.validate()) {
+			List<XmlError> errors = new ArrayList<XmlError>();
+			this.packageDescription.validate(new XmlOptions().setErrorListener(errors));
+			logger.warn("Package is not valid: "+errors);
+			return false;
+		} else {
+			return true;
 		}
-		return false;
 	}
 
 	/**
@@ -278,6 +282,9 @@ public class MovingCodePackage {
 	/**
 	 * Returns the timestamp of this package. The timestamp indicates the last update of the package content
 	 * and can be used as a simple versioning machanism.
+	 * 
+	 * TODO: timestamp now covered by package ID - is this method still required?
+	 * 
 	 * 
 	 * @return {@link DateTime} package timestamp
 	 */

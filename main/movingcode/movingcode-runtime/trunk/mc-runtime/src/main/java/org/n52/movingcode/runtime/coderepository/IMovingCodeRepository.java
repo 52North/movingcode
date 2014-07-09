@@ -39,17 +39,17 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 
 public interface IMovingCodeRepository {
-	
-	final long localPollingInterval = 5 * 1000; // 5 sec
+
+	final long localPollingInterval = 20 * 1000; // 20 sec
 	final long remotePollingInterval = 10 * 60 * 1000; // 10 min
-	
+
 	/**
 	 * Returns the IDs of all registered packages.
 	 * 
 	 * @return Array of packageIDs {@link String}
 	 */
 	public PID[] getPackageIDs();
-	
+
 	/**
 	 * method to determine whether a package with the given ID is provided by this repository
 	 * 
@@ -57,7 +57,7 @@ public interface IMovingCodeRepository {
 	 * @return boolean - true if a package with the given ID is provided by this repository.
 	 */
 	public boolean containsPackage(PID packageID);
-	
+
 	/**
 	 * returns a package matching a given packageID
 	 * 
@@ -65,7 +65,7 @@ public interface IMovingCodeRepository {
 	 * 
 	 */
 	public MovingCodePackage getPackage(PID packageId);
-	
+
 	/**
 	 * Returns a package matching a given functionID.
 	 * If there a multiple packages that provide the same function, this method could return any
@@ -77,13 +77,13 @@ public interface IMovingCodeRepository {
 	 * 
 	 */
 	public MovingCodePackage[] getPackageByFunction(String functionID);
-	
+
 	/**
 	 * returns package description for a given package ID
 	 * the returned packageDescription shall be an exclusive copy
 	 */
 	public PackageDescriptionDocument getPackageDescription(PID packageID);
-	
+
 	/**
 	 * Public method to determine whether this repository instance provides a certain functionality
 	 * (i.e. ProcessIdentifier in WPS 1.0). 
@@ -92,7 +92,7 @@ public interface IMovingCodeRepository {
 	 * @return boolean - returns true if this repository instance contains a suitable package for a given functional ID, false otherwise.
 	 */
 	public boolean providesFunction(String functionID);
-	
+
 	/**
 	 * Returns the function IDs (i.e. WPS processIdentifiers) of all registered packages
 	 * 
@@ -101,7 +101,7 @@ public interface IMovingCodeRepository {
 	 * this method again.
 	 */
 	public String[] getFunctionIDs();
-	
+
 	/**
 	 * registers a changelistener. Implementations decide if they support
 	 * the changelistener pattern.
@@ -117,8 +117,8 @@ public interface IMovingCodeRepository {
 	 * @param l the listener
 	 */
 	public void removeRepositoryChangeListener(RepositoryChangeListener l);
-	
-	
+
+
 	//###########################################################################//
 	/**
 	 * Static Factory method to create MovingCodeRepositories from various sources
@@ -127,7 +127,7 @@ public interface IMovingCodeRepository {
 	 *
 	 */
 	static class Factory {
-		
+
 		/**
 		 * Creates a {@link IMovingCodeRepository} from a remote feed URL.
 		 * 
@@ -137,7 +137,7 @@ public interface IMovingCodeRepository {
 		public static final  IMovingCodeRepository createFromRemoteFeed(final URL atomFeedURL){
 			return new RemoteFeedRepository(atomFeedURL);
 		}
-		
+
 		/**
 		 * Creates a {@link IMovingCodeRepository} from a local folder with zipped packages. This folder may contain an arbitrary
 		 * number of zipped packages. The packages can also be nested in sub-directories.
@@ -148,7 +148,7 @@ public interface IMovingCodeRepository {
 		public static final IMovingCodeRepository createFromZipFilesFolder(File sourceDirectory){
 			return new LocalZipPackageRepository(sourceDirectory);
 		}
-		
+
 		/**
 		 * Creates a {@link IMovingCodeRepository} from a local folder with plain packages. This folder may contain an arbitrary
 		 * number of plain packages. The packages <b>cannot<b> be nested in sub-directories.
@@ -160,7 +160,7 @@ public interface IMovingCodeRepository {
 		public static final IMovingCodeRepository createFromPlainFolder( File sourceDirectory){
 			return new LocalPlainRepository(sourceDirectory);
 		}
-		
+
 		/**
 		 * Creates a {@link IMovingCodeRepository} from a remote feed URL.
 		 * Uses a cache directory to store its contents
@@ -175,7 +175,7 @@ public interface IMovingCodeRepository {
 		public static final IMovingCodeRepository createCachedRemoteRepository(final URL atomFeedURL, final File cacheDirectory){
 			return new CachedRemoteFeedRepository(atomFeedURL, cacheDirectory);
 		}
-		
+
 	}
 
 }

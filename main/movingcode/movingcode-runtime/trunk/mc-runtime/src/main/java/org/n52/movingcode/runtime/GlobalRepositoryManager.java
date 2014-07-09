@@ -62,12 +62,12 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	private static GlobalRepositoryManager instance;
-	
+
 	private Map<String, IMovingCodeRepository> repositories = new HashMap<String, IMovingCodeRepository>();
-	
+
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
-	
+
 	/**
 	 * private constructor for singleton pattern
 	 */
@@ -99,12 +99,12 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 */
 	public boolean addLocalPlainRepository(final String directory) {
 		final String repoID = directory;
-		
+
 		// add new repo
 		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
 		return registerRepo(repoID, repo);
 	}
-	
+
 	/**
 	 * Creates a new {@link IMovingCodeRepository} for the given directory and tries to add this repository to
 	 * the internal repositories Map. 
@@ -117,7 +117,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 */
 	public boolean addLocalZipPackageRepository(final String directory) {
 		final String repoID = directory;
-			
+
 		// add new repo
 		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromZipFilesFolder(new File(directory)); 
 		return registerRepo(repoID, repo);
@@ -142,7 +142,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public boolean addCachedRemoteRepository(final URL atomFeedURL, final File cacheDirectory) {
 		// TODO: maybe create a simpler repo ID ...
 		final String repoID = atomFeedURL.toString() + cacheDirectory.getAbsolutePath();
-		
+
 		// add new repo
 		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createCachedRemoteRepository(atomFeedURL, cacheDirectory); 
 		return registerRepo(repoID, repo);
@@ -159,7 +159,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		// add new repo
 		return registerRepo(repoID, repo);
 	}
-	
+
 	/**
 	 * Creates a new {@link IMovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
 	 * repository to the internal repositories Map. 
@@ -175,7 +175,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(atomFeedURL); 
 		return registerRepo(repoID, repo);
 	}
-	
+
 	/**
 	 * Private convenience method. Puts a {@link IMovingCodeRepository} on the private
 	 * Map {@link #repositories} and adds a default change listener to it. Thus 
@@ -190,10 +190,10 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		if (repositories.containsKey(repoID)){
 			return false;
 		}
-		
+
 		// add repo to map
 		repositories.put(repoID, repo);
-		
+
 		// add change listener
 		repo.addRepositoryChangeListener(new RepositoryChangeListener() {
 			@Override
@@ -201,12 +201,12 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 				informRepositoryChangeListeners();
 			}
 		});
-		
+
 		// inform listeners
 		informRepositoryChangeListeners();
 		return true;
 	}
-	
+
 	/**
 	 * Finds a package for a given function identifier.
 	 * 
@@ -263,7 +263,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public String[] getRegisteredRepositories() {
 		return repositories.keySet().toArray(new String[repositories.size()]);
 	}
-	
+
 	/**
 	 * Check if a (remote feed-based) repository has been registered already.
 	 * 
@@ -282,7 +282,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public synchronized void removeRepository(final String repoID) {
 		repositories.remove(repoID);
 	}
-	
+
 	@Override
 	public synchronized MovingCodePackage getPackage(final PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
@@ -344,7 +344,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		for (IMovingCodeRepository currentRepo : repositories.values()){
 			fids.addAll(Arrays.asList(currentRepo.getFunctionIDs()));
 		}
-		
+
 		return fids.toArray(new String[fids.size()]);
 	}
 
@@ -357,61 +357,61 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public void removeRepositoryChangeListener(final RepositoryChangeListener l) {
 		this.changeListeners.remove(l);
 	}
-	
-    /**
-     * informs all listeners about an update.
-     */
+
+	/**
+	 * informs all listeners about an update.
+	 */
 	private synchronized void informRepositoryChangeListeners() {
 		for (RepositoryChangeListener l : this.changeListeners) {
 			l.onRepositoryUpdate(this);
 		}
 	}
-	
-//	/**
-//	 * Private convenience method that filters the repoID from a global packageID
-//	 * of the form <repoid>+<separator>+<localPID>.
-//	 * 
-//	 * If no repo with a matching ID was found this methods return null
-//	 * 
-//	 * @param packageID {@link String}
-//	 * @return a valid repo id {@link String} 
-//	 */
-//	private final PackageID repoID(final PackageID packageID){
-//		for (String currentRepoID : repositories.keySet()){
-//			// <prefix> = <repoid>+"/"
-//			String prefix = currentRepoID + separator;
-//			// if packageID starts with  <prefix>
-//			if ( packageID.startsWith(prefix) ){
-//				return currentRepoID;
-//			}
-//		}
-//		return null;
-//	}
-	
-//	/**
-//	 * Private convenience method that filters the local Package ID (localPID) from a
-//	 * global packageID of the form <repoid>+<separator>+<localPID>.
-//	 * The local package ID is the package ID that was assigned to a package by the 
-//	 * particular repository.
-//	 * 
-//	 * @param packageID {@link String}
-//	 * @return a localPID {@link String} 
-//	 */
-//	private final String localPID(final String packageID){
-//		String repoID = repoID(packageID);
-//		// safety check to avoid null pointers
-//		// should not happen during regular operation
-//		if (repoID == null){
-//			return null;
-//		}
-//		// <prefix> = <repoid>+"/"
-//		String prefix = repoID + separator;
-//		// if packageID starts with  <prefix>
-//		if ( packageID.startsWith(prefix) ){
-//			return packageID.substring(prefix.length());
-//		} else {
-//			return null;
-//		}
-//	}
+
+	//	/**
+	//	 * Private convenience method that filters the repoID from a global packageID
+	//	 * of the form <repoid>+<separator>+<localPID>.
+	//	 * 
+	//	 * If no repo with a matching ID was found this methods return null
+	//	 * 
+	//	 * @param packageID {@link String}
+	//	 * @return a valid repo id {@link String} 
+	//	 */
+	//	private final PackageID repoID(final PackageID packageID){
+	//		for (String currentRepoID : repositories.keySet()){
+	//			// <prefix> = <repoid>+"/"
+	//			String prefix = currentRepoID + separator;
+	//			// if packageID starts with  <prefix>
+	//			if ( packageID.startsWith(prefix) ){
+	//				return currentRepoID;
+	//			}
+	//		}
+	//		return null;
+	//	}
+
+	//	/**
+	//	 * Private convenience method that filters the local Package ID (localPID) from a
+	//	 * global packageID of the form <repoid>+<separator>+<localPID>.
+	//	 * The local package ID is the package ID that was assigned to a package by the 
+	//	 * particular repository.
+	//	 * 
+	//	 * @param packageID {@link String}
+	//	 * @return a localPID {@link String} 
+	//	 */
+	//	private final String localPID(final String packageID){
+	//		String repoID = repoID(packageID);
+	//		// safety check to avoid null pointers
+	//		// should not happen during regular operation
+	//		if (repoID == null){
+	//			return null;
+	//		}
+	//		// <prefix> = <repoid>+"/"
+	//		String prefix = repoID + separator;
+	//		// if packageID starts with  <prefix>
+	//		if ( packageID.startsWith(prefix) ){
+	//			return packageID.substring(prefix.length());
+	//		} else {
+	//			return null;
+	//		}
+	//	}
 
 }

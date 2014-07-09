@@ -29,7 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.n52.movingcode.runtime.GlobalRepositoryManager;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
@@ -53,8 +53,6 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 	@Test
 	public void localZipRepoTest() {
-		// create string buffer for the package report
-		StringBuffer report = new StringBuffer(CR);
 		
 		// Arrange
 		File packageFolder = new File(packageFolderName);
@@ -64,17 +62,24 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
 
 		// Assert
-		Assert.assertTrue(mcRep.providesFunction(zTransformFunctionID));
-		report.append("Information for package: " + zTransformFunctionID + CR);
+		assertTrue(mcRep.providesFunction(zTransformFunctionID));
+		logger.debug("Retrieving process: " + zTransformFunctionID);
 		
 		MovingCodePackage pack = mcRep.getPackageByFunction(zTransformFunctionID)[0]; // get the test package
-		Assert.assertFalse(pack == null); // make sure it is not null
-		report.append("Package Timestamp is: " + pack.getTimestamp() + CR);
+		if (pack == null){
+			logger.warn("Could not find a package for process: " + zTransformFunctionID);
+		} else {
+			logger.debug("Found package: " + pack.getVersionedPackageId().toString() + " supplying process " + zTransformFunctionID);
+		}
+		
+		assertFalse(pack == null); // make sure it is not null
 
 		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty
 		// parameter Map
-		Assert.assertFalse(paramsMap == null); // make sure it is not null
-
+		assertFalse(paramsMap == null); // make sure it is not null
+		
+		// create string buffer for the package report
+		StringBuffer report = new StringBuffer(CR);
 		report.append("--- Parameters ---" + CR);
 		for (IOParameter param : paramsMap.values()) {
 			report.append(
@@ -115,16 +120,15 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromPlainFolder(packageFolder);
 
 		// Assert
-		Assert.assertTrue(mcRep.providesFunction(zTransformFunctionID));
+		assertTrue(mcRep.providesFunction(zTransformFunctionID));
 		report.append("Information for package: " + zTransformFunctionID + CR);
 		
 		MovingCodePackage pack = mcRep.getPackageByFunction(zTransformFunctionID)[0]; // get the test package
-		Assert.assertFalse(pack == null); // make sure it is not null
+		assertFalse(pack == null); // make sure it is not null
 		report.append("Package Timestamp is: " + pack.getTimestamp() + CR);
 
-		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty
-		// parameter Map
-		Assert.assertFalse(paramsMap == null); // make sure it is not null
+		IOParameterMap paramsMap = ProcessorFactory.getInstance().newProcessor(pack); // get an empty parameter Map
+		assertFalse(paramsMap == null); // make sure it is not null
 
 		report.append("--- Parameters ---" + CR);
 		for (IOParameter param : paramsMap.values()) {
@@ -166,7 +170,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 				report.append("\nFound process: " + pID + CR);
 				MovingCodePackage pack = mcRep.getPackage(pID);
 
-				Assert.assertFalse(pack == null); // make sure it is not null
+				assertFalse(pack == null); // make sure it is not null
 
 				AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(pack); // get an
 				// empty
@@ -222,7 +226,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 				report.append("\nFound process: " + pID + CR);
 				MovingCodePackage pack = mcRep.getPackage(pID);
 
-				Assert.assertFalse(pack == null); // make sure it is not null
+				assertFalse(pack == null); // make sure it is not null
 
 				AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(pack); // get an
 				// empty
@@ -275,7 +279,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		repoMan.addLocalPlainRepository(packageFolderName);
 
 		// Assert
-		Assert.assertTrue(repoMan.providesFunction(zTransformFunctionID));
+		assertTrue(repoMan.providesFunction(zTransformFunctionID));
 	}
 
 	@Test
@@ -304,7 +308,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		mcp = new MovingCodePackage(tempFile);
 
 		// Assert
-		Assert.assertTrue(mcp.isValid());
+		assertTrue(mcp.isValid());
 	}
 	
 	private static final File newTempDir(){
