@@ -198,8 +198,6 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 		@Override
 		public void run() {
-			// 1. check whether there is another thread of this kind running
-
 
 			logger.info("Loading remote repository from URL " +  atomFeedURL.toString());
 			// create new remote repo
