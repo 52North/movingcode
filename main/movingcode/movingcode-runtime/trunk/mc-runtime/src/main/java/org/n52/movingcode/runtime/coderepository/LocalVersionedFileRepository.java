@@ -25,13 +25,15 @@ package org.n52.movingcode.runtime.coderepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.HashSet;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.jackrabbit.uuid.UUID;
 import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.Constants;
@@ -73,9 +75,8 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 public class LocalVersionedFileRepository extends AbstractRepository {
 
 	private final File directory;
-	private String fingerprint;
-	private Timer timerDaemon;
-
+	private final Thread updateThread;
+	
 	private static final HashMap<PID,String> packageFolders = new HashMap<PID,String>();
 
 	/**
@@ -89,15 +90,13 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 */
 	public LocalVersionedFileRepository(File sourceDirectory) {
 		this.directory = sourceDirectory;
-		// compute directory fingerprint
-		fingerprint = RepositoryUtils.directoryFingerprint(directory);
 
 		// load packages from folder
 		load();
 
-		// start timer daemon
-		timerDaemon = new Timer(true);
-		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
+		// start update thread
+		updateThread = new UpdateInventoryThread();
+		updateThread.start();
 	}
 
 	public synchronized void addPackage(File workspace, PackageDescriptionDocument pd){
@@ -162,17 +161,21 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 * MovingCode packages from a local folder.  
 	 */
 	private final void load(){
-		// recursively obtain all zipfiles in sourceDirectory
-		Collection<File> packageFolders = scanForFolders(directory);
-
+		// obtain all immediate subfolders
+		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
+		Collection<Path> packageFolders = listSubdirs(repoRoot);
+		
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
-
-
-		for (File currentFolder : packageFolders) {
+		
+		
+		for (Path currentFolder : packageFolders) {
 
 			// attempt to read packageDescription XML
-			File packageDescriptionFile = new File(currentFolder, Constants.PACKAGE_DESCRIPTION_XML);
+			File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
+			// deal with empty inventory folders
 			if (!packageDescriptionFile.exists()){
+				// TODO: remove such invalid folders?
+				logger.warn("Found empty inventory folder: " + currentFolder.toAbsolutePath());
 				continue; // skip this and immediately jump to the next iteration
 			}
 
@@ -195,39 +198,55 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			if (workspace.startsWith("./")){
 				workspace = workspace.substring(2); // remove leading "./" if it exists
 			}
-			File workspaceDir = new File(currentFolder, workspace);
+			
+			File workspaceDir = new File(currentFolder.toFile(), workspace);
 			if (!workspaceDir.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
-
-			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir);
-
-
+			
+			
+			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd);
+			
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				register(mcPackage);
+				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getVersionedPackageId().toString());
 			}
 			else {
-				logger.error(currentFolder.getAbsolutePath() + " is an invalid package.");
+				logger.error(currentFolder + " is an invalid package.");
 			}
 		}
 	}
-
+	
 	/**
-	 * Scans a directory for subfolders (i.e. immediate child folders) and adds them
-	 * to the resulting Collection.
+	 * Scans the root directory for subfolders and returns them.
+	 * In this type of repo, each subfolder SHALL contain a single package.
 	 * 
-	 * @param directory {@link File} - parent directory to scan.
-	 * @return {@link Collection} of {@link File} - the directories found
+	 * @param path
+	 * @return
 	 */
-	private static final Collection<File> scanForFolders(File directory) {
-		return FileUtils.listFiles(directory, FileFilterUtils.directoryFileFilter(), null);
+	private static final Collection<Path> listSubdirs(Path path) {
+		Collection<Path> dirs = new HashSet<Path>();
+		DirectoryStream<Path> stream;
+		try {
+			stream = Files.newDirectoryStream(path);
+			for (Path entry : stream) {
+				if (Files.isDirectory(entry)) {
+					dirs.add(entry);
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return dirs;
 	}
 
 	/**
-	 * Generate a new directory.
+	 * Generate a new directory; use a UUID for this task.
 	 * 
 	 * @return
 	 */
@@ -237,30 +256,120 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		newDir.mkdirs();
 		return newDir;
 	}
-
+	
+	
 	/**
-	 * A task which re-computes the directory's fingerprint and
+	 * A thread that occasionally updates the repo's inventory
 	 * triggers a content reload if required.
 	 * 
 	 * @author Matthias Mueller
 	 *
 	 */
-	private final class CheckFolder extends TimerTask {
-
+	private final class UpdateInventoryThread extends Thread {
+		
+		private static final long updateInterval = IMovingCodeRepository.localPollingInterval;
+		
 		@Override
 		public void run() {
-			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
-			if (!newFingerprint.equals(fingerprint)){
-				logger.info("Repository content has silently changed. Running update ...");
-				// set new fingerprint
-				fingerprint = newFingerprint;
-				// clear an reload
-				clear();
-				load();
 
-				logger.info("Reload finished. Calling Repository Change Listeners.");
-				informRepositoryChangeListeners();
-			}			
+			while(true){ // spin forever
+
+				logger.debug("Update thread started."
+						+"\nDirectory: " + directory.getAbsolutePath()
+						+ "\nUpdate interval: " + updateInterval + " milliseconds"
+						);
+
+				try {
+					sleep(updateInterval);
+				} catch (InterruptedException e1) {
+					logger.debug("Interrupt received. Update thread stopped.");
+					this.interrupt();
+				}
+
+				boolean changeOccurred = false;
+
+				// recursively obtain all folders in sourceDirectory
+				Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
+				Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
+				logger.info("Scanning directory: " + directory.getAbsolutePath());
+				
+				// create a new set of currently known packageIDs
+				HashSet<PID> knownPackageIdSet = new HashSet<PID>();
+				for (Path currentFolder : potentialPackageFolders) {
+					// attempt to read packageDescription XML
+					File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
+					if (!packageDescriptionFile.exists()){
+						continue; // skip this and immediately jump to the next iteration
+					}
+
+					PackageDescriptionDocument pd = null;
+					try {
+						pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
+					} catch (XmlException e) {
+						// silently skip this and immediately jump to the next iteration
+						continue;
+					} catch (IOException e) {
+						// silently skip this and immediately jump to the next iteration
+						continue;
+					}
+
+					// attempt to access workspace root folder
+					String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
+					if (workspace.startsWith("./")){
+						workspace = workspace.substring(2); // remove leading "./" if it exists
+					}
+					File workspaceDir = new File(currentFolder.toFile(), workspace);
+					if (!workspaceDir.exists()){
+						continue; // skip this and immediately jump to the next iteration
+					}
+
+					MovingCodePackage candidatePackage = new MovingCodePackage(workspaceDir, pd);
+
+					// validate and add to package map if not yet registered
+					if (candidatePackage.isValid()) {
+						// add current package ID to the set of currently known package IDs
+						knownPackageIdSet.add(candidatePackage.getVersionedPackageId());
+						
+						if (!containsPackage(candidatePackage.getVersionedPackageId())){
+							register(candidatePackage);
+							logger.info("Found package: " + currentFolder + "; using ID: " + candidatePackage.getVersionedPackageId().toString());
+							changeOccurred = true;
+						}
+					} else {
+						// if validation fails: report
+						logger.error(currentFolder + " is an invalid package.");
+
+						// attempt removal if it was previously registered
+						try{
+							if (containsPackage(candidatePackage.getVersionedPackageId())){
+								unregister(candidatePackage.getVersionedPackageId());
+							}
+						} catch (Exception e){
+							// silent catch since we could encounter any kind of error with invalid packages
+						}
+					}
+				}
+				
+				// remove any packages from repo that are not in the current potential collection
+				for (PID pid : getPackageIDs()){
+					if (!knownPackageIdSet.contains(pid)){
+						unregister(pid);
+					}
+				}
+				
+				// inform listeners that this repo has changed
+				if (changeOccurred){
+					logger.info("Repository content has changed. Calling Repository Change Listeners.");
+					informRepositoryChangeListeners();
+				}
+			}
+
 		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		updateThread.interrupt();
+		super.finalize();
 	}
 }

@@ -35,6 +35,7 @@ import java.util.HashSet;
 import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.codepackage.PID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -88,8 +89,9 @@ public final class LocalPlainRepository extends AbstractRepository {
 		// load packages from folder
 		load();
 
-		// start timer daemon
+		// start update thread
 		updateThread = new UpdateInventoryThread();
+		updateThread.start();
 	}
 
 	/**
@@ -170,16 +172,16 @@ public final class LocalPlainRepository extends AbstractRepository {
 	}
 
 	/**
-	 * A task which re-computes the directory's fingerprint and
+	 * A thread that occasionally updates the repo's inventory
 	 * triggers a content reload if required.
 	 * 
 	 * @author Matthias Mueller
 	 *
 	 */
 	private final class UpdateInventoryThread extends Thread {
-
+		
 		private static final long updateInterval = IMovingCodeRepository.localPollingInterval;
-
+		
 		@Override
 		public void run() {
 
@@ -198,12 +200,14 @@ public final class LocalPlainRepository extends AbstractRepository {
 				}
 
 				boolean changeOccurred = false;
-
-				// recursively obtain all folders in sourceDirectory
+				
+				// obtain all folders in sourceDirectory
 				Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
 				Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
 				logger.info("Scanning directory: " + directory.getAbsolutePath());
-
+				
+				// create a new set of currently known packageIDs
+				HashSet<PID> knownPackageIdSet = new HashSet<PID>();
 				for (Path currentFolder : potentialPackageFolders) {
 					// attempt to read packageDescription XML
 					File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
@@ -236,6 +240,9 @@ public final class LocalPlainRepository extends AbstractRepository {
 
 					// validate and add to package map if not yet registered
 					if (candidatePackage.isValid()) {
+						// add current package ID to the set of currently known package IDs
+						knownPackageIdSet.add(candidatePackage.getVersionedPackageId());
+						
 						if (!containsPackage(candidatePackage.getVersionedPackageId())){
 							register(candidatePackage);
 							logger.info("Found package: " + currentFolder + "; using ID: " + candidatePackage.getVersionedPackageId().toString());
@@ -255,8 +262,15 @@ public final class LocalPlainRepository extends AbstractRepository {
 						}
 					}
 				}
-
-				// inform listeners if this repos has changed
+				
+				// remove any packages from repo that are not in the current potential collection
+				for (PID pid : getPackageIDs()){
+					if (!knownPackageIdSet.contains(pid)){
+						unregister(pid);
+					}
+				}
+				
+				// inform listeners that this repo has changed
 				if (changeOccurred){
 					logger.info("Repository content has changed. Calling Repository Change Listeners.");
 					informRepositoryChangeListeners();
