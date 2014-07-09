@@ -49,6 +49,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 	private RemoteFeedRepository remoteRepo;
 	private LocalVersionedFileRepository localRepoMirror;
+	
+	private volatile boolean initDone = false;
 
 	private Date mirrorTimestamp;
 
@@ -164,6 +166,8 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			informRepositoryChangeListeners();
 		}
 		
+		// mark init done
+		initDone = true;
 	}
 
 	/**
@@ -190,11 +194,10 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 				}
 			});
 			logger.info("Finished loading remote repository from URL " +  atomFeedURL.toString());
-
-			// compare remote repo date and local cache date
-			// run an update if required
-			Date remoteDate = ((RemoteFeedRepository)remoteRepo).lastUpdated();
-			if (remoteDate.after(mirrorTimestamp)){
+			
+			// since we added a change listener, an update may already have taken place before we get here
+			// so we need to check initDone variable.
+			if (!initDone){
 				updateLocalMirror();
 			}
 		}

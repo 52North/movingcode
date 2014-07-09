@@ -134,26 +134,26 @@ public final class RemoteFeedRepository extends AbstractRepository {
 		@Override
 		public void run() {
 			InputStream stream = null;
+			
 			try {
 				// TODO: Do it with Apache HTTPClient
 				stream = atomFeedURL.openStream();
 				GeoprocessingFeed feed = new GeoprocessingFeed(stream);
 
 				// if feed's update time is newer than last known update time
-				// re-init the feed
+				// re-read the feed and update contents accordingly
 				if (feed.lastUpdated().after(lastFeedUpdate)){
-					logger.info("Repository content has silently changed. Running update ...");
-
-					// clear contents and reload
-					// TODO: change behaviour: Do it package by package
+					logger.info("Repository content has  changed. Running update ...");
+					
+					// clear the contents and do a re-load
 					clear();
 					load();
-
-					logger.info("Reload finished. Calling Repository Change Listeners.");
-
-					informRepositoryChangeListeners();
+					
 				}
+				
+				lastFeedUpdate = feed.lastUpdated();
 				stream.close();
+				
 			}
 			catch (IOException e) {
 				logger.error("Could read feed from URL: " + atomFeedURL);
@@ -167,10 +167,13 @@ public final class RemoteFeedRepository extends AbstractRepository {
 					logger.error("Could not close GeoprocessingFeed stream.", e);
 					stream = null;
 				}
-			}		
+			}
+			
+			logger.info("Reload finished. Calling Repository Change Listeners.");
+			informRepositoryChangeListeners();
 		}
 	}
-
+	
 	/**
 	 * Returns the time at which the feed was last updated.
 	 * 
