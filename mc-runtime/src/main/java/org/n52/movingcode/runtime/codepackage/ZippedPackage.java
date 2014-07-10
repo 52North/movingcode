@@ -151,7 +151,7 @@ final class ZippedPackage implements ICodePackage {
 		String archiveName = null;
 
 		String wdName = workspaceDirName;
-		if (wdName.startsWith("./") || workspaceDirName.startsWith(".\\")) {
+		if (wdName.startsWith("./") || wdName.startsWith(".\\")) {
 			wdName = wdName.substring(2);
 		}
 
@@ -239,6 +239,72 @@ final class ZippedPackage implements ICodePackage {
 		builder.append(this.zipURL);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public boolean containsFileInWorkspace(String relativePath) {
+		if (relativePath.startsWith("./") || relativePath.startsWith(".\\")){
+			relativePath = relativePath.substring(2);
+		}
+		if (relativePath.startsWith("/") || relativePath.startsWith("\\")){
+			relativePath = relativePath.substring(1);
+		}
+
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (zipFile == null) && (zipURL == null)));
+		String archiveName = null;
+
+		String wsName = getDescription().getPackageDescription().getWorkspace().getWorkspaceRoot();
+		if (wsName.startsWith("./") || wsName.startsWith(".\\")) {
+			wsName = wsName.substring(2);
+		}
+		
+		String searchEntry = wsName + "/" + relativePath;
+		
+		
+		boolean retval = false;
+		try {
+			
+			ZipInputStream zis = null;
+			if (zipFile != null) {
+				zis = new ZipInputStream(new FileInputStream(zipFile));
+				archiveName = zipFile.getAbsolutePath();
+			}
+			else if (zipURL != null) {
+				zis = new ZipInputStream(zipURL.openConnection().getInputStream());
+				archiveName = zipURL.toString();
+			}
+
+			ZipEntry entry;
+			
+			while ( (entry = zis.getNextEntry()) != null) {
+				if (samePath(entry.getName(), searchEntry)) {
+					retval = true;
+					zis.closeEntry();
+					break;
+				} else {
+					zis.closeEntry();
+				}
+			}
+			
+			zis.close();
+
+		}
+		catch (ZipException e) {
+			logger.error("Error! Could read from archive: " + archiveName);
+		}
+		catch (IOException e) {
+			logger.error("Error! Could not open archive: " + archiveName);
+		}
+
+		return retval;
+	}
+	
+	private static final boolean samePath(String p1, String p2){
+		p1 = p1.replace("\\", "/");
+		p2 = p2.replace("\\", "/");
+		
+		return p1.equalsIgnoreCase(p2);
 	}
 
 }
