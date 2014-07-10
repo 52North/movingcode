@@ -257,6 +257,10 @@ public class MovingCodePackage {
 		// TODO: Identifiers of IO data must be unique!
 		
 		// TODO: verify path to executable.
+		String exLoc = packageDescription.getPackageDescription().getWorkspace().getExecutableLocation();
+		if (!this.archive.containsFileInWorkspace(exLoc)){
+			return false;
+		}
 		
 		// check if there exists a package description
 		// and return the validation result

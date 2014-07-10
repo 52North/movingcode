@@ -51,7 +51,15 @@ public interface ICodePackage {
 	 * @return boolean - true if the package was successfully dumped, false otherwise
 	 */
 	public boolean dumpPackage(File targetZipFile);
-
+	
+	/**
+	 * 
+	 * 
+	 * @param relativePath
+	 * @return
+	 */
+	public boolean containsFileInWorkspace(String relativePath);
+	
 	/**
 	 * TODO: deep compare: Package introspection to see if ICodePackage packages have the same contents
 	 * 

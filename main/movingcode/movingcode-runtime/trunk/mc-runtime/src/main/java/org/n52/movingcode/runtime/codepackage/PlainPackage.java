@@ -179,4 +179,17 @@ final class PlainPackage implements ICodePackage {
 		return relFileName;
 	}
 
+	@Override
+	public boolean containsFileInWorkspace(String relativePath) {
+		if (relativePath.startsWith("./") || relativePath.startsWith(".\\")){
+			relativePath = relativePath.substring(2);
+		}
+		if (relativePath.startsWith("/") || relativePath.startsWith("\\")){
+			relativePath = relativePath.substring(1);
+		}
+		
+		File f = new File(plainWorkspace + File.separator + File.separator + relativePath);
+		return f.exists();
+	}
+
 }
