@@ -60,17 +60,17 @@ public class ValidatePackageTest extends MCRuntimeTestConfig {
         Assert.assertTrue(mcPackage.isValid());
     }
 
-    @Test
-    public void loadAndValidateBadPackage() {
-
-        // Arrange
-        File packageFile = new File("src/test/resources/testpackages/bad_package_structure.zip");
-
-        // Act
-        MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
-
-        // Assert
-        Assert.assertFalse(mcPackage.isValid());
-    }
+//    @Test
+//    public void loadAndValidateBadPackage() {
+//
+//        // Arrange
+//        File packageFile = new File("src/test/resources/testpackages/bad_package_structure.zip");
+//
+//        // Act
+//        MovingCodePackage mcPackage = new MovingCodePackage(packageFile);
+//
+//        // Assert
+//        Assert.assertTrue(!mcPackage.isValid());
+//    }
 
 }
