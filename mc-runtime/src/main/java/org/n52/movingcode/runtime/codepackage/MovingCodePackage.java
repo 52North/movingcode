@@ -26,6 +26,7 @@ package org.n52.movingcode.runtime.codepackage;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,13 +56,18 @@ public class MovingCodePackage {
 	private final ICodePackage archive;
 
 	// package description XML document
-	private PackageDescriptionDocument packageDescription = null;
+//	private PackageDescriptionDocument packageDescription = null;
+	
+	// immutable representation of the package description XML
+	private final String packageDescription;
 
 	// identifier of the provided functionality (e.g. WPS process identifier)
 	private final String functionIdentifier;
 
 	// Package id and time stamp, i.e. date of creation or last modification
 	private final PID packageID;
+	
+	private final boolean isValid;
 
 	private final List<FunctionalType> supportedFuncTypes;
 
@@ -73,25 +79,28 @@ public class MovingCodePackage {
 	public MovingCodePackage(final File zipFile) {
 
 		this.archive = new ZippedPackage(zipFile);
-		this.packageDescription = this.archive.getDescription();
+		PackageDescriptionDocument doc = this.archive.getDescription();
 		
-
-		if (this.packageDescription != null) {
-			this.functionIdentifier = this.packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
-			this.supportedFuncTypes = getFunctionalTypes(this.packageDescription);
+		// assign properties fields
+		if (doc != null) {
+			functionIdentifier = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
+			supportedFuncTypes = getFunctionalTypes(doc);
 			
-			DateTime timestamp = new DateTime(this.packageDescription.getPackageDescription().getTimestamp());
-			String id = this.packageDescription.getPackageDescription().getPackageId();
-			this.packageID = new PID(id, timestamp);
+			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
+			String id = doc.getPackageDescription().getPackageId();
+			packageID = new PID(id, timestamp);
+			packageDescription = XMLUtils.toString(doc);
+			
 		}
 		else {
-			this.functionIdentifier = null;
-			this.supportedFuncTypes = null;
-			this.packageID = null;
+			functionIdentifier = null;
+			supportedFuncTypes = null;
+			packageID = null;
+			packageDescription = null;
 		}
 		
+		isValid = validate(doc, this);
 	}
-	
 	
 	/**
 	 * Constructor for geoprocessing feed entries. Creates a MovingCodePackage from an atom feed entry.
@@ -108,31 +117,33 @@ public class MovingCodePackage {
 	 * @param packageStamp
 	 */
 	public MovingCodePackage(final URL zipPackageURL) {
-
-		PackageDescriptionDocument packageDescription = null;
+		
 		ZippedPackage archive = null;
 		
 		archive = new ZippedPackage(zipPackageURL);
-		packageDescription = archive.getDescription();
+		PackageDescriptionDocument doc = archive.getDescription();
 		
-		this.packageDescription = packageDescription;
 		// TODO: Information from the feed might lag during updates
 		// how can deal with that?
-		if (packageDescription != null) {
-			this.functionIdentifier = packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
-			this.supportedFuncTypes = getFunctionalTypes(packageDescription);
-						
-			DateTime timestamp = new DateTime(this.packageDescription.getPackageDescription().getTimestamp());
-			String id = this.packageDescription.getPackageDescription().getPackageId();
-			this.packageID = new PID(id, timestamp);
+		// assign properties fields
+		if (doc != null) {
+			functionIdentifier = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
+			supportedFuncTypes = getFunctionalTypes(doc);
+				
+			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
+			String id = doc.getPackageDescription().getPackageId();
+			packageID = new PID(id, timestamp);
+			packageDescription = XMLUtils.toString(doc);
 		}
 		else {
-			this.functionIdentifier = null;
-			this.supportedFuncTypes = null;
-			this.packageID = null;
+			functionIdentifier = null;
+			supportedFuncTypes = null;
+			packageID = null;
+			packageDescription = null;
 		}
 		
 		this.archive = archive;
+		isValid = validate(doc, this);
 
 	}
 
@@ -145,26 +156,27 @@ public class MovingCodePackage {
 	 * @param {@link DateTime} lastModified - the date of latest modification. This value is optional. If NULL,
 	 *        the lastModified date is obtained from the workspace's content.
 	 */
-	public MovingCodePackage(final File workspace,
-			final PackageDescriptionDocument packageDescription) {
-
-		this.packageDescription = packageDescription;
-
-		if (packageDescription != null) {
-			this.functionIdentifier = packageDescription.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
-			this.supportedFuncTypes = getFunctionalTypes(packageDescription);
+	public MovingCodePackage(final File workspace, final PackageDescriptionDocument doc) {
+		
+		// assign properties fields
+		if (doc != null) {
+			functionIdentifier = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
+			supportedFuncTypes = getFunctionalTypes(doc);
 			
-			DateTime timestamp = new DateTime(this.packageDescription.getPackageDescription().getTimestamp());
-			String id = this.packageDescription.getPackageDescription().getPackageId();
-			this.packageID = new PID(id, timestamp);
+			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
+			String id = doc.getPackageDescription().getPackageId();
+			packageID = new PID(id, timestamp);
+			packageDescription = XMLUtils.toString(doc);
 		}
 		else {
-			this.functionIdentifier = null;
-			this.supportedFuncTypes = null;
-			this.packageID = null;
+			functionIdentifier = null;
+			supportedFuncTypes = null;
+			packageID = null;
+			packageDescription = null;
 		}
 		
-		this.archive = new PlainPackage(workspace, packageDescription);
+		this.archive = new PlainPackage(workspace, doc);
+		isValid = validate(doc, this);
 
 	}
 
@@ -176,7 +188,7 @@ public class MovingCodePackage {
 	 * @return {@link String} dumpWorkspacePath - absolute path of the dumped workspace
 	 */
 	public String dumpWorkspace(File targetDirectory) {
-		String wsRoot = this.packageDescription.getPackageDescription().getWorkspace().getWorkspaceRoot();
+		String wsRoot = archive.getDescription().getPackageDescription().getWorkspace().getWorkspaceRoot();
 		this.archive.dumpPackage(wsRoot, targetDirectory);
 		if (wsRoot.startsWith("./")) {
 			wsRoot = wsRoot.substring(2);
@@ -207,7 +219,9 @@ public class MovingCodePackage {
 	 */
 	public boolean dumpDescription(File targetFile) {
 		try {
-			this.packageDescription.save(targetFile);
+			PrintWriter out = new PrintWriter(targetFile);
+			out.print(packageDescription);
+			out.close();
 			return true;
 		}
 		catch (IOException e) {
@@ -221,58 +235,20 @@ public class MovingCodePackage {
 	}
 	
 	/**
-	 * Returns the PackageDescription
+	 * Returns the PackageDescription in String representation
 	 * 
-	 * @return {@link PackageDescriptionDocument}
+	 * @return {@link String}
 	 */
-	public PackageDescriptionDocument getDescription() {
-		return this.packageDescription;
+	public String getDescriptionAsString() {
+		return packageDescription;
 	}
-
-	/**
-	 * Does this object contain valid content?
-	 * 
-	 * @return boolean - true if content is valid, false if not
-	 */
-	public boolean isValid() {
-		
-		if(this.packageDescription == null || this.packageDescription.isNil()){
-			return false;
-		}
-		
-		// a valid Code Package must have a package ID
-		if(packageID.id == null || packageID.equals("")){
-			return false;
-		}
-		// ... and timestamp
-		if(packageID.timestamp == null){
-			return false;
-		}
-		
-		// a valid Code Package MUST have a function (aka process) identifier
-		if (this.functionIdentifier == null) {
-			return false;
-		}
-
-		// TODO: Identifiers of IO data must be unique!
-		
-		// TODO: verify path to executable.
-		String exLoc = packageDescription.getPackageDescription().getWorkspace().getExecutableLocation();
-		if (!this.archive.containsFileInWorkspace(exLoc)){
-			return false;
-		}
-		
-		// check if there exists a package description
-		// and return the validation result
-		//information on validation errors
-		if (!this.packageDescription.validate()) {
-			List<XmlError> errors = new ArrayList<XmlError>();
-			this.packageDescription.validate(new XmlOptions().setErrorListener(errors));
-			logger.warn("Package is not valid: "+errors);
-			return false;
-		} else {
-			return true;
-		}
+	
+	public PackageDescriptionDocument getDescriptionAsDocument() {
+		return XMLUtils.fromString(packageDescription);
+	}
+	
+	public boolean isValid(){
+		return isValid;
 	}
 
 	/**
@@ -318,6 +294,52 @@ public class MovingCodePackage {
 		availableFunctionalDescriptions.add(FunctionalType.WPS100);
 		
 		return availableFunctionalDescriptions;
+	}
+	
+	/**
+	 * Does this object contain valid content?
+	 * 
+	 * @return boolean - true if content is valid, false if not
+	 */
+	private static final boolean validate(PackageDescriptionDocument doc, MovingCodePackage mcp) {
+		
+		if(doc == null || doc.isNil()){
+			return false;
+		}
+		
+		// a valid Code Package must have a package ID
+		if(mcp.packageID.id == null || mcp.packageID.equals("")){
+			return false;
+		}
+		// ... and timestamp
+		if(mcp.packageID.timestamp == null){
+			return false;
+		}
+		
+		// a valid Code Package MUST have a function (aka process) identifier
+		if (mcp.functionIdentifier == null) {
+			return false;
+		}
+
+		// TODO: Identifiers of IO data must be unique!
+		
+		// TODO: verify path to executable.
+		String exLoc = doc.getPackageDescription().getWorkspace().getExecutableLocation();
+		if (!mcp.archive.containsFileInWorkspace(exLoc)){
+			return false;
+		}
+		
+		// check if there exists a package description
+		// and return the validation result
+		//information on validation errors
+		if (!doc.validate()) {
+			List<XmlError> errors = new ArrayList<XmlError>();
+			doc.validate(new XmlOptions().setErrorListener(errors));
+			logger.warn("Package is not valid: "+errors);
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	@Override

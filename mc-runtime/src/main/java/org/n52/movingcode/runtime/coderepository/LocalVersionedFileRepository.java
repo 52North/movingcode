@@ -76,7 +76,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 
 	private final File directory;
 	private final Thread updateThread;
-	
+
 	private static final HashMap<PID,String> packageFolders = new HashMap<PID,String>();
 
 	/**
@@ -92,7 +92,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		this.directory = sourceDirectory;
 
 		// load packages from folder
-		load();
+		reloadContent();
 
 		// start update thread
 		updateThread = new UpdateInventoryThread();
@@ -156,18 +156,18 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		return true;
 	}
 
-	/**
-	 * private method that encapsulates the logic for loading zipped
-	 * MovingCode packages from a local folder.  
-	 */
-	private final void load(){
+
+	private final synchronized void reloadContent(){
+		
+		PackageInventory newInventory = new PackageInventory();
+
 		// obtain all immediate subfolders
 		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
 		Collection<Path> packageFolders = listSubdirs(repoRoot);
-		
+
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
-		
-		
+
+
 		for (Path currentFolder : packageFolders) {
 
 			// attempt to read packageDescription XML
@@ -198,28 +198,31 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			if (workspace.startsWith("./")){
 				workspace = workspace.substring(2); // remove leading "./" if it exists
 			}
-			
+
 			File workspaceDir = new File(currentFolder.toFile(), workspace);
 			if (!workspaceDir.exists()){
 				continue; // skip this and immediately jump to the next iteration
 			}
-			
-			
+
+
 			MovingCodePackage mcPackage = new MovingCodePackage(workspaceDir, pd);
-			
+
 			// validate
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage);
+				newInventory.add(mcPackage);
 				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getVersionedPackageId().toString());
 			}
 			else {
 				logger.error(currentFolder + " is an invalid package.");
 			}
 		}
+		
+		// announce new content scan
+		updateInventory(newInventory);
 	}
-	
+
 	/**
 	 * Scans the root directory for subfolders and returns them.
 	 * In this type of repo, each subfolder SHALL contain a single package.
@@ -256,8 +259,8 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		newDir.mkdirs();
 		return newDir;
 	}
-	
-	
+
+
 	/**
 	 * A thread that occasionally updates the repo's inventory
 	 * triggers a content reload if required.
@@ -266,9 +269,9 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 *
 	 */
 	private final class UpdateInventoryThread extends Thread {
-		
+
 		private static final long updateInterval = IMovingCodeRepository.localPollingInterval;
-		
+
 		@Override
 		public void run() {
 
@@ -285,88 +288,14 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 					logger.debug("Interrupt received. Update thread stopped.");
 					this.interrupt();
 				}
-
-				boolean changeOccurred = false;
-
-				// recursively obtain all folders in sourceDirectory
-				Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
-				Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
-				logger.info("Scanning directory: " + directory.getAbsolutePath());
 				
-				// create a new set of currently known packageIDs
-				HashSet<PID> knownPackageIdSet = new HashSet<PID>();
-				for (Path currentFolder : potentialPackageFolders) {
-					// attempt to read packageDescription XML
-					File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
-					if (!packageDescriptionFile.exists()){
-						continue; // skip this and immediately jump to the next iteration
-					}
-
-					PackageDescriptionDocument pd = null;
-					try {
-						pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
-					} catch (XmlException e) {
-						// silently skip this and immediately jump to the next iteration
-						continue;
-					} catch (IOException e) {
-						// silently skip this and immediately jump to the next iteration
-						continue;
-					}
-
-					// attempt to access workspace root folder
-					String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
-					if (workspace.startsWith("./")){
-						workspace = workspace.substring(2); // remove leading "./" if it exists
-					}
-					File workspaceDir = new File(currentFolder.toFile(), workspace);
-					if (!workspaceDir.exists()){
-						continue; // skip this and immediately jump to the next iteration
-					}
-
-					MovingCodePackage candidatePackage = new MovingCodePackage(workspaceDir, pd);
-
-					// validate and add to package map if not yet registered
-					if (candidatePackage.isValid()) {
-						// add current package ID to the set of currently known package IDs
-						knownPackageIdSet.add(candidatePackage.getVersionedPackageId());
-						
-						if (!containsPackage(candidatePackage.getVersionedPackageId())){
-							register(candidatePackage);
-							logger.info("Found package: " + currentFolder + "; using ID: " + candidatePackage.getVersionedPackageId().toString());
-							changeOccurred = true;
-						}
-					} else {
-						// if validation fails: report
-						logger.error(currentFolder + " is an invalid package.");
-
-						// attempt removal if it was previously registered
-						try{
-							if (containsPackage(candidatePackage.getVersionedPackageId())){
-								unregister(candidatePackage.getVersionedPackageId());
-							}
-						} catch (Exception e){
-							// silent catch since we could encounter any kind of error with invalid packages
-						}
-					}
-				}
-				
-				// remove any packages from repo that are not in the current potential collection
-				for (PID pid : getPackageIDs()){
-					if (!knownPackageIdSet.contains(pid)){
-						unregister(pid);
-					}
-				}
-				
-				// inform listeners that this repo has changed
-				if (changeOccurred){
-					logger.info("Repository content has changed. Calling Repository Change Listeners.");
-					informRepositoryChangeListeners();
-				}
+				// trigger update routine
+				reloadContent();
 			}
 
 		}
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		updateThread.interrupt();

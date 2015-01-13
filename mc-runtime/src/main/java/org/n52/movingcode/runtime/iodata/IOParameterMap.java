@@ -33,7 +33,9 @@ import net.opengis.wps.x100.OutputDescriptionType;
 
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
+
 import de.tudresden.gis.geoprocessing.movingcode.schema.ExecutionParameterType;
+import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements IIOParameterMap {
 
@@ -51,16 +53,17 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
         // retrieve functional description types
         // TODO: rework resolution mechanism for WPS 1.0 cs 2.0
         this.isWPSdescription = true;
+        PackageDescriptionDocument pd = mcp.getDescriptionAsDocument();
 
         // create input index
         Map<String, InputDescriptionType> inputs = new HashMap<String, InputDescriptionType>();
-        for (InputDescriptionType input : mcp.getDescription().getPackageDescription().getFunctionality().getWps100ProcessDescription().getDataInputs().getInputArray()) {
+        for (InputDescriptionType input : pd.getPackageDescription().getFunctionality().getWps100ProcessDescription().getDataInputs().getInputArray()) {
             inputs.put(input.getIdentifier().getStringValue(), input);
         }
 
         // create output index
         Map<String, OutputDescriptionType> outputs = new HashMap<String, OutputDescriptionType>();
-        for (OutputDescriptionType output : mcp.getDescription().getPackageDescription().getFunctionality().getWps100ProcessDescription().getProcessOutputs().getOutputArray()) {
+        for (OutputDescriptionType output : pd.getPackageDescription().getFunctionality().getWps100ProcessDescription().getProcessOutputs().getOutputArray()) {
             outputs.put(output.getIdentifier().getStringValue(), output);
         }
 
@@ -68,7 +71,7 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
         this.messageIDparamID_lookup = new HashMap<String, ParameterID>();
 
         if (this.isWPSdescription) {
-            for (ExecutionParameterType param : mcp.getDescription().getPackageDescription().getWorkspace().getExecutionParameters().getParameterArray()) {
+            for (ExecutionParameterType param : pd.getPackageDescription().getWorkspace().getExecutionParameters().getParameterArray()) {
                 IOParameter exItem = new IOParameter(param,
                                                      inputs.get(param.isSetFunctionalInputID() ? param.getFunctionalInputID()
                                                                                               : null),

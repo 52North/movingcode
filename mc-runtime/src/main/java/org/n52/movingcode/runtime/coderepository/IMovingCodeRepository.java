@@ -56,7 +56,7 @@ public interface IMovingCodeRepository {
 	 * @param packageID {@link String} - the internal (unique) identifier of package. 
 	 * @return boolean - true if a package with the given ID is provided by this repository.
 	 */
-	public boolean containsPackage(PID packageID);
+	public boolean containsPackage(PID packageId);
 
 	/**
 	 * returns a package matching a given packageID
@@ -76,14 +76,18 @@ public interface IMovingCodeRepository {
 	 * @return - Array of MovingCodePackage
 	 * 
 	 */
-	public MovingCodePackage[] getPackageByFunction(String functionID);
+	public MovingCodePackage[] getPackageByFunction(String functionId);
 
 	/**
 	 * returns package description for a given package ID
 	 * the returned packageDescription shall be an exclusive copy
+	 * and changes to the returned document shall not be forwarded
+	 * to the package 
 	 */
-	public PackageDescriptionDocument getPackageDescription(PID packageID);
-
+	public PackageDescriptionDocument getPackageDescriptionAsDocument(PID packageId);
+	
+	public String getPackageDescriptionAsString(PID packageId);
+	
 	/**
 	 * Public method to determine whether this repository instance provides a certain functionality
 	 * (i.e. ProcessIdentifier in WPS 1.0). 
@@ -91,7 +95,7 @@ public interface IMovingCodeRepository {
 	 * @param functionalID {@link String}
 	 * @return boolean - returns true if this repository instance contains a suitable package for a given functional ID, false otherwise.
 	 */
-	public boolean providesFunction(String functionID);
+	public boolean providesFunction(String functionId);
 
 	/**
 	 * Returns the function IDs (i.e. WPS processIdentifiers) of all registered packages

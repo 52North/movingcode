@@ -134,7 +134,7 @@ public final class GeoprocessingFeed {
 			String feedWebRoot = getFeedWebRoot();
 			GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(
 					feedWebRoot + entryID,
-					mcp.getDescription(),
+					mcp.getDescriptionAsDocument(),
 					mcp.getTimestamp().toDate(),
 					feedWebRoot + entryID + ".zip",
 					feedWebRoot + entryID + ".xml"

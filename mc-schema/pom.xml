@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.n52.mc</groupId>
 		<artifactId>movingcode-runtime-parent</artifactId>
-		<version>0.7-SNAPSHOT</version>
+		<version>0.8-SNAPSHOT</version>
 	</parent>
 	<artifactId>mc-schema</artifactId>
 	<packaging>jar</packaging>

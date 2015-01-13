@@ -73,7 +73,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 		// init local mirror
 		// also loads previously mirrored content
-		initLocalMirrotMirror();
+		initLocalMirror();
 		
 		// trigger initial update from remote repo in separate thread
 		Thread tLoadRemote = new UpdateContentThread();
@@ -85,7 +85,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * private method that encapsulates the logic for loading 
 	 * MovingCode packages.  
 	 */
-	private void initLocalMirrotMirror(){
+	private void initLocalMirror(){
 
 		// 1. check if directory exists
 		//    if not: create and set lastModifiedDate to zero
@@ -113,14 +113,18 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 	 * This method initializes the {@link #localRepoMirror} and registers its
 	 * packages with this repo.
 	 */
-	private void registerLocalPackages(){
+	private synchronized void registerLocalPackages(){
 		// 1. init local mirror and load contents from disk
 		localRepoMirror = new LocalVersionedFileRepository(cacheDirectory);
-
-		// 2. Add all processes in the localRepoMirror to our list
+		
+		// 2. Add all processes in the localRepoMirror to a new inventory list
+		PackageInventory newInventory = new PackageInventory();
 		for (PID currentPID : localRepoMirror.getPackageIDs()){
-			register(localRepoMirror.getPackage(currentPID));
+			newInventory.add(localRepoMirror.getPackage(currentPID));
 		}
+		
+		// 3. update the current inventory
+		this.updateInventory(newInventory);
 	}
 
 	/**
@@ -134,8 +138,6 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 
 		List<PID> remotePIDs = Arrays.asList(remoteRepo.getPackageIDs());
 		
-		boolean changeOccurred = false;
-		
 		for (PID currentRemotePID : remotePIDs){
 			
 			// no need to perform validity checks since the remote repo
@@ -144,7 +146,6 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			// add packages that have not yet been downloaded
 			if(!localRepoMirror.containsPackage(currentRemotePID)){
 				localRepoMirror.addPackage(remoteRepo.getPackage(currentRemotePID));
-				changeOccurred = true;
 			}
 
 		}
@@ -159,12 +160,6 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		// set to latest update dates
 		mirrorTimestamp = ((RemoteFeedRepository)remoteRepo).lastUpdated();
 		cacheDirectory.setLastModified(mirrorTimestamp.getTime());
-		
-		// inform listeners that this repo has changed
-		if (changeOccurred){
-			logger.info("Repository content has changed. Calling Repository Change Listeners.");
-			informRepositoryChangeListeners();
-		}
 		
 		// mark init done
 		initDone = true;

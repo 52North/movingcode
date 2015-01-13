@@ -23,21 +23,15 @@
  */
 package org.n52.movingcode.runtime.coderepository;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
+import org.n52.movingcode.runtime.codepackage.XMLUtils;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ImmutableSet;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -57,20 +51,12 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 public abstract class AbstractRepository implements IMovingCodeRepository{
 
-	// registered packages - KVP (packageID, mPackage)
-	private Map<PID, MovingCodePackage> packages = new HashMap<PID, MovingCodePackage>();
-
-	// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
-	private Multimap<String, PID> fIDpID_Lookup = ArrayListMultimap.create();
+	private PackageInventory inventory = new PackageInventory();
 
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
 
 	static Logger logger = Logger.getLogger(AbstractRepository.class);
-
-	// volatile read and write locks
-	protected volatile boolean writeLock = false;
-	protected volatile int readLock = 0;
 
 	/**
 	 * Protected method for registering packages with this repository.
@@ -79,11 +65,8 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * 
 	 * @param mcPackage {@link MovingCodePackage}
 	 */
-	protected void register(MovingCodePackage mcPackage) {
-		acquireWriteLock();
-		this.packages.put(mcPackage.getVersionedPackageId(), mcPackage);
-		this.fIDpID_Lookup.put(mcPackage.getFunctionIdentifier(), mcPackage.getVersionedPackageId());
-		returnWriteLock();
+	protected void register(final MovingCodePackage mcPackage) {
+		inventory.add(mcPackage);
 		informRepositoryChangeListeners();
 	}
 
@@ -94,101 +77,64 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * 
 	 * @param packageID
 	 */
-	protected void unregister(PID packageID){
-		acquireWriteLock();
-		if (fIDpID_Lookup.containsValue(packageID)){
-			String fID = getPackage(packageID).getFunctionIdentifier();
-			fIDpID_Lookup.remove(fID, packageID);
-		}
-
-		returnWriteLock();
+	protected void unregister(PID packageId){
+		inventory.remove(packageId);
 		informRepositoryChangeListeners();
 	}
-
-	@Override
-	public boolean providesFunction(String functionID) {
-		acquireReadLock();
-		boolean retval = this.fIDpID_Lookup.containsKey(functionID);
-		returnReadLock();
-		return retval;
+	
+	/**
+	 * Performs a comparison between old and new inventory. If the content has changed
+	 * the current inventory will be replaced with the new inventory.
+	 * 
+	 * @param newInventory
+	 */
+	protected void updateInventory(final PackageInventory newInventory){
+		if (!inventory.equals(newInventory)){
+			inventory = newInventory;
+			informRepositoryChangeListeners();
+		}
 	}
 
 	@Override
-	public boolean containsPackage(PID packageID) {
-		acquireReadLock();
-		boolean retval = this.packages.containsKey(packageID);
-		returnReadLock();
-		return retval;
+	public boolean providesFunction(String functionId) {
+		return inventory.contains(functionId);
+	}
+
+	@Override
+	public boolean containsPackage(PID packageId) {
+		return inventory.contains(packageId);
 	}
 
 	@Override
 	public String[] getFunctionIDs() {
-		acquireReadLock();
-		String[] retval = this.fIDpID_Lookup.keySet().toArray(new String[this.fIDpID_Lookup.keySet().size()]);
-		returnReadLock();
-		return retval;
+		ImmutableSet<String> s = inventory.getFunctionIDs();
+		return s.toArray(new String[s.size()]);
 	}
 
 	@Override
 	public PID[] getPackageIDs() {
-		acquireReadLock();
-		PID[] retval = this.packages.keySet().toArray(new PID[this.packages.keySet().size()]);
-		returnReadLock();
-		return retval;
+		ImmutableSet<PID> s = inventory.getPackageIDs();
+		return s.toArray(new PID[s.size()]);
 	}
 
 	@Override
-	public MovingCodePackage getPackage(PID packageID) {
-		acquireReadLock();
-		MovingCodePackage retval = this.packages.get(packageID);
-		returnReadLock();
-		return retval;
+	public MovingCodePackage getPackage(final PID packageId) {
+		return inventory.getPackage(packageId);
 	}
 
 	@Override
-	public PackageDescriptionDocument getPackageDescription(PID packageID) {
-		acquireReadLock();
-		// 1. Create an *immutable* copy of the original package description
-		// 2. return only this copy
-		// (Having an immutable copy means that later modifications of this repo will not alter the returned object.)
-		PackageDescriptionDocument originalDescription = this.packages.get(packageID).getDescription();
-		PackageDescriptionDocument retval = null;
-		try {
-			StringWriter writer = new StringWriter();  
-			originalDescription.save(writer);
-			String immutableCopy = writer.toString();
-			retval = PackageDescriptionDocument.Factory.parse(immutableCopy);
-		} catch (XmlException e) {
-			// should not occur since we had everything validated before ...
-			logger.error("Could not read PackageDescription from String.\n" + e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
-			// should not occur since writing a valid XML document to a new String is always possible ...
-			logger.error("Could not copy PackageDescription to String.\n" + e.getMessage());
-			e.printStackTrace();
-		} catch (NullPointerException e){
-			logger.debug("PackageDescription not found for packageID " + packageID + "\n(Package is either unavailable or has disapperared temporarily.)");
-			retval = null;
-		}
-		returnReadLock();
-		return retval;
+	public PackageDescriptionDocument getPackageDescriptionAsDocument(PID packageId) {
+		return XMLUtils.fromString(getPackageDescriptionAsString(packageId));
+	}
+	
+	@Override
+	public String getPackageDescriptionAsString(PID packageId) {
+		return inventory.getPackage(packageId).getDescriptionAsString();
 	}
 
 	@Override
-	public MovingCodePackage[] getPackageByFunction(String functionID){
-		acquireReadLock(); // acquire lock
-		Collection<PID> packageIDs = this.fIDpID_Lookup.get(functionID);
-		if (packageIDs.size() != 0){
-			ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
-			for (PID currentPID : packageIDs){
-				resultSet.add(packages.get(currentPID));
-			}
-			returnReadLock(); // return lock
-			return resultSet.toArray(new MovingCodePackage[resultSet.size()]);
-		} else {
-			returnReadLock(); // return lock
-			return null;
-		}
+	public MovingCodePackage[] getPackageByFunction(String functionId){
+		return inventory.getPackagesByFunctionId(functionId);
 	}
 
 	@Override
@@ -204,7 +150,7 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	/**
 	 * informs all listeners about an update.
 	 */
-	protected synchronized void informRepositoryChangeListeners() {
+	private synchronized void informRepositoryChangeListeners() {
 		for (RepositoryChangeListener l : this.changeListeners) {
 			l.onRepositoryUpdate(this);
 		}
@@ -215,40 +161,10 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	 * the registered listeners.)
 	 */
 	protected void clear(){
-		acquireWriteLock();
-
-		// registered packages - KVP (packageID, mPackage)
-		this.packages = new HashMap<PID, MovingCodePackage>();
-
-		// lookup table between functionalID (i.e. WPS ProcessIdentifier) <--> packageID 
-		this.fIDpID_Lookup = ArrayListMultimap.create();
-
-		returnWriteLock();
+		this.inventory = new PackageInventory();
 
 		// inform change listeners
 		informRepositoryChangeListeners();
-	}
-
-	private synchronized void acquireWriteLock(){
-		while (writeLock || readLock !=0 ){
-			// spin
-		}
-		writeLock = true;
-	}
-
-	private synchronized void returnWriteLock(){
-		writeLock = false;
-	}
-
-	private synchronized void acquireReadLock(){
-		while (writeLock){
-			// spin
-		}
-		readLock++;
-	}
-
-	private void returnReadLock(){
-		readLock--;
 	}
 
 }

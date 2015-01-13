@@ -35,7 +35,6 @@ import java.util.HashSet;
 import org.apache.xmlbeans.XmlException;
 import org.n52.movingcode.runtime.codepackage.Constants;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.codepackage.PID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -87,27 +86,25 @@ public final class LocalPlainRepository extends AbstractRepository {
 		this.directory = sourceDirectory;
 
 		// load packages from folder
-		load();
+		updateContent();
 
 		// start update thread
 		updateThread = new UpdateInventoryThread();
 		updateThread.start();
 	}
-
-	/**
-	 * private method that encapsulates the logic for loading zipped
-	 * MovingCode packages from a local folder.  
-	 */
-	private final void load(){
+	
+	private synchronized void updateContent(){
+		
+		PackageInventory newInventory = new PackageInventory();
+		
 		// recursively obtain all folders in sourceDirectory
 		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
 		Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
 
 		logger.info("Scanning directory: " + directory.getAbsolutePath());
-
-
+		
 		for (Path currentFolder : potentialPackageFolders) {
-
+			
 			// attempt to read packageDescription XML
 			File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
 			if (!packageDescriptionFile.exists()){
@@ -140,13 +137,15 @@ public final class LocalPlainRepository extends AbstractRepository {
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage);
+				newInventory.add(mcPackage);
 				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getVersionedPackageId().toString());
 			}
 			else {
 				logger.error(currentFolder + " is an invalid package.");
 			}
 		}
+		
+		this.updateInventory(newInventory);
 	}
 
 
@@ -198,83 +197,8 @@ public final class LocalPlainRepository extends AbstractRepository {
 					logger.debug("Interrupt received. Update thread stopped.");
 					this.interrupt();
 				}
-
-				boolean changeOccurred = false;
 				
-				// obtain all folders in sourceDirectory
-				Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
-				Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
-				logger.info("Scanning directory: " + directory.getAbsolutePath());
-				
-				// create a new set of currently known packageIDs
-				HashSet<PID> knownPackageIdSet = new HashSet<PID>();
-				for (Path currentFolder : potentialPackageFolders) {
-					// attempt to read packageDescription XML
-					File packageDescriptionFile = new File(currentFolder.toFile(), Constants.PACKAGE_DESCRIPTION_XML);
-					if (!packageDescriptionFile.exists()){
-						continue; // skip this and immediately jump to the next iteration
-					}
-
-					PackageDescriptionDocument pd = null;
-					try {
-						pd = PackageDescriptionDocument.Factory.parse(packageDescriptionFile);
-					} catch (XmlException e) {
-						// silently skip this and immediately jump to the next iteration
-						continue;
-					} catch (IOException e) {
-						// silently skip this and immediately jump to the next iteration
-						continue;
-					}
-
-					// attempt to access workspace root folder
-					String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
-					if (workspace.startsWith("./")){
-						workspace = workspace.substring(2); // remove leading "./" if it exists
-					}
-					File workspaceDir = new File(currentFolder.toFile(), workspace);
-					if (!workspaceDir.exists()){
-						continue; // skip this and immediately jump to the next iteration
-					}
-
-					MovingCodePackage candidatePackage = new MovingCodePackage(workspaceDir, pd);
-
-					// validate and add to package map if not yet registered
-					if (candidatePackage.isValid()) {
-						// add current package ID to the set of currently known package IDs
-						knownPackageIdSet.add(candidatePackage.getVersionedPackageId());
-						
-						if (!containsPackage(candidatePackage.getVersionedPackageId())){
-							register(candidatePackage);
-							logger.info("Found package: " + currentFolder + "; using ID: " + candidatePackage.getVersionedPackageId().toString());
-							changeOccurred = true;
-						}
-					} else {
-						// if validation fails: report
-						logger.error(currentFolder + " is an invalid package.");
-
-						// attempt removal if it was previously registered
-						try{
-							if (containsPackage(candidatePackage.getVersionedPackageId())){
-								unregister(candidatePackage.getVersionedPackageId());
-							}
-						} catch (Exception e){
-							// silent catch since we could encounter any kind of error with invalid packages
-						}
-					}
-				}
-				
-				// remove any packages from repo that are not in the current potential collection
-				for (PID pid : getPackageIDs()){
-					if (!knownPackageIdSet.contains(pid)){
-						unregister(pid);
-					}
-				}
-				
-				// inform listeners that this repo has changed
-				if (changeOccurred){
-					logger.info("Repository content has changed. Calling Repository Change Listeners.");
-					informRepositoryChangeListeners();
-				}
+				updateContent();
 			}
 
 		}

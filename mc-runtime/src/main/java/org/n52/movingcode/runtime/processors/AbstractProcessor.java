@@ -29,6 +29,8 @@ import java.io.File;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.iodata.IOParameterMap;
 
+import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
+
 /**
  * An abstract processor that is going to handle MovingCodePackages. It implements the {@link IProcessor}
  * interface and extends an {@link IOParameterMap}.
@@ -45,6 +47,7 @@ public abstract class AbstractProcessor extends IOParameterMap implements IProce
 	protected final File scratchWorkspace;
 	protected final MovingCodePackage mcPackage;
 	protected final PropertyMap properties;
+	protected final PackageDescriptionDocument packageDescriptionDoc;
 
 	/**
 	 * The default and mandatory constructor for all processors in this framework.
@@ -58,6 +61,7 @@ public abstract class AbstractProcessor extends IOParameterMap implements IProce
 		this.scratchWorkspace = scratchworkspace;
 		this.mcPackage = mcp;
 		this.properties = properties;
+		this.packageDescriptionDoc = mcp.getDescriptionAsDocument();
 	}
 
 }

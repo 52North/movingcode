@@ -216,7 +216,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public ProcessDescriptionType getProcessDescription(final String functionIdentifier) {
 		MovingCodePackage[] mcpArray = getPackageByFunction(functionIdentifier);
 		if (mcpArray != null && mcpArray.length > 0){
-			return mcpArray[0].getDescription().getPackageDescription().getFunctionality().getWps100ProcessDescription();
+			return mcpArray[0].getDescriptionAsDocument().getPackageDescription().getFunctionality().getWps100ProcessDescription();
 		} else {
 			return null;
 		}
@@ -329,10 +329,30 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	@Override
-	public PackageDescriptionDocument getPackageDescription(PID packageId) {
+	public PackageDescriptionDocument getPackageDescriptionAsDocument(PID packageId) {
 		for(IMovingCodeRepository currentRepo : repositories.values()){
+			// cycle through all repos to find the packageId
 			if (currentRepo.containsPackage(packageId)){
-				currentRepo.getPackage(packageId).getTimestamp();
+				// attempt a package retrieval
+				PackageDescriptionDocument doc = currentRepo.getPackageDescriptionAsDocument(packageId);
+				if (doc != null){
+					return doc;
+				}
+			}
+		}
+		return null; 
+	}
+	
+	@Override
+	public String getPackageDescriptionAsString(PID packageId) {
+		for(IMovingCodeRepository currentRepo : repositories.values()){
+			// cycle through all repos to find the packageId
+			if (currentRepo.containsPackage(packageId)){
+				// attempt a package retrieval
+				String packageDescription = currentRepo.getPackageDescriptionAsString(packageId);
+				if (packageDescription != null){
+					return packageDescription;
+				}
 			}
 		}
 		return null; 
@@ -366,52 +386,5 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 			l.onRepositoryUpdate(this);
 		}
 	}
-
-	//	/**
-	//	 * Private convenience method that filters the repoID from a global packageID
-	//	 * of the form <repoid>+<separator>+<localPID>.
-	//	 * 
-	//	 * If no repo with a matching ID was found this methods return null
-	//	 * 
-	//	 * @param packageID {@link String}
-	//	 * @return a valid repo id {@link String} 
-	//	 */
-	//	private final PackageID repoID(final PackageID packageID){
-	//		for (String currentRepoID : repositories.keySet()){
-	//			// <prefix> = <repoid>+"/"
-	//			String prefix = currentRepoID + separator;
-	//			// if packageID starts with  <prefix>
-	//			if ( packageID.startsWith(prefix) ){
-	//				return currentRepoID;
-	//			}
-	//		}
-	//		return null;
-	//	}
-
-	//	/**
-	//	 * Private convenience method that filters the local Package ID (localPID) from a
-	//	 * global packageID of the form <repoid>+<separator>+<localPID>.
-	//	 * The local package ID is the package ID that was assigned to a package by the 
-	//	 * particular repository.
-	//	 * 
-	//	 * @param packageID {@link String}
-	//	 * @return a localPID {@link String} 
-	//	 */
-	//	private final String localPID(final String packageID){
-	//		String repoID = repoID(packageID);
-	//		// safety check to avoid null pointers
-	//		// should not happen during regular operation
-	//		if (repoID == null){
-	//			return null;
-	//		}
-	//		// <prefix> = <repoid>+"/"
-	//		String prefix = repoID + separator;
-	//		// if packageID starts with  <prefix>
-	//		if ( packageID.startsWith(prefix) ){
-	//			return packageID.substring(prefix.length());
-	//		} else {
-	//			return null;
-	//		}
-	//	}
 
 }

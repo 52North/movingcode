@@ -88,14 +88,16 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		fingerprint = RepositoryUtils.directoryFingerprint(directory);
 
 		// load packages from folder
-		load();
+		reloadContent();
 
 		// start timer daemon
 		timerDaemon = new Timer(true);
 		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
 	}
 
-	private void load(){
+	private synchronized void reloadContent(){
+		PackageInventory newInventory = new PackageInventory();
+		
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> zipFiles = scanForZipFiles(directory);
 
@@ -110,13 +112,15 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			// and add to package map
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
-				register(mcPackage);
+				newInventory.add(mcPackage);
 				logger.debug("Registered package: " + currentFile + "; using ID: " + mcPackage.getVersionedPackageId().toString());	
 			} else {
 				logger.error(currentFile.getAbsolutePath() + " is an invalid package.");
 			}
 
 		}
+		
+		updateInventory(newInventory);
 	}
 
 	/**
@@ -145,12 +149,9 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 				logger.info("Repository content has silently changed. Running update ...");
 				// set new fingerprint
 				fingerprint = newFingerprint;
-				// clear an reload
-				clear();
-				load();
-
-				logger.info("Reload finished. Calling Repository Change Listeners.");
-				informRepositoryChangeListeners();
+				
+				// ... and trigger reload
+				reloadContent();
 			}			
 		}
 	}

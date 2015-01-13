@@ -71,13 +71,16 @@ public final class RemoteFeedRepository extends AbstractRepository {
 	 */
 	public RemoteFeedRepository(final URL atomFeedURL) {
 		this.atomFeedURL = atomFeedURL;
-		load();
+		reloadContent();
 		// start timer daemon
 		timerDaemon = new Timer(true);
 		timerDaemon.scheduleAtFixedRate(new CheckFeed(), 0, IMovingCodeRepository.remotePollingInterval);
 	}
 
-	private synchronized void load(){
+	private synchronized void reloadContent(){
+		
+		PackageInventory newInventory = new PackageInventory();
+		
 		InputStream stream = null;
 		try {
 			logger.debug("Create RemoteFeedRepository from " + atomFeedURL);
@@ -95,7 +98,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				// and add to package map
 				// and add current file to zipFiles map
 				if (mcp.isValid()) {
-					register(mcp);
+					newInventory.add(mcp);
 				}
 				else {
 					logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
@@ -118,7 +121,9 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				stream = null;
 			}
 		}
-
+		
+		updateInventory(newInventory);
+		
 		logger.trace("Created!");
 	}
 
@@ -145,9 +150,8 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				if (feed.lastUpdated().after(lastFeedUpdate)){
 					logger.info("Repository content has  changed. Running update ...");
 					
-					// clear the contents and do a re-load
-					clear();
-					load();
+					// do a re-load
+					reloadContent();
 					
 				}
 				
@@ -169,8 +173,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				}
 			}
 			
-			logger.info("Reload finished. Calling Repository Change Listeners.");
-			informRepositoryChangeListeners();
+			logger.info("Reload finished.");
 		}
 	}
 	

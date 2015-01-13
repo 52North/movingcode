@@ -136,7 +136,7 @@ public class RServerProcessor extends AbstractProcessor {
         }
 
         // create toolName and path
-        String rScript = this.mcPackage.getDescription().getPackageDescription().getWorkspace().getExecutableLocation();
+        String rScript = this.packageDescriptionDoc.getPackageDescription().getWorkspace().getExecutableLocation();
         if (rScript.startsWith("./")) {
             rScript = rScript.substring(2);
         }
@@ -147,8 +147,8 @@ public class RServerProcessor extends AbstractProcessor {
         rScript = this.clonedWorkspace + File.separator + rScript;
 
         String rFunction = null;
-        if (this.mcPackage.getDescription().getPackageDescription().getWorkspace().isSetExecutableMethodCall()) {
-            rFunction = this.mcPackage.getDescription().getPackageDescription().getWorkspace().getExecutableMethodCall();
+        if (this.packageDescriptionDoc.getPackageDescription().getWorkspace().isSetExecutableMethodCall()) {
+            rFunction = this.packageDescriptionDoc.getPackageDescription().getWorkspace().getExecutableMethodCall();
         }
 
         // execute and break if an error occurs

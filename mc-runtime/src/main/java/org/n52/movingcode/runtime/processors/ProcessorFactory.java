@@ -74,7 +74,7 @@ public class ProcessorFactory {
 	 */
 	public AbstractProcessor newProcessor(final MovingCodePackage mcPackage) {
 
-		String processorID = findCompatibleProcessor(mcPackage.getDescription().getPackageDescription());
+		String processorID = findCompatibleProcessor(mcPackage.getDescriptionAsDocument().getPackageDescription());
 
 		if (processorID != null) {
 			logger.trace("Creating new processor for package: " + mcPackage.getVersionedPackageId().toString());
@@ -90,7 +90,7 @@ public class ProcessorFactory {
 	}
 
 	public boolean supportsPackage(final MovingCodePackage mcPackage){
-		String processorID = findCompatibleProcessor(mcPackage.getDescription().getPackageDescription());
+		String processorID = findCompatibleProcessor(mcPackage.getDescriptionAsDocument().getPackageDescription());
 
 		// return true if processorID is not null
 		return processorID != null ? true : false; 

@@ -125,7 +125,7 @@ public class JavaJARProcessor extends AbstractProcessor {
 		}
 
 		// create command from parameters and values
-		String executable = this.mcPackage.getDescription().getPackageDescription().getWorkspace().getExecutableLocation();
+		String executable = this.packageDescriptionDoc.getPackageDescription().getWorkspace().getExecutableLocation();
 		if (executable.startsWith("./")) {
 			executable = executable.substring(2);
 		}
