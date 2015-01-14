@@ -51,7 +51,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 public abstract class AbstractRepository implements IMovingCodeRepository{
 
-	private PackageInventory inventory = new PackageInventory();
+	private volatile PackageInventory inventory = new PackageInventory();
 
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
