@@ -34,7 +34,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
+import org.n52.movingcode.runtime.coderepository.MovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.LocalZipPackageRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
 import org.n52.movingcode.runtime.coderepository.RepositoryUtils;

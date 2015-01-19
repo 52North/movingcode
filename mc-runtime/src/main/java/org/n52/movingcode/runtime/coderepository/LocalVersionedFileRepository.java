@@ -44,7 +44,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 
 
 /**
- * This class implements an {@link IMovingCodeRepository} for local (unzipped) packages, stored
+ * This class implements an {@link MovingCodeRepository} for local (unzipped) packages, stored
  * in a flat folder structure. This folder structure shall have the following appearance:
  * 
  * <absPath>-<folder1>-<packagedescription.xml>
@@ -67,7 +67,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * The file <packagedescription.xml> contains the description of the MovingCode package.
  * 
  * This Repo performs occasional checks for updated content.
- * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
+ * (Interval for periodical checks is given by {@link MovingCodeRepository#localPollingInterval})
  * 
  * @author Matthias Mueller, TU Dresden
  *
@@ -113,7 +113,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 
 		// 6. register package
 		register(mcp);
-		packageFolders.put(mcp.getVersionedPackageId(), targetDir.getAbsolutePath());
+		packageFolders.put(mcp.getPackageId(), targetDir.getAbsolutePath());
 
 	}
 
@@ -212,7 +212,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				newInventory.add(mcPackage);
-				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getVersionedPackageId().toString());
+				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getPackageId().toString());
 			}
 			else {
 				logger.error(currentFolder + " is an invalid package.");
@@ -270,7 +270,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 	 */
 	private final class UpdateInventoryThread extends Thread {
 
-		private static final long updateInterval = IMovingCodeRepository.localPollingInterval;
+		private static final long updateInterval = MovingCodeRepository.localPollingInterval;
 
 		@Override
 		public void run() {

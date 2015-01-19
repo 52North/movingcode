@@ -39,25 +39,23 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.model.Link;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
 import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 /**
- * A {@link GeoprocessingFeed} is a class that provides access to a set of {@link GeoprocessingFeedEntry}.
+ * A {@link CodePackageFeed} is a class that provides access to a set of {@link GeoprocessingFeedEntry}.
  * 
  * @author Matthias Mueller, TU Dresden
  * 
  */
-public final class GeoprocessingFeed {
+public final class CodePackageFeed {
 
-	static Logger logger = Logger.getLogger(GeoprocessingFeed.class);
+	static Logger logger = Logger.getLogger(CodePackageFeed.class);
 
 	private final Feed feed;
-
-	public static final String atomFeedFileName = "feed.xml";
+	
 	public static final String feedMimeType = "application/atom+xml";
 	public static final String PACKAGE_MIMETYPE = "application/zip";
 	public static final String PACKAGE_DESCRIPTION_MIMETYPE = "text/xml";
@@ -65,21 +63,11 @@ public final class GeoprocessingFeed {
 	public static final String DETAILED_DESCRIPTION_LINK_REL = "alternate";
 
 	/**
-	 * No argument constructor. This creates an empty feed without any of the
-	 * mandatory elements. Shall only be used by internal methods.
-	 *  
-	 */
-	protected GeoprocessingFeed(){
-		Abdera abdera = new Abdera();
-		feed = abdera.newFeed();
-	}
-
-	/**
-	 * Construct a {@link GeoprocessingFeed} from an atom XML stream
+	 * Construct a {@link CodePackageFeed} from an atom XML stream
 	 * 
 	 * @param atomStream {@link InputStream}
 	 */
-	public GeoprocessingFeed(InputStream atomStream) {
+	public CodePackageFeed(InputStream atomStream) {
 		logger.debug("Loading Feed from " + atomStream);
 
 		Parser parser = Abdera.getInstance().getParser();
@@ -90,17 +78,17 @@ public final class GeoprocessingFeed {
 	}
 
 	/**
-	 * Construct a {@link GeoprocessingFeed} from a given {@link FeedTemplate} 
+	 * Construct a {@link CodePackageFeed} from a given {@link FeedTemplate} 
 	 * 
 	 * @param template {@link FeedTemplate}
 	 */
-	protected GeoprocessingFeed(FeedTemplate template) {
+	public CodePackageFeed(FeedTemplate template) {
 
 		Abdera abdera = new Abdera();
 		feed = abdera.newFeed();
 
 		// set ID
-		feed.setId(template.getID());
+		feed.setId(template.getFeedURL());
 		// set title and subtitle
 		feed.setTitle(template.getFeedTitle());
 		feed.setSubtitle(template.getFeedSubtitle());
@@ -120,24 +108,23 @@ public final class GeoprocessingFeed {
 	}
 
 	/**
-	 * 
-	 * 
+	 *  
 	 * @param entryID
 	 * @param mcp
 	 * @return
 	 * 
 	 * TODO: add link with relation "self" to follow an atom recommendation
 	 */
-	protected synchronized boolean addEntry(String entryID, MovingCodePackage mcp){
+	public synchronized boolean addEntry(final MovingCodePackage mcp, final String webRoot){
 		// add only if ID is still free
-		if (!containsEntry(entryID)){
-			String feedWebRoot = getFeedWebRoot();
+		String entryId = mcp.getPackageId().name;
+		if (!containsEntry(entryId)){
 			GeoprocessingFeedEntry entry = new GeoprocessingFeedEntry(
-					feedWebRoot + entryID,
+					webRoot + entryId,
 					mcp.getDescriptionAsDocument(),
 					mcp.getTimestamp().toDate(),
-					feedWebRoot + entryID + ".zip",
-					feedWebRoot + entryID + ".xml"
+					webRoot + entryId + ".zip",
+					webRoot + entryId + ".xml"
 			);
 			feed.addEntry(entry.getAtomEntry());
 
@@ -157,7 +144,7 @@ public final class GeoprocessingFeed {
 	 * @param entryID {@link String}
 	 * @return {@link GeoprocessingFeedEntry} -  the entry
 	 */
-	protected GeoprocessingFeedEntry getFeedEntry(final String entryID){
+	public GeoprocessingFeedEntry getFeedEntry(final String entryID){
 		for (Entry currentEntry : feed.getEntries()){
 			if (currentEntry.getId().toString().equals(entryID)){
 				return new GeoprocessingFeedEntry(currentEntry);
@@ -253,30 +240,6 @@ public final class GeoprocessingFeed {
 		updateFeedTimestamp();
 	}
 
-	/**
-	 * Helper get the webRoot from the first feed/link/href element
-	 * Contains a trailing "/"!
-	 * 
-	 * If no valid web root can be obtained from this feed, an empty string will be returned.
-	 * 
-	 * @return {@link String} - the webRoot string
-	 */
-	private String getFeedWebRoot(){
-		// example: <link href="http://services2.glues.geo.tu-dresden.de/feeds/gpfeed.xml" rel="self" type="application/atom+xml"/>
-
-		// find the link with the self relation and use its value to determine the web root
-		for (Link currentLink : feed.getLinks()){
-			if (currentLink.getRel().equals("self")){
-				String webRoot = currentLink.getHref().toString();
-				// truncate trailing feed.xml
-				webRoot = webRoot.substring(0, webRoot.indexOf(atomFeedFileName));
-				return webRoot;
-			}
-		}
-
-		// "default" value for web root is "" (empty String)
-		return "";
-	}
 
 	/**
 	 * Contains check for entryIDs
@@ -302,6 +265,20 @@ public final class GeoprocessingFeed {
 			}
 		}
 		feed.setUpdated(lastUpdate);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (! (obj instanceof CodePackageFeed) ){
+			return false;
+		}
+		CodePackageFeed ref = (CodePackageFeed) obj;
+		return ref.feed.getId().equals(this.feed.getId());
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.feed.getId().hashCode();
 	}
 
 }

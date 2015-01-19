@@ -1,5 +1,5 @@
 /**
- * ﻿Copyright (C) 2012
+ * ﻿Copyright (C) 2014
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -32,14 +32,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.opengis.wps.x100.ProcessDescriptionType;
 
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
 import org.n52.movingcode.runtime.coderepository.CachedRemoteFeedRepository;
-import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
+import org.n52.movingcode.runtime.coderepository.MovingCodeRepository;
 import org.n52.movingcode.runtime.coderepository.RepositoryChangeListener;
+
+import com.google.common.collect.ImmutableSet;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -56,14 +59,14 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * TODO: add check to ensure that identical functions have the same ProcessDescription
  *       (otherwise we are running into severe issues when somebody queries a particular function)
- *       This could be be done in {@link #registerRepo(String, IMovingCodeRepository)}
+ *       This could be be done in {@link #registerRepo(String, MovingCodeRepository)}
  *       
  */
-public class GlobalRepositoryManager implements IMovingCodeRepository {
+public class GlobalRepositoryManager implements MovingCodeRepository {
 
 	private static GlobalRepositoryManager instance;
 
-	private Map<String, IMovingCodeRepository> repositories = new HashMap<String, IMovingCodeRepository>();
+	private Map<String, MovingCodeRepository> repositories = new HashMap<String, MovingCodeRepository>();
 
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
@@ -88,7 +91,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	}
 
 	/**
-	 * Creates a new {@link IMovingCodeRepository} for the given directory and tries to add this repository to
+	 * Creates a new {@link MovingCodeRepository} for the given directory and tries to add this repository to
 	 * the internal repositories Map. 
 	 * 1) If the directory was already loaded/registered, this method returns false.
 	 * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
@@ -101,12 +104,12 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		final String repoID = directory;
 
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
+		MovingCodeRepository repo = MovingCodeRepository.Factory.createFromPlainFolder(new File(directory)); 
 		return registerRepo(repoID, repo);
 	}
 
 	/**
-	 * Creates a new {@link IMovingCodeRepository} for the given directory and tries to add this repository to
+	 * Creates a new {@link MovingCodeRepository} for the given directory and tries to add this repository to
 	 * the internal repositories Map. 
 	 * 1) If the directory was already loaded/registered, this method returns false.
 	 * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
@@ -119,13 +122,13 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		final String repoID = directory;
 
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromZipFilesFolder(new File(directory)); 
+		MovingCodeRepository repo = MovingCodeRepository.Factory.createFromZipFilesFolder(new File(directory)); 
 		return registerRepo(repoID, repo);
 
 	}
 
 	/**
-	 * Creates a new {@link IMovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
+	 * Creates a new {@link MovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
 	 * repository to the internal repositories Map. This repository is implemented as a {@link CachedRemoteFeedRepository},
 	 * i.e. the content will be mirrored to a local directory.
 	 * This speeds up initial load time, access time and provides some fail over capabilities in the case of weak internet
@@ -144,24 +147,24 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		final String repoID = atomFeedURL.toString() + cacheDirectory.getAbsolutePath();
 
 		// add new repo
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createCachedRemoteRepository(atomFeedURL, cacheDirectory); 
+		MovingCodeRepository repo = MovingCodeRepository.Factory.createCachedRemoteRepository(atomFeedURL, cacheDirectory); 
 		return registerRepo(repoID, repo);
 	}
 
 	/**
-	 * Registers a previously created {@link IMovingCodeRepository}.
+	 * Registers a previously created {@link MovingCodeRepository}.
 	 * 
-	 * @param repo a previously created {@link IMovingCodeRepository} instance
+	 * @param repo a previously created {@link MovingCodeRepository} instance
 	 * @param repoId the id 
 	 * @return true if successfully added
 	 */
-	public boolean addRepository(final IMovingCodeRepository repo, final String repoID) {
+	public boolean addRepository(final MovingCodeRepository repo, final String repoID) {
 		// add new repo
 		return registerRepo(repoID, repo);
 	}
 
 	/**
-	 * Creates a new {@link IMovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
+	 * Creates a new {@link MovingCodeRepository} for the given Geoprocessing Feed URL and tries to add this
 	 * repository to the internal repositories Map. 
 	 * 1) If the feed URL was already loaded/registered, this method returns false.
 	 * 2) If, for some other reason, the new repository cannot be added, this method returns false. 
@@ -172,20 +175,20 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 */
 	public boolean addRepository(final URL atomFeedURL) {
 		final String repoID = atomFeedURL.toString();
-		IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(atomFeedURL); 
+		MovingCodeRepository repo = MovingCodeRepository.Factory.createFromRemoteFeed(atomFeedURL); 
 		return registerRepo(repoID, repo);
 	}
 
 	/**
-	 * Private convenience method. Puts a {@link IMovingCodeRepository} on the private
+	 * Private convenience method. Puts a {@link MovingCodeRepository} on the private
 	 * Map {@link #repositories} and adds a default change listener to it. Thus 
 	 * the RepositoryManager will be noticed about content changes in this repository and
 	 * propagate this notice to its own listeners, i.e. the subscribers to the RepositoryManager.
 	 * 
 	 * @param repoID {@link String} - the ID of the repository
-	 * @param repo {@link IMovingCodeRepository} - the repository
+	 * @param repo {@link MovingCodeRepository} - the repository
 	 */
-	private final synchronized boolean registerRepo(final String repoID, final IMovingCodeRepository repo){
+	private final synchronized boolean registerRepo(final String repoID, final MovingCodeRepository repo){
 		// if already registered: Exit
 		if (repositories.containsKey(repoID)){
 			return false;
@@ -197,7 +200,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 		// add change listener
 		repo.addRepositoryChangeListener(new RepositoryChangeListener() {
 			@Override
-			public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
+			public void onRepositoryUpdate(MovingCodeRepository updatedRepo) {
 				informRepositoryChangeListeners();
 			}
 		});
@@ -231,7 +234,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public int checkMultiplicityOfPackage(final PID identifier) {
 		int counter = 0;
 
-		for (IMovingCodeRepository repo : repositories.values()) {
+		for (MovingCodeRepository repo : repositories.values()) {
 			if (repo.containsPackage(identifier)) {
 				counter++;
 			}
@@ -247,7 +250,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	 * @return boolean
 	 */
 	public boolean providesFunction(final String functionalID) {
-		for (IMovingCodeRepository repo : repositories.values()) {
+		for (MovingCodeRepository repo : repositories.values()) {
 			if (repo.providesFunction(functionalID)) {
 				return true;
 			}
@@ -285,7 +288,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	@Override
 	public synchronized MovingCodePackage getPackage(final PID packageId) {
-		for(IMovingCodeRepository currentRepo : repositories.values()){
+		for(MovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
 				return currentRepo.getPackage(packageId);
 			}
@@ -295,7 +298,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	@Override
 	public PID[] getPackageIDs() {
-		ArrayList<PID> globalPIDs = new ArrayList<PID>();
+		Set<PID> globalPIDs = new HashSet<PID>();
 		for (String currentRepoID : repositories.keySet()){
 
 			for (PID pid : repositories.get(currentRepoID).getPackageIDs()){
@@ -305,10 +308,19 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 		return globalPIDs.toArray(new PID[globalPIDs.size()]);
 	}
+	
+	@Override
+	public ImmutableSet<MovingCodePackage> getLatestPackages() {
+		Set<MovingCodePackage> packages = new HashSet<MovingCodePackage>();
+		for (MovingCodeRepository currentRepo : repositories.values()){
+			packages.addAll(currentRepo.getLatestPackages());
+		}
+		return ImmutableSet.copyOf(packages);
+	}
 
 	@Override
 	public boolean containsPackage(final PID packageId) {
-		for(IMovingCodeRepository currentRepo : repositories.values()){
+		for(MovingCodeRepository currentRepo : repositories.values()){
 			if (currentRepo.containsPackage(packageId)){
 				return true;
 			}
@@ -320,7 +332,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	public MovingCodePackage[] getPackageByFunction(final String functionID) {
 		ArrayList<MovingCodePackage> resultSet = new ArrayList<MovingCodePackage>();
 		// for each repo
-		for (IMovingCodeRepository currentRepo : repositories.values()){
+		for (MovingCodeRepository currentRepo : repositories.values()){
 			// add the matching packages to the result set
 			resultSet.addAll( Arrays.asList(currentRepo.getPackageByFunction(functionID)) );
 		}
@@ -330,7 +342,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 
 	@Override
 	public PackageDescriptionDocument getPackageDescriptionAsDocument(PID packageId) {
-		for(IMovingCodeRepository currentRepo : repositories.values()){
+		for(MovingCodeRepository currentRepo : repositories.values()){
 			// cycle through all repos to find the packageId
 			if (currentRepo.containsPackage(packageId)){
 				// attempt a package retrieval
@@ -345,7 +357,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	
 	@Override
 	public String getPackageDescriptionAsString(PID packageId) {
-		for(IMovingCodeRepository currentRepo : repositories.values()){
+		for(MovingCodeRepository currentRepo : repositories.values()){
 			// cycle through all repos to find the packageId
 			if (currentRepo.containsPackage(packageId)){
 				// attempt a package retrieval
@@ -361,7 +373,7 @@ public class GlobalRepositoryManager implements IMovingCodeRepository {
 	@Override
 	public String[] getFunctionIDs() {
 		HashSet<String> fids = new HashSet<String>();
-		for (IMovingCodeRepository currentRepo : repositories.values()){
+		for (MovingCodeRepository currentRepo : repositories.values()){
 			fids.addAll(Arrays.asList(currentRepo.getFunctionIDs()));
 		}
 

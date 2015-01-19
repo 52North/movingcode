@@ -32,7 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 
 /**
- * This class implements an {@link IMovingCodeRepository} for local zipped packages, stored
+ * This class implements an {@link MovingCodeRepository} for local zipped packages, stored
  * in a possibly nested folder structure.
  * 
  * <absPath>-<folder1>\<zip1.1>
@@ -58,7 +58,7 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
  * interpretation as a Code Package.
  * 
  * This Repo performs occasional checks for updated content.
- * (Interval for periodical checks is given by {@link IMovingCodeRepository#localPollingInterval})
+ * (Interval for periodical checks is given by {@link MovingCodeRepository#localPollingInterval})
  * 
  * @author Matthias Mueller, TU Dresden
  *
@@ -92,7 +92,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 
 		// start timer daemon
 		timerDaemon = new Timer(true);
-		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, IMovingCodeRepository.localPollingInterval);
+		timerDaemon.scheduleAtFixedRate(new CheckFolder(), 0, MovingCodeRepository.localPollingInterval);
 	}
 
 	private synchronized void reloadContent(){
@@ -113,7 +113,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				newInventory.add(mcPackage);
-				logger.debug("Registered package: " + currentFile + "; using ID: " + mcPackage.getVersionedPackageId().toString());	
+				logger.debug("Registered package: " + currentFile + "; using ID: " + mcPackage.getPackageId().toString());	
 			} else {
 				logger.error(currentFile.getAbsolutePath() + " is an invalid package.");
 			}

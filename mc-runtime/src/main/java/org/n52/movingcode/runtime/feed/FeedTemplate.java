@@ -27,60 +27,78 @@ package org.n52.movingcode.runtime.feed;
 /**
  * 
  * @author Matthias Mueller, TU Dresden
- *
- * TODO: is this still useful? Maybe for future re-engineering of the feed handling?
- * TODO: if so, this could be transformed to a value object
  */
 public class FeedTemplate {
-	private String feedTitle;
-	private String feedSubtitle;
-	private String feedAuthorName;
-	private String feedAuthorEmail;
+	
+	private String title;
+	private String subtitle;
+	private String authorName;
+	private String authorEmail;
 
-	private final String feedURL;
-
+	private String feedURL;
+	
+	private FeedTemplate(){}
+	
 	public FeedTemplate(String feedURL) {
 		this.feedURL = feedURL;
 	}
 
-	public void setFeedTitle(String feedTitle) {
-		this.feedTitle = feedTitle;
-	}
-
 	public String getFeedTitle() {
-		return this.feedTitle;
-	}
-
-	public void setFeedSubtitle(String feedSubtitle) {
-		this.feedSubtitle = feedSubtitle;
+		return this.title;
 	}
 
 	public String getFeedSubtitle() {
-		return this.feedSubtitle;
-	}
-
-	public void setFeedAuthorName(String feedAuthorName) {
-		this.feedAuthorName = feedAuthorName;
+		return this.subtitle;
 	}
 
 	public String getFeedAuthorName() {
-		return this.feedAuthorName;
-	}
-
-	public void setFeedAuthorEmail(String feedAuthorEmail) {
-		this.feedAuthorEmail = feedAuthorEmail;
+		return this.authorName;
 	}
 
 	public String getFeedAuthorEmail() {
-		return this.feedAuthorEmail;
+		return this.authorEmail;
 	}
 
 	public String getFeedURL() {
 		return this.feedURL;
 	}
-
-	public String getID() {
-		return this.feedURL;
+	
+	
+	public static class Builder{
+		private final FeedTemplate builder;
+		
+		public Builder(){
+			builder = new FeedTemplate();
+		}
+		
+		public Builder feedUrl(String url){
+			this.builder.feedURL = url;
+			return this;
+		}
+		
+		public Builder feedTitle(String title){
+			this.builder.title = title;
+			return this;
+		}
+		
+		public Builder feedSubtitle(String subtitle){
+			this.builder.subtitle = subtitle;
+			return this;
+		}
+		
+		public Builder feedAuthorName(String authorName){
+			this.builder.authorName = authorName;
+			return this;
+		}
+		
+		public Builder feedAuthorEmail(String authorEmail){
+			this.builder.authorEmail = authorEmail;
+			return this;
+		}
+		
+		public FeedTemplate build(){
+			return builder;
+		}
 	}
-
+	
 }

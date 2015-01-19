@@ -77,13 +77,13 @@ public class ProcessorFactory {
 		String processorID = findCompatibleProcessor(mcPackage.getDescriptionAsDocument().getPackageDescription());
 
 		if (processorID != null) {
-			logger.trace("Creating new processor for package: " + mcPackage.getVersionedPackageId().toString());
+			logger.trace("Creating new processor for package: " + mcPackage.getPackageId().toString());
 			return loadProcessor(processorID,
 					getScratchworkspace(processorID),
 					mcPackage,
 					getProcessorProperties(processorID));
 		} else {
-			logger.debug("Could not find a suitable processor for package: " + mcPackage.getVersionedPackageId().toString());
+			logger.debug("Could not find a suitable processor for package: " + mcPackage.getPackageId().toString());
 			return null; // if no suitable processor was found
 		}
 		

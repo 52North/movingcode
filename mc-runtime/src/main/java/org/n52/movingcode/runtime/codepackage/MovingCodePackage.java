@@ -26,6 +26,7 @@ package org.n52.movingcode.runtime.codepackage;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ import static org.n52.movingcode.runtime.codepackage.Constants.*;
  * @author Matthias Mueller, TU Dresden
  * 
  */
-public class MovingCodePackage {
+public class MovingCodePackage implements Comparable<MovingCodePackage>{
 
 	private static final Logger logger = Logger.getLogger(MovingCodePackage.class);
 
@@ -65,7 +66,7 @@ public class MovingCodePackage {
 	private final String functionIdentifier;
 
 	// Package id and time stamp, i.e. date of creation or last modification
-	private final PID packageID;
+	private final PID packageId;
 	
 	private final boolean isValid;
 
@@ -88,14 +89,14 @@ public class MovingCodePackage {
 			
 			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
 			String id = doc.getPackageDescription().getPackageId();
-			packageID = new PID(id, timestamp);
+			packageId = new PID(id, timestamp);
 			packageDescription = XMLUtils.toString(doc);
 			
 		}
 		else {
 			functionIdentifier = null;
 			supportedFuncTypes = null;
-			packageID = null;
+			packageId = null;
 			packageDescription = null;
 		}
 		
@@ -113,7 +114,7 @@ public class MovingCodePackage {
 	 * Also requires the intended packageID an
 	 * 
 	 * @param zipPackageURL
-	 * @param packageID
+	 * @param packageId
 	 * @param packageStamp
 	 */
 	public MovingCodePackage(final URL zipPackageURL) {
@@ -132,13 +133,13 @@ public class MovingCodePackage {
 				
 			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
 			String id = doc.getPackageDescription().getPackageId();
-			packageID = new PID(id, timestamp);
+			packageId = new PID(id, timestamp);
 			packageDescription = XMLUtils.toString(doc);
 		}
 		else {
 			functionIdentifier = null;
 			supportedFuncTypes = null;
-			packageID = null;
+			packageId = null;
 			packageDescription = null;
 		}
 		
@@ -165,13 +166,13 @@ public class MovingCodePackage {
 			
 			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
 			String id = doc.getPackageDescription().getPackageId();
-			packageID = new PID(id, timestamp);
+			packageId = new PID(id, timestamp);
 			packageDescription = XMLUtils.toString(doc);
 		}
 		else {
 			functionIdentifier = null;
 			supportedFuncTypes = null;
-			packageID = null;
+			packageId = null;
 			packageDescription = null;
 		}
 		
@@ -210,6 +211,10 @@ public class MovingCodePackage {
 	public boolean dumpPackage(File targetFile) {
 		return this.archive.dumpPackage(targetFile);
 	}
+	
+	public boolean dumpPackage(OutputStream os) {
+		return this.archive.dumpPackage(os);
+	}
 
 	/**
 	 * writes a copy of the package (zipfile) to a given directory TODO: implement for URL sources
@@ -230,8 +235,12 @@ public class MovingCodePackage {
 	}
 	
 	
-	public PID getVersionedPackageId(){
-		return packageID;
+	public PID getPackageId(){
+		return packageId;
+	}
+	
+	public boolean isNewerThan(final MovingCodePackage mcPackage){
+		return this.packageId.isNewerThan(mcPackage.packageId);
 	}
 	
 	/**
@@ -271,7 +280,7 @@ public class MovingCodePackage {
 	 * @return {@link DateTime} package timestamp
 	 */
 	public DateTime getTimestamp() {
-		return this.packageID.timestamp;
+		return this.packageId.timestamp;
 	}
 
 	/**
@@ -308,11 +317,11 @@ public class MovingCodePackage {
 		}
 		
 		// a valid Code Package must have a package ID
-		if(mcp.packageID.id == null || mcp.packageID.equals("")){
+		if(mcp.packageId.name == null || mcp.packageId.equals("")){
 			return false;
 		}
 		// ... and timestamp
-		if(mcp.packageID.timestamp == null){
+		if(mcp.packageId.timestamp == null){
 			return false;
 		}
 		
@@ -350,13 +359,18 @@ public class MovingCodePackage {
 		builder.append(", packageDescription=");
 		builder.append(this.packageDescription);
 		builder.append(", PackageID=");
-		builder.append(this.packageID.id);
+		builder.append(this.packageId.name);
 		builder.append(", timeStamp=");
-		builder.append(this.packageID.timestamp.toString());
+		builder.append(this.packageId.timestamp.toString());
 		builder.append(", supportedFuncTypes=");
 		builder.append(this.supportedFuncTypes);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public int compareTo(MovingCodePackage other) {
+		return this.packageId.compareTo(other.packageId);
 	}
 
 }

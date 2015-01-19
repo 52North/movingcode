@@ -47,7 +47,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 
 /**
  * This class contains static utility methods to convert between different
- * {@link IMovingCodeRepository} implementations.
+ * {@link MovingCodeRepository} implementations.
  * 
  * @author Matthias Mueller, TU Dresden
  *

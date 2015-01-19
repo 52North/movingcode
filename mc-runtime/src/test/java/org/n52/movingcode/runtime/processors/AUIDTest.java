@@ -21,10 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.movingcode.runtime.test;
+package org.n52.movingcode.runtime.processors;
 
 import org.junit.Test;
 import org.n52.movingcode.runtime.processors.AUID;
+import org.n52.movingcode.runtime.test.MCRuntimeTestConfig;
 
 /**
  * Tests for {@link AUID}

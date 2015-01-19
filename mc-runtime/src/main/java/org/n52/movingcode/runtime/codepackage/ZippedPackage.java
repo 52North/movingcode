@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -35,6 +37,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.lf5.util.StreamUtils;
 import org.apache.xmlbeans.XmlException;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
@@ -78,11 +81,6 @@ final class ZippedPackage implements ICodePackage {
 	@Override
 	public final PackageDescriptionDocument getDescription() {
 		return extractDescription(this);
-	}
-
-	@Override
-	public final void dumpPackage(String workspaceDirName, File targetDirectory) {
-		unzipWorkspace(this, workspaceDirName, targetDirectory);
 	}
 
 	/**
@@ -201,6 +199,12 @@ final class ZippedPackage implements ICodePackage {
 		}
 	}
 
+
+	@Override
+	public final void dumpPackage(String workspaceDirName, File targetDirectory) {
+		unzipWorkspace(this, workspaceDirName, targetDirectory);
+	}
+
 	@Override
 	public boolean dumpPackage(File targetZipFile) {
 		// zipFile and zip url MUST not be null at the same time
@@ -227,6 +231,37 @@ final class ZippedPackage implements ICodePackage {
 			}
 		}
 
+		return false;
+	}
+
+	@Override
+	public boolean dumpPackage(OutputStream os) {
+		// zipFile and zip url MUST not be null at the same time
+		assert ( ! ( (zipFile == null) && (zipURL == null)));
+
+		// in case there is a zipped package file on disk
+		if (zipFile != null) {
+			try {
+				FileUtils.copyFile(zipFile, os);
+				return true;
+			}
+			catch (Exception e) {
+				return false;
+			}
+			// in case there is no file on disk and but a valid url to a zipped package
+		}
+		else if (zipURL != null) {
+			try (InputStream is = zipURL.openStream()) {
+				IOUtils.copy(is,os);
+				return true;
+			}
+			catch (IOException e) {
+				return false;
+			}
+		}
+		
+		// we should never get here.
+		// TODO: restructure and avoid this clause
 		return false;
 	}
 
@@ -258,13 +293,13 @@ final class ZippedPackage implements ICodePackage {
 		if (wsName.startsWith("./") || wsName.startsWith(".\\")) {
 			wsName = wsName.substring(2);
 		}
-		
+
 		String searchEntry = wsName + "/" + relativePath;
-		
-		
+
+
 		boolean retval = false;
 		try {
-			
+
 			ZipInputStream zis = null;
 			if (zipFile != null) {
 				zis = new ZipInputStream(new FileInputStream(zipFile));
@@ -276,7 +311,7 @@ final class ZippedPackage implements ICodePackage {
 			}
 
 			ZipEntry entry;
-			
+
 			while ( (entry = zis.getNextEntry()) != null) {
 				if (samePath(entry.getName(), searchEntry)) {
 					retval = true;
@@ -286,7 +321,7 @@ final class ZippedPackage implements ICodePackage {
 					zis.closeEntry();
 				}
 			}
-			
+
 			zis.close();
 
 		}
@@ -299,11 +334,11 @@ final class ZippedPackage implements ICodePackage {
 
 		return retval;
 	}
-	
+
 	private static final boolean samePath(String p1, String p2){
 		p1 = p1.replace("\\", "/");
 		p2 = p2.replace("\\", "/");
-		
+
 		return p1.equalsIgnoreCase(p2);
 	}
 

@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.n52.movingcode.runtime.GlobalRepositoryManager;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
-import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
+import org.n52.movingcode.runtime.coderepository.MovingCodeRepository;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.IOParameterMap;
 import org.n52.movingcode.runtime.processors.AUID;
@@ -59,7 +59,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		logger.info(packageFolder.getAbsolutePath());
 
 		// Act
-		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
+		MovingCodeRepository mcRep = MovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
 
 		// Assert
 		assertTrue(mcRep.providesFunction(zTransformFunctionID));
@@ -69,7 +69,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		if (pack == null){
 			logger.warn("Could not find a package for process: " + zTransformFunctionID);
 		} else {
-			logger.debug("Found package: " + pack.getVersionedPackageId().toString() + " supplying process " + zTransformFunctionID);
+			logger.debug("Found package: " + pack.getPackageId().toString() + " supplying process " + zTransformFunctionID);
 		}
 		
 		assertFalse(pack == null); // make sure it is not null
@@ -117,7 +117,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		logger.info("Adding plain folder repo: " + packageFolder.getAbsolutePath());
 
 		// Act
-		IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromPlainFolder(packageFolder);
+		MovingCodeRepository mcRep = MovingCodeRepository.Factory.createFromPlainFolder(packageFolder);
 
 		// Assert
 		assertTrue(mcRep.providesFunction(zTransformFunctionID));
@@ -163,7 +163,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		
 		try {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
-			IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createFromRemoteFeed(url);
+			MovingCodeRepository mcRep = MovingCodeRepository.Factory.createFromRemoteFeed(url);
 			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
 
 			for (PID pID : mcRep.getPackageIDs()) {
@@ -218,7 +218,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		try {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
 			File cacheWS = newTempDir();
-			IMovingCodeRepository mcRep = IMovingCodeRepository.Factory.createCachedRemoteRepository(url, cacheWS);
+			MovingCodeRepository mcRep = MovingCodeRepository.Factory.createCachedRemoteRepository(url, cacheWS);
 			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
 			logger.info("Using Cache directory: " + cacheWS.getAbsolutePath());
 

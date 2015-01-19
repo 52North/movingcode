@@ -29,6 +29,8 @@ import java.net.URL;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
 
+import com.google.common.collect.ImmutableSet;
+
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 
@@ -38,7 +40,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * @author Matthias Mueller, TU Dresden
  */
 
-public interface IMovingCodeRepository {
+public interface MovingCodeRepository {
 
 	final long localPollingInterval = 20 * 1000; // 20 sec
 	final long remotePollingInterval = 10 * 60 * 1000; // 10 min
@@ -65,12 +67,14 @@ public interface IMovingCodeRepository {
 	 * 
 	 */
 	public MovingCodePackage getPackage(PID packageId);
+	
+	public ImmutableSet<MovingCodePackage> getLatestPackages();
 
 	/**
 	 * Returns a package matching a given functionID.
 	 * If there a multiple packages that provide the same function, this method could return any
 	 * of them. If you need fine-grained control about the selection process, you have to implement
-	 * your own logic and request the package directly by calling {@link IMovingCodeRepository#getPackage(String)}
+	 * your own logic and request the package directly by calling {@link MovingCodeRepository#getPackage(String)}
 	 * 
 	 * @param {@link String} functionID - the (unique) ID of the package
 	 * @return - Array of MovingCodePackage
@@ -133,50 +137,50 @@ public interface IMovingCodeRepository {
 	static class Factory {
 
 		/**
-		 * Creates a {@link IMovingCodeRepository} from a remote feed URL.
+		 * Creates a {@link MovingCodeRepository} from a remote feed URL.
 		 * 
 		 * @param atomFeedURL {@link URL} -  the URL of the remote feed
-		 * @return {@link IMovingCodeRepository} - an new repository
+		 * @return {@link MovingCodeRepository} - an new repository
 		 */
-		public static final  IMovingCodeRepository createFromRemoteFeed(final URL atomFeedURL){
+		public static final  MovingCodeRepository createFromRemoteFeed(final URL atomFeedURL){
 			return new RemoteFeedRepository(atomFeedURL);
 		}
 
 		/**
-		 * Creates a {@link IMovingCodeRepository} from a local folder with zipped packages. This folder may contain an arbitrary
+		 * Creates a {@link MovingCodeRepository} from a local folder with zipped packages. This folder may contain an arbitrary
 		 * number of zipped packages. The packages can also be nested in sub-directories.
 		 * 
 		 * @param sourceDirectory {@link File} - the source directory, which contains all the zipped packages.
-		 * @return {@link IMovingCodeRepository} - an new repository
+		 * @return {@link MovingCodeRepository} - an new repository
 		 */
-		public static final IMovingCodeRepository createFromZipFilesFolder(File sourceDirectory){
+		public static final MovingCodeRepository createFromZipFilesFolder(File sourceDirectory){
 			return new LocalZipPackageRepository(sourceDirectory);
 		}
 
 		/**
-		 * Creates a {@link IMovingCodeRepository} from a local folder with plain packages. This folder may contain an arbitrary
+		 * Creates a {@link MovingCodeRepository} from a local folder with plain packages. This folder may contain an arbitrary
 		 * number of plain packages. The packages <b>cannot<b> be nested in sub-directories.
 		 * 
 		 * @param codeSpace{{@link String} - code space prefix used to create package identifiers
 		 * @param sourceDirectory {@link File} - the source directory, which contains all the zipped packages.
-		 * @return {@link IMovingCodeRepository} - an new repository
+		 * @return {@link MovingCodeRepository} - an new repository
 		 */
-		public static final IMovingCodeRepository createFromPlainFolder( File sourceDirectory){
+		public static final MovingCodeRepository createFromPlainFolder( File sourceDirectory){
 			return new LocalPlainRepository(sourceDirectory);
 		}
 
 		/**
-		 * Creates a {@link IMovingCodeRepository} from a remote feed URL.
+		 * Creates a {@link MovingCodeRepository} from a remote feed URL.
 		 * Uses a cache directory to store its contents
 		 * 
 		 * @param atomFeedURL {@link URL} -  the URL of the remote feed
 		 * @param cacheDirectory {@link File} - the directory that contains the cached content ot he remote repo
-		 * @return {@link IMovingCodeRepository} - the new repository
+		 * @return {@link MovingCodeRepository} - the new repository
 		 * 
 		 * TODO: add a wipe trigger? --> Directory will be empties on load ... but is this really useful?
 		 * 
 		 */
-		public static final IMovingCodeRepository createCachedRemoteRepository(final URL atomFeedURL, final File cacheDirectory){
+		public static final MovingCodeRepository createCachedRemoteRepository(final URL atomFeedURL, final File cacheDirectory){
 			return new CachedRemoteFeedRepository(atomFeedURL, cacheDirectory);
 		}
 

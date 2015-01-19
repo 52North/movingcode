@@ -33,8 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.n52.movingcode.runtime.coderepository.IMovingCodeRepository;
-import org.n52.movingcode.runtime.coderepository.RepositoryUtils;
+import org.n52.movingcode.runtime.coderepository.MovingCodeRepository;
 import org.n52.movingcode.runtime.processors.AUID;
 
 public class FeedConversionTest extends MCRuntimeTestConfig {
@@ -45,7 +44,7 @@ public class FeedConversionTest extends MCRuntimeTestConfig {
 
 		try {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
-			IMovingCodeRepository repo = IMovingCodeRepository.Factory.createFromRemoteFeed(url);
+			MovingCodeRepository repo = MovingCodeRepository.Factory.createFromRemoteFeed(url);
 			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
 			
 			File tmpDir = new File(FileUtils.getTempDirectory(), AUID.randomAUID());
@@ -54,6 +53,7 @@ public class FeedConversionTest extends MCRuntimeTestConfig {
 			
 			logger.info("Using temp dir " + tmpDir.getAbsolutePath());
 
+			// TODO: reactivate dump testing
 //			RepositoryUtils.materializeAsLocalZipRepo(repo, tmpDir);
 
 		}

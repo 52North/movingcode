@@ -24,6 +24,7 @@
 package org.n52.movingcode.runtime.codepackage;
 
 import java.io.File;
+import java.io.OutputStream;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -51,6 +52,14 @@ public interface ICodePackage {
 	 * @return boolean - true if the package was successfully dumped, false otherwise
 	 */
 	public boolean dumpPackage(File targetZipFile);
+	
+	/**
+	 * Writes the content of this {@link ICodePackage} Object to an output stream. 
+	 * 
+	 * @param os
+	 * @return
+	 */
+	public boolean dumpPackage(OutputStream os);
 	
 	/**
 	 * 

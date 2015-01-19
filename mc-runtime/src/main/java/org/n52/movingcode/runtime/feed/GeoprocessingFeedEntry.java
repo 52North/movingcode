@@ -47,7 +47,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * 
  * @author Matthias Mueller, TU Dresden
  *
- * TODO: Should be used by {@link GeoprocessingFeed} class only.
+ * TODO: Should be used by {@link CodePackageFeed} class only.
  * 
  */
 final class GeoprocessingFeedEntry {
@@ -202,8 +202,8 @@ final class GeoprocessingFeedEntry {
 		for (Link currentLink : entry.getLinks()){
 			String rel = currentLink.getRel();
 			String mt = currentLink.getMimeType().toString();
-			if (rel.equals(GeoprocessingFeed.PACKAGE_LINK_REL)
-					&& mt.equals(GeoprocessingFeed.PACKAGE_MIMETYPE)){
+			if (rel.equals(CodePackageFeed.PACKAGE_LINK_REL)
+					&& mt.equals(CodePackageFeed.PACKAGE_MIMETYPE)){
 				try {
 					return currentLink.getHref().toURL();
 				} catch (MalformedURLException e) {
@@ -237,8 +237,8 @@ final class GeoprocessingFeedEntry {
 	private static final Link makePackageLink(String packageURL) {
 		Link link = Abdera.getInstance().getFactory().newLink();
 		link.setHref(packageURL);
-		link.setMimeType(GeoprocessingFeed.PACKAGE_MIMETYPE);
-		link.setRel(GeoprocessingFeed.PACKAGE_LINK_REL);
+		link.setMimeType(CodePackageFeed.PACKAGE_MIMETYPE);
+		link.setRel(CodePackageFeed.PACKAGE_LINK_REL);
 		return link;
 	}
 
@@ -252,8 +252,8 @@ final class GeoprocessingFeedEntry {
 	private static Link makePackageDescriptionLink(String descriptionURL) {
 		Link link = Abdera.getInstance().getFactory().newLink();
 		link.setHref(descriptionURL);
-		link.setMimeType(GeoprocessingFeed.PACKAGE_DESCRIPTION_MIMETYPE);
-		link.setRel(GeoprocessingFeed.PACKAGE_LINK_REL);
+		link.setMimeType(CodePackageFeed.PACKAGE_DESCRIPTION_MIMETYPE);
+		link.setRel(CodePackageFeed.PACKAGE_LINK_REL);
 		return link;
 	}
 

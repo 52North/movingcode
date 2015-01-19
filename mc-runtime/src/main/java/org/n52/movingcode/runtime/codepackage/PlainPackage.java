@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -117,8 +118,19 @@ final class PlainPackage implements ICodePackage {
 
 	@Override
 	public boolean dumpPackage(File targetZipFile) {
+		try (OutputStream os = new FileOutputStream(targetZipFile)) {
+			dumpPackage(os);
+			return true;
+		}
+		catch (IOException e) {
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean dumpPackage(OutputStream os) {
 		try {
-			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZipFile));
+			ZipOutputStream zos = new ZipOutputStream(os);
 			// add package description to zipFile
 			zos.putNextEntry(new ZipEntry(Constants.PACKAGE_DESCRIPTION_XML));
 			IOUtils.copy(plainDescription.newInputStream(), zos);

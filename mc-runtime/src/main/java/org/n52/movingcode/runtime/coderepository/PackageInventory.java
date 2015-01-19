@@ -1,8 +1,10 @@
 package org.n52.movingcode.runtime.coderepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
@@ -23,17 +25,28 @@ import com.google.common.collect.Sets.SetView;
  */
 public class PackageInventory {
 	
-	private final Map<PID, MovingCodePackage> packages;
-	// lookup table between functionID (i.e. WPS ProcessIdentifier) <--> packageID 
-	private final Multimap<String, PID> functionToPackageLookup;
+	// lookup table packageId -> package 
+	private final Map<PID, MovingCodePackage> packagesByIdMap;
+	
+	// lookup table packageName -> package 
+	private final Multimap<String, MovingCodePackage> packagesByNameMap;
+	
+	// lookup table functionId -> packageID 
+	private final Multimap<String, MovingCodePackage> packagesByFunctionIdMap;
 	
 	/**
 	 * No argument constructor.
 	 */
 	PackageInventory(){
-		packages = new ConcurrentHashMap<PID, MovingCodePackage>();
-		Multimap<String, PID> delegate = ArrayListMultimap.create();
-		functionToPackageLookup = Multimaps.synchronizedMultimap(delegate);
+		packagesByIdMap = new ConcurrentHashMap<PID, MovingCodePackage>();
+		
+		// multimap for packageName -> packageId LUT
+		Multimap<String, MovingCodePackage> delegate1 = ArrayListMultimap.create();
+		packagesByNameMap = Multimaps.synchronizedMultimap(delegate1);
+		
+		// multimap for functionId -> packageId LUT
+		Multimap<String, MovingCodePackage> delegate2 = ArrayListMultimap.create();
+		packagesByFunctionIdMap = Multimaps.synchronizedMultimap(delegate2);
 	}
 	
 	/**
@@ -42,8 +55,9 @@ public class PackageInventory {
 	 * @param mcPackage
 	 */
 	void add(final MovingCodePackage mcPackage) {
-		this.packages.put(mcPackage.getVersionedPackageId(), mcPackage);
-		this.functionToPackageLookup.put(mcPackage.getFunctionIdentifier(), mcPackage.getVersionedPackageId());
+		this.packagesByIdMap.put(mcPackage.getPackageId(), mcPackage);
+		this.packagesByNameMap.put(mcPackage.getPackageId().name, mcPackage);
+		this.packagesByFunctionIdMap.put(mcPackage.getFunctionIdentifier(), mcPackage);
 	}
 	
 	/**
@@ -52,13 +66,13 @@ public class PackageInventory {
 	 * @param packageId
 	 */
 	void remove(final PID packageId) {
-		MovingCodePackage mcp = packages.get(packageId);
+		MovingCodePackage mcp = packagesByIdMap.get(packageId);
 		if (mcp==null){
 			return;
 		}
-		String functionID = mcp.getFunctionIdentifier();
-		functionToPackageLookup.remove(functionID, packageId);
-		packages.remove(packageId);
+		packagesByFunctionIdMap.remove(mcp.getFunctionIdentifier(), packageId);
+		packagesByNameMap.remove(mcp.getPackageId().name, mcp.getPackageId());
+		packagesByIdMap.remove(packageId);
 	}
 	
 	/**
@@ -68,7 +82,7 @@ public class PackageInventory {
 	 * @return
 	 */
 	boolean contains(final PID packageId){
-		return packages.containsKey(packageId);
+		return packagesByIdMap.containsKey(packageId);
 	}
 	
 	/**
@@ -78,7 +92,7 @@ public class PackageInventory {
 	 * @return
 	 */
 	boolean contains(final String functionId){
-		return functionToPackageLookup.containsKey(functionId);
+		return packagesByFunctionIdMap.containsKey(functionId);
 	}
 	
 	/**
@@ -88,8 +102,8 @@ public class PackageInventory {
 	 * @return
 	 */
 	ImmutableSet<String> getFunctionIDs(){
-		synchronized (functionToPackageLookup){
-			return ImmutableSet.copyOf(functionToPackageLookup.keys());
+		synchronized (packagesByFunctionIdMap){
+			return ImmutableSet.copyOf(packagesByFunctionIdMap.keys());
 		}
 	}
 	
@@ -100,8 +114,8 @@ public class PackageInventory {
 	 * @return
 	 */
 	ImmutableSet<PID> getPackageIDs(){
-		synchronized (packages){
-			return ImmutableSet.copyOf(packages.keySet());
+		synchronized (packagesByIdMap){
+			return ImmutableSet.copyOf(packagesByIdMap.keySet());
 		}
 	}
 	
@@ -112,11 +126,8 @@ public class PackageInventory {
 	 * @return
 	 */
 	MovingCodePackage[] getPackagesByFunctionId(String functionId){
-		List<MovingCodePackage> packageList = new ArrayList<MovingCodePackage>();
-		for (PID packageId : functionToPackageLookup.get(functionId)){
-			packageList.add(getPackage(packageId));
-		}
-		return packageList.toArray(new MovingCodePackage[packageList.size()]);
+		Collection<MovingCodePackage> retval = packagesByFunctionIdMap.asMap().get(functionId);
+		return retval.toArray(new MovingCodePackage[retval.size()]);
 	}
 	
 	/**
@@ -126,7 +137,58 @@ public class PackageInventory {
 	 * @return
 	 */
 	MovingCodePackage getPackage(final PID packageId){
-		return packages.get(packageId);
+		return packagesByIdMap.get(packageId);
+	}
+	
+	@Deprecated
+	MovingCodePackage getLatestPackage(final String packageName){
+		
+		Set<PID> packageSet = new HashSet<PID>();	
+		for (PID pid : getPackageIDs()){
+			if (pid.name.equals(packageName)){
+				packageSet.add(pid);
+			}
+		}
+		
+		if (packageSet.isEmpty()){
+			// if no adequate package was found
+			return null;
+		}
+		
+		// try to retrieve code package
+		MovingCodePackage retval = getPackage(Collections.max(packageSet));
+		
+		if (retval==null){
+			// an update was conducted while this method ran
+			// recursively call this method
+			return getLatestPackage(packageName);
+		} else {
+			return retval;
+		}
+		
+	}
+	
+	/**
+	 * Utility method that returns a current copy of 
+	 * 
+	 * TODO: Should this be a copy or a view in future releases?
+	 * 
+	 * @param inventory
+	 */
+	final ImmutableSet<MovingCodePackage> latestPackageVersions(){
+		
+		Set<MovingCodePackage> retval = new HashSet<MovingCodePackage>();
+		
+		// synchronized access to the inventory
+		// to prevent errors due to concurrent content updates
+		synchronized (packagesByIdMap){
+			for (Collection<MovingCodePackage> namedPages : packagesByNameMap.asMap().values()){
+				// add latest (= greatest) package to result set
+				retval.add(Collections.max(namedPages));
+			}
+		}
+		
+		return ImmutableSet.copyOf(retval);
 	}
 	
 	/**
@@ -142,9 +204,9 @@ public class PackageInventory {
 		// comparison of the PIDs is sufficient
 		SetView<PID> symmDiff;
 		// synchronized access to the underlying maps
-		synchronized (packages){
-			synchronized (ref.packages) {
-				symmDiff = Sets.symmetricDifference(ref.packages.keySet(), this.packages.keySet());
+		synchronized (packagesByIdMap){
+			synchronized (ref.packagesByIdMap) {
+				symmDiff = Sets.symmetricDifference(ref.packagesByIdMap.keySet(), this.packagesByIdMap.keySet());
 			}
 		}
 		return symmDiff.isEmpty();
@@ -158,8 +220,8 @@ public class PackageInventory {
 	@Override
 	public int hashCode() {
 		int hash = 17;
-		synchronized (packages){
-			for (PID key : packages.keySet()){
+		synchronized (packagesByIdMap){
+			for (PID key : packagesByIdMap.keySet()){
 				hash = hash * 31 + key.hashCode();
 			}
 		}

@@ -31,10 +31,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
- * This class implements an {@link IMovingCodeRepository} for Remote Geoprocessing Feeds
+ * This class implements an {@link MovingCodeRepository} for Remote Geoprocessing Feeds
  * and caches the contents on disk.
  * 
  * @author Matthias Mueller, TU Dresden
@@ -184,7 +187,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			// add change listener
 			remoteRepo.addRepositoryChangeListener(new RepositoryChangeListener() {
 				@Override
-				public void onRepositoryUpdate(IMovingCodeRepository updatedRepo) {
+				public void onRepositoryUpdate(MovingCodeRepository updatedRepo) {
 					updateLocalMirror();
 				}
 			});
@@ -197,4 +200,5 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 			}
 		}
 	}
+	
 }

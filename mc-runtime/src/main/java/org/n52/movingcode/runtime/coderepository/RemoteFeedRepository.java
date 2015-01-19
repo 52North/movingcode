@@ -33,13 +33,13 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.feed.GeoprocessingFeed;
+import org.n52.movingcode.runtime.feed.CodePackageFeed;
 
 /**
- * This class implements an {@link IMovingCodeRepository} for Remote Geoprocessing Feeds.
+ * This class implements an {@link MovingCodeRepository} for Remote Geoprocessing Feeds.
  * 
  * Performs occasional checks for updated content.
- * (Interval for periodical checks is given by {@link IMovingCodeRepository#remotePollingInterval})
+ * (Interval for periodical checks is given by {@link MovingCodeRepository#remotePollingInterval})
  * 
  * @author Matthias Mueller, TU Dresden
  * 
@@ -74,7 +74,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 		reloadContent();
 		// start timer daemon
 		timerDaemon = new Timer(true);
-		timerDaemon.scheduleAtFixedRate(new CheckFeed(), 0, IMovingCodeRepository.remotePollingInterval);
+		timerDaemon.scheduleAtFixedRate(new CheckFeed(), 0, MovingCodeRepository.remotePollingInterval);
 	}
 
 	private synchronized void reloadContent(){
@@ -86,7 +86,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			logger.debug("Create RemoteFeedRepository from " + atomFeedURL);
 			// TODO: Do it with Apache HTTPClient
 			stream = atomFeedURL.openStream();
-			GeoprocessingFeed feed = new GeoprocessingFeed(stream);
+			CodePackageFeed feed = new CodePackageFeed(stream);
 			lastFeedUpdate = feed.lastUpdated();
 
 			for (String currentEntryID : feed.getEntryIDs()) {
@@ -102,7 +102,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				}
 				else {
 					logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
-							+ mcp.getVersionedPackageId().toString());
+							+ mcp.getPackageId().toString());
 				}
 			}
 
@@ -143,7 +143,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			try {
 				// TODO: Do it with Apache HTTPClient
 				stream = atomFeedURL.openStream();
-				GeoprocessingFeed feed = new GeoprocessingFeed(stream);
+				CodePackageFeed feed = new CodePackageFeed(stream);
 
 				// if feed's update time is newer than last known update time
 				// re-read the feed and update contents accordingly

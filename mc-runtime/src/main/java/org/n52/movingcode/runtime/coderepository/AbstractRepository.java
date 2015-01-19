@@ -49,7 +49,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  * Considered thread safe. Uses separate read and write locks.
  * 
  */
-public abstract class AbstractRepository implements IMovingCodeRepository{
+public abstract class AbstractRepository implements MovingCodeRepository{
 
 	private volatile PackageInventory inventory = new PackageInventory();
 
@@ -135,6 +135,11 @@ public abstract class AbstractRepository implements IMovingCodeRepository{
 	@Override
 	public MovingCodePackage[] getPackageByFunction(String functionId){
 		return inventory.getPackagesByFunctionId(functionId);
+	}
+	
+	@Override
+	public ImmutableSet<MovingCodePackage> getLatestPackages() {
+		return inventory.latestPackageVersions();
 	}
 
 	@Override
