@@ -1,5 +1,5 @@
 # Moving Code
-A library project to manage, share and execute computing components for spatial data processing.
+A software framework to manage, share and execute computing components for spatial data processing.
 
 ## Project Structure
 
