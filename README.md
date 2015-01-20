@@ -6,7 +6,7 @@ The components are written in Java. The client uses JSF with Primefaces
 
 * ``/mc-schema`` - XSD Schema that describes the structure and content of a code package
 * ``/mc-runtime`` - Library to create, read, update, manage and execute code packages
-* ``/mc-feed`` - A simple servlet project that creates an atom feed from a Repository of code packages
+* ``/mc-feed`` - Simple servlet to create atom feeds from a repository of code packages
 
 ## Java Libraries
 
