@@ -18,9 +18,10 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
 /**
- * An inventory for code packages. Supports concurrency for updates (add, remove).
+ * An inventory for code packages. Thread safe for concurrent updates
+ * (blocking ADD and REMOVE methods).
  * 
- * @author matthias
+ * @author Matthias Mueller, TU Dresden
  *
  */
 public class PackageInventory {
@@ -138,34 +139,6 @@ public class PackageInventory {
 	 */
 	MovingCodePackage getPackage(final PID packageId){
 		return packagesByIdMap.get(packageId);
-	}
-	
-	@Deprecated
-	MovingCodePackage getLatestPackage(final String packageName){
-		
-		Set<PID> packageSet = new HashSet<PID>();	
-		for (PID pid : getPackageIDs()){
-			if (pid.name.equals(packageName)){
-				packageSet.add(pid);
-			}
-		}
-		
-		if (packageSet.isEmpty()){
-			// if no adequate package was found
-			return null;
-		}
-		
-		// try to retrieve code package
-		MovingCodePackage retval = getPackage(Collections.max(packageSet));
-		
-		if (retval==null){
-			// an update was conducted while this method ran
-			// recursively call this method
-			return getLatestPackage(packageName);
-		} else {
-			return retval;
-		}
-		
 	}
 	
 	/**

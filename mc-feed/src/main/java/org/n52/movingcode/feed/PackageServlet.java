@@ -12,14 +12,30 @@ import javax.servlet.http.HttpServletResponse;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
 
-@WebServlet(urlPatterns = "/package/*")
+/**
+ * Servlet for direct access to the code packages.
+ * 
+ * @author Matthias Mueller, TU Dresden
+ *
+ */
+@WebServlet(urlPatterns = "/packages/*")
 public class PackageServlet extends RepositoryServlet {
 	
 	/**
-	 * 
+	 * Generated serial.
 	 */
 	private static final long serialVersionUID = 8856458560873746081L;
-
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+	}
+	
+	@Override
+	public void destroy() {
+		super.destroy();
+	}
+	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PackageProperties props = new PackageProperties(request);
@@ -30,6 +46,11 @@ public class PackageServlet extends RepositoryServlet {
 		}
 		
 		MovingCodePackage mcp = repo.getPackage(props.packageId);
+		
+		if (mcp==null){
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
 		
 		try {
 			switch (props.prop) {
@@ -52,6 +73,7 @@ public class PackageServlet extends RepositoryServlet {
 			}
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			e.printStackTrace();
 			return;
 		}
 		
@@ -77,10 +99,10 @@ public class PackageServlet extends RepositoryServlet {
 			String s = request.getPathInfo();
 			if (s.endsWith(".xml")){
 				prop = Property.XML;
-				packageId = PID.fromString(s.substring(0, s.indexOf(".xml")));
+				packageId = PID.fromString(s.substring(1, s.indexOf(".xml")));
 			} else if (s.endsWith(".zip")){
 				prop = Property.ZIP;
-				packageId = PID.fromString(s.substring(0, s.indexOf(".zip")));
+				packageId = PID.fromString(s.substring(1, s.indexOf(".zip")));
 			} else {
 				prop = Property.UNKNOWN;
 				packageId = null;
@@ -89,6 +111,6 @@ public class PackageServlet extends RepositoryServlet {
 	}
 	
 	private enum Property{
-		XML, ZIP, UNKNOWN
+		XML, ZIP, ROOT, UNKNOWN
 	}
 }

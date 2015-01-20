@@ -1,5 +1,5 @@
 /**
- * ﻿Copyright (C) 2012
+ * ﻿Copyright (C) 2015
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -68,6 +68,13 @@ public interface MovingCodeRepository {
 	 */
 	public MovingCodePackage getPackage(PID packageId);
 	
+	/**
+	 * Returns the latest version of the registered packages. Packages are distinguished by their
+	 * names. If two packages have the same name, the package with the greater (newer) timestamp
+	 * is returned.
+	 * 
+	 * @return
+	 */
 	public ImmutableSet<MovingCodePackage> getLatestPackages();
 
 	/**

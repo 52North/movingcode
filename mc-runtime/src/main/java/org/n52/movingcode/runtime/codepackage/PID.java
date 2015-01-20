@@ -51,10 +51,9 @@ public class PID implements Comparable<PID> {
 	 * @return
 	 */
 	public static final PID fromString(String s){
-		int versionStart = s.indexOf("(");
-		int versionEnd = s.indexOf(")");
+		int versionStart = s.lastIndexOf("_");
 		String name = s.substring(0,versionStart);
-		DateTime timestamp = DateTime.parse(s.substring(versionStart+1, versionEnd));
+		DateTime timestamp = DateTime.parse(s.substring(versionStart+1, s.length()));
 		return new PID(name, timestamp);
 	}
 	
@@ -69,7 +68,7 @@ public class PID implements Comparable<PID> {
 		}
 		if (o instanceof PID){
 			PID otherPID = (PID) o;
-			return this.name.equalsIgnoreCase((otherPID).name) && this.timestamp.isEqual((otherPID).timestamp);
+			return this.name.equals((otherPID).name) && this.timestamp.isEqual((otherPID).timestamp);
 		} else {
 			return false;
 		}
@@ -79,7 +78,7 @@ public class PID implements Comparable<PID> {
 	public int hashCode() {
 		int hash = 17;
 		hash = hash * 31 + name.hashCode();
-		hash = hash * 13 + timestamp.hashCode();
+		hash = hash * 13 + (int)timestamp.getMillis();
 		return hash;
 	}
 
@@ -87,9 +86,8 @@ public class PID implements Comparable<PID> {
 	public String toString(){
 		return new StringBuilder()
 			.append(name)
-			.append("(")
+			.append("_")
 			.append(timestamp.withZone(DateTimeZone.UTC).toString())
-			.append(")")
 			.toString();
 	}
 

@@ -1,71 +1,62 @@
 package org.n52.movingcode.feed;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Arrays;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.n52.movingcode.runtime.feed.FeedTemplate;
+import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.n52.movingcode.runtime.feed.CodePackageFeed;
 
+/**
+ * Servlet class for code package feeds.
+ * 
+ * @author Matthias Mueller, TU Dresden
+ *
+ */
 @WebServlet("/feed")
-public class FeedServlet extends HttpServlet {
-
+public class FeedServlet extends RepositoryServlet {
+	
 	/**
 	 * Generated Serial
 	 */
 	private static final long serialVersionUID = 8977994392612616210L;
 	
-	private String feedTitle;
-	private String feedSubtitle;
-	private String feedAuthorName;
-	private String feedAuthorEmail;
-
 	@Override
-	public void init(ServletConfig config) throws ServletException {
-		this.feedTitle = config.getInitParameter("feed.Title");
-		this.feedSubtitle = config.getInitParameter("feed.Subtitle");
-		this.feedAuthorName = config.getInitParameter("feed.AuthorName");
-		this.feedAuthorEmail = config.getInitParameter("feed.AuthorEmail");	
+	public void init() throws ServletException {
+		super.init();
 	}
 	
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
 		super.destroy();
 	}
-
+	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		final String baseUrl = getBaseUrl(request);
+		final String webRoot = baseUrl.substring(0, baseUrl.indexOf("/feed")) + "/packages/";
 		
-		response.setContentType("text/plain");
-
-		PrintWriter out = response.getWriter();
-
-		out.println(getBaseUrl(request));
-
-		out.close();
-
-		// response.getWriter().write("<html><body>GET response</body></html>");
+		response.setContentType("application/atom+xml");
+		CodePackageFeed feed = new CodePackageFeed(makeTemplate(baseUrl));
 		
+		MovingCodePackage[] mcpArray = repo.getLatestPackages().toArray(new MovingCodePackage[0]); 
+		Arrays.sort(mcpArray);
 		
-	}
-
-	private static final String getBaseUrl(final HttpServletRequest req) {
-		return req.getRequestURL().toString();
-	}
-	
-	private final FeedTemplate makeTemplate(final String baseUrl){
-		return new FeedTemplate.Builder()
-				.feedTitle(feedTitle)
-				.feedSubtitle(feedSubtitle)
-				.feedAuthorName(feedAuthorName)
-				.feedAuthorEmail(feedAuthorEmail)
-				.build();
+		for (MovingCodePackage mcp : mcpArray){
+			feed.addEntry(mcp, webRoot);
+		}
+		
+		try (ServletOutputStream os = response.getOutputStream()){
+			feed.write(os);
+		} catch (Exception e){
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+		
 	}
 }

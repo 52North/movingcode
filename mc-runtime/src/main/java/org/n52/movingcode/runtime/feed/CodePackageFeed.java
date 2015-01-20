@@ -1,5 +1,5 @@
 /**
- * ﻿Copyright (C) 2012
+ * ﻿Copyright (C) 2012-2015
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -123,8 +123,8 @@ public final class CodePackageFeed {
 					webRoot + entryId,
 					mcp.getDescriptionAsDocument(),
 					mcp.getTimestamp().toDate(),
-					webRoot + entryId + ".zip",
-					webRoot + entryId + ".xml"
+					webRoot + mcp.getPackageId().toString() + ".zip",
+					webRoot + mcp.getPackageId().toString() + ".xml"
 			);
 			feed.addEntry(entry.getAtomEntry());
 
