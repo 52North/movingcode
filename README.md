@@ -20,7 +20,7 @@ The components are written in Java. The client uses JSF with Primefaces
 
 ## License
 
-TODO - (Apache 2.0 planned)
+Apache License 2.0
 
 ## Contact
 
