@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.n52.movingcode.runtime.processors.arctoolbox;
 
 import java.io.File;

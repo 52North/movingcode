@@ -13,19 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-
-	<issueManagement>
-		<system>Bugzilla</system>
-		<url>
-        	https://bugzilla.52north.org/
-        </url>
-	</issueManagement>
-	<licenses>
-		<license>
-			<name>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
-		</license>
-	</licenses>
+	
 	<inceptionYear>2012</inceptionYear>
 	<developers>
 		<developer>
@@ -213,38 +201,6 @@
 						<include>**/FeedConversionTest.java</include>
 					</includes>
 				</configuration>
-			</plugin>
-			
-			<!-- run "mvn license:check" to check -->
-			<!-- run "mvn license:format" to add missing licenses to the files -->
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<configuration>
-					<header>src/main/resources/52N_license.txt</header>
-					<excludes>
-						<exclude>**/test/resources/**</exclude>
-						<exclude>**/main/resources/**</exclude>
-					</excludes>
-					<includes>
-						<include>**/*.java</include>
-						<include>**/*.properties</include>
-						<include>**/*.xml</include>
-						<include>**/*.xsl</include>
-					</includes>
-					<strictCheck>true</strictCheck>
-					<properties>
-						<year>${project.inceptionYear}</year>
-					</properties>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>test</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 		</plugins>

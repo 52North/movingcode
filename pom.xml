@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>52-North</artifactId>
@@ -21,18 +22,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<license.header.file>license/license-header.txt</license.header.file>
 	</properties>
-
-	<issueManagement>
-		<system>Bugzilla</system>
-		<url>
-        	https://bugzilla.52north.org/
-        </url>
-	</issueManagement>
+	
 	<licenses>
 		<license>
-			<name>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
 		</license>
 	</licenses>
 	<inceptionYear>2012</inceptionYear>
@@ -49,7 +45,7 @@
 				<role>developer</role>
 			</roles>
 			<timezone>+1</timezone>
-			<properties/>
+			<properties />
 		</developer>
 	</developers>
 	<scm>
@@ -222,9 +218,35 @@
 				<!-- run "mvn license:check" to check -->
 				<!-- run "mvn license:format" to add to the files -->
 				<plugin>
-					<groupId>com.mycila.maven-license-plugin</groupId>
-					<artifactId>maven-license-plugin</artifactId>
-					<version>1.9.0</version>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>2.2</version>
+					<inherited>false</inherited>
+					<configuration>
+						<header>${license.header.file}</header>
+						<aggregate>true</aggregate>
+						<properties>
+							<inceptionYear>${project.inceptionYear}</inceptionYear>
+						</properties>
+						<includes>
+							<include>src/**/*.java</include>
+							<!-- <include>src/**/*.xml</include> -->
+						</includes>
+						<excludes>
+							<exclude>**/logback.xml</exclude>
+							<exclude>**/logback-test.xml</exclude>
+							<exclude>**/src/test/resources/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>check-license</id>
+							<phase>initialize</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 
 			</plugins>
@@ -241,11 +263,11 @@
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
 							<connectionUrl>
-								scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/
+								scm:git:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/
 							</connectionUrl>
 							<preparationGoals>clean</preparationGoals>
 							<!-- make use of system prop set by hudson -->
-							<tag>movingcode-runtime-${project.rel.org.n52.movingcode:movingcode-runtime}</tag>
+							<tag>movingcode-parent-${project.rel.org.n52.movingcode:movingcode-parent}</tag>
 						</configuration>
 					</plugin>
 				</plugins>

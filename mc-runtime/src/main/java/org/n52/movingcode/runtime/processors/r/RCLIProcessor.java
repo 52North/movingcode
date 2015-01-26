@@ -1,27 +1,3 @@
-/**
- * ﻿Copyright (C) 2012
- * by 52 North Initiative for Geospatial Open Source Software GmbH
- *
- * Contact: Andreas Wytzisk
- * 52 North Initiative for Geospatial Open Source Software GmbH
- * Martin-Luther-King-Weg 24
- * 48155 Muenster, Germany
- * info@52north.org
- *
- * This program is free software; you can redistribute and/or modify it under
- * the terms of the GNU General Public License version 2 as published by the
- * Free Software Foundation.
- *
- * This program is distributed WITHOUT ANY WARRANTY; even without the implied
- * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program (see gnu-gpl v2.txt). If not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
- * visit the Free Software Foundation web page, http://www.fsf.org.
- */
-
 package org.n52.movingcode.runtime.processors.r;
 
 import java.io.File;
@@ -64,7 +40,7 @@ public class RCLIProcessor extends AbstractProcessor {
 
     protected static final String rExecutable = "R CMD";
 
-    private static Logger log = Logger.getLogger(RCLIProcessor.class);
+    private static Logger LOGGER = Logger.getLogger(RCLIProcessor.class);
 
     /**
      * A sorted Map containing all executionValues in an ascending order
@@ -83,7 +59,7 @@ public class RCLIProcessor extends AbstractProcessor {
         File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath() + File.separator + AUID.randomAUID());
 
         if ( !tmpWorkspace.mkdir()) {
-            log.error("Could not create instance workspace!");
+            LOGGER.error("Could not create instance workspace!");
             return false;
         }
 
@@ -105,12 +81,12 @@ public class RCLIProcessor extends AbstractProcessor {
     }
 
     public void execute(int timeoutSeconds) throws IllegalArgumentException, RuntimeException, IOException {
-        log.debug("Executing...");
+        LOGGER.debug("Executing...");
         
         // http://stat.ethz.ch/R-manual/R-patched/library/utils/html/BATCH.html
         
         
-        log.debug("Done.");
+        LOGGER.debug("Done.");
     }
 
     private static MimeTypeDatabase getMimeRegistry() {
@@ -119,8 +95,8 @@ public class RCLIProcessor extends AbstractProcessor {
             return new MimeTypeDatabase(registryURL.openStream());
         }
         catch (Exception e) {
-            log.debug("Could not open MimeType Registry file." + e.getMessage());
-            log.debug("Creating empty Registry instead.");
+            LOGGER.debug("Could not open MimeType Registry file." + e.getMessage());
+            LOGGER.debug("Creating empty Registry instead.");
             return new MimeTypeDatabase();
         }
     }

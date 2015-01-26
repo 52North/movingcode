@@ -1,27 +1,3 @@
-/**
- * ﻿Copyright (C) 2012
- * by 52 North Initiative for Geospatial Open Source Software GmbH
- *
- * Contact: Andreas Wytzisk
- * 52 North Initiative for Geospatial Open Source Software GmbH
- * Martin-Luther-King-Weg 24
- * 48155 Muenster, Germany
- * info@52north.org
- *
- * This program is free software; you can redistribute and/or modify it under
- * the terms of the GNU General Public License version 2 as published by the
- * Free Software Foundation.
- *
- * This program is distributed WITHOUT ANY WARRANTY; even without the implied
- * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program (see gnu-gpl v2.txt). If not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
- * visit the Free Software Foundation web page, http://www.fsf.org.
- */
-
 package org.n52.movingcode.runtime.test;
 
 import java.io.File;
@@ -56,20 +32,20 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		
 		// Arrange
 		File packageFolder = new File(packageFolderName);
-		logger.info(packageFolder.getAbsolutePath());
+		LOGGER.info(packageFolder.getAbsolutePath());
 
 		// Act
 		MovingCodeRepository mcRep = MovingCodeRepository.Factory.createFromZipFilesFolder(packageFolder);
 
 		// Assert
 		assertTrue(mcRep.providesFunction(zTransformFunctionID));
-		logger.debug("Retrieving process: " + zTransformFunctionID);
+		LOGGER.debug("Retrieving process: " + zTransformFunctionID);
 		
 		MovingCodePackage pack = mcRep.getPackageByFunction(zTransformFunctionID)[0]; // get the test package
 		if (pack == null){
-			logger.warn("Could not find a package for process: " + zTransformFunctionID);
+			LOGGER.warn("Could not find a package for process: " + zTransformFunctionID);
 		} else {
-			logger.debug("Found package: " + pack.getPackageId().toString() + " supplying process " + zTransformFunctionID);
+			LOGGER.debug("Found package: " + pack.getPackageId().toString() + " supplying process " + zTransformFunctionID);
 		}
 		
 		assertFalse(pack == null); // make sure it is not null
@@ -103,7 +79,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		}
 		
 		// show report
-		logger.info(report.toString());
+		LOGGER.info(report.toString());
 	}
 	
 	
@@ -114,7 +90,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		
 		// Arrange
 		File packageFolder = new File(packageFolderName);
-		logger.info("Adding plain folder repo: " + packageFolder.getAbsolutePath());
+		LOGGER.info("Adding plain folder repo: " + packageFolder.getAbsolutePath());
 
 		// Act
 		MovingCodeRepository mcRep = MovingCodeRepository.Factory.createFromPlainFolder(packageFolder);
@@ -153,7 +129,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		}
 		
 		// show report
-		logger.info(report.toString());
+		LOGGER.info(report.toString());
 	}
 	
 	@Test
@@ -164,7 +140,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		try {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
 			MovingCodeRepository mcRep = MovingCodeRepository.Factory.createFromRemoteFeed(url);
-			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
+			LOGGER.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
 
 			for (PID pID : mcRep.getPackageIDs()) {
 				report.append("\nFound process: " + pID + CR);
@@ -202,11 +178,11 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 			}
 			
 			// show report
-			logger.info(report.toString());
+			LOGGER.info(report.toString());
 
 		}
 		catch (MalformedURLException e) {
-			logger.info("Could not read test feed from URL " + feedURL + CR + "Please check if this feed is indeed up and running.");
+			LOGGER.info("Could not read test feed from URL " + feedURL + CR + "Please check if this feed is indeed up and running.");
 		}
 	}
 	
@@ -219,8 +195,8 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 			URL url = new URL(MCRuntimeTestConfig.feedURL);
 			File cacheWS = newTempDir();
 			MovingCodeRepository mcRep = MovingCodeRepository.Factory.createCachedRemoteRepository(url, cacheWS);
-			logger.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
-			logger.info("Using Cache directory: " + cacheWS.getAbsolutePath());
+			LOGGER.info("Added Repo: " + MCRuntimeTestConfig.feedURL);
+			LOGGER.info("Using Cache directory: " + cacheWS.getAbsolutePath());
 
 			for (PID pID : mcRep.getPackageIDs()) {
 				report.append("\nFound process: " + pID + CR);
@@ -258,11 +234,11 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 			}
 			
 			// show report
-			logger.info(report.toString());
+			LOGGER.info(report.toString());
 			
 		}
 		catch (MalformedURLException e) {
-			logger.info("Could not read test feed from URL " + feedURL + CR + "Please check if this feed is indeed up and running.");
+			LOGGER.info("Could not read test feed from URL " + feedURL + CR + "Please check if this feed is indeed up and running.");
 		}
 		
 	}
@@ -272,7 +248,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 		// Arrange
 		File packageFolder = new File(packageFolderName);
-		logger.info(packageFolder.getAbsolutePath());
+		LOGGER.info(packageFolder.getAbsolutePath());
 
 		// Act
 		GlobalRepositoryManager repoMan = GlobalRepositoryManager.getInstance();
@@ -298,7 +274,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		// create a new zipped package
 		File tempFile = new File(tempFolder + File.separator + AUID.randomAUID() + ".zip");
 		String packageIdentifier = tempFile.getPath();
-		logger.info(packageIdentifier);
+		LOGGER.info(packageIdentifier);
 
 		MovingCodePackage mcp = new MovingCodePackage(wsFolder, doc);
 
