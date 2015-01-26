@@ -11,7 +11,7 @@
 	<artifactId>mc-feed</artifactId>
 	<packaging>war</packaging>
 	<name>Code Package Feed</name>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -57,6 +57,38 @@
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
+			</plugin>
+
+			<!-- run "mvn license:check" to check -->
+			<!-- run "mvn license:format" to add to the files -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.8</version>
+				<inherited>false</inherited>
+				<configuration>
+					<header>license-header.txt</header>
+					<properties>
+						<inceptionYear>${project.inceptionYear}</inceptionYear>
+					</properties>
+					<includes>
+						<include>src/**/*.java</include>
+						<!-- <include>src/**/*.xml</include> -->
+					</includes>
+					<excludes>
+						<exclude>**/logback.xml</exclude>
+						<exclude>**/logback-test.xml</exclude>
+						<exclude>**/src/test/resources/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

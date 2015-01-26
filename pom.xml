@@ -223,7 +223,6 @@
 					<inherited>false</inherited>
 					<configuration>
 						<header>license-header.txt</header>
-						<aggregate>true</aggregate>
 						<properties>
 							<inceptionYear>${project.inceptionYear}</inceptionYear>
 						</properties>
