@@ -16,7 +16,7 @@ The components are written in Java. The client uses JSF with Primefaces
 * Apache commons-exec (Apache License 2.0)
 * Apache commons-io (Apache License 2.0)
 * Guava-collections (Apache License 2.0)
-* JodaTime 2.3.3 (Apache License 2.0)
+* JodaTime (Apache License 2.0)
 
 ## License
 
