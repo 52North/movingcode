@@ -11,7 +11,7 @@
 	<artifactId>movingcode-parent</artifactId>
 	<version>0.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Moving Code Runtime Reactor</name>
+	<name>Moving Code Framework</name>
 
 	<modules>
 		<module>mc-runtime</module>

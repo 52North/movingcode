@@ -10,7 +10,7 @@
 	</parent>
 	<artifactId>mc-feed</artifactId>
 	<packaging>war</packaging>
-	<name>mc-feed webapp</name>
+	<name>Code Package Feed</name>
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>

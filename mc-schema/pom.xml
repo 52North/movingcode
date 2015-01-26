@@ -9,7 +9,7 @@
 	<artifactId>mc-schema</artifactId>
 	<packaging>jar</packaging>
 	
-	<name>Moving Code - Schema</name>
+	<name>Moving Code XML Schema</name>
 	<description>XML Schemas for Moving Code files and XMLBeans generation</description>
 	<version>1.1-SNAPSHOT</version>
 	
@@ -84,12 +84,6 @@
 					<download>true</download>
 					<javaSource>1.7</javaSource>
 				</configuration>
-			</plugin>
-			
-			<!-- Deploy Plugin - adds artifact to repository -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
 			</plugin>
 
 			<plugin>
