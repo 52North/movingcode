@@ -22,10 +22,9 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
+import org.n52.movingcode.runtime.iodata.ParameterID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
@@ -66,10 +65,10 @@ public class PythonPackageTest extends MCRuntimeTestConfig {
 		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage); 
 
 		// add input
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(inPosition),
+		Assert.assertTrue(processor.addData(new ParameterID(inPosition),
 				new MediaData(new FileInputStream(new File(dataFileName)), mimeType)));
 		// add output declaration
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(outPosition), new MediaData(null, mimeType)));
+		Assert.assertTrue(processor.addData(new ParameterID(outPosition), new MediaData(null, mimeType)));
 
 		// Assert
 		Assert.assertTrue(processor.isFeasible());

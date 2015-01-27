@@ -19,18 +19,17 @@ import java.math.BigInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.n52.movingcode.runtime.iodata.IODataType;
-import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
+import org.n52.movingcode.runtime.iodata.ParameterID;
 
 public class IOParameterTest extends MCRuntimeTestConfig {
 	@Test
 	public void createParameterValues() {
 
 		// Arrange
-		IOParameter data = new IOParameter(new IIOParameter.ParameterID(new BigInteger("1")),
+		IOParameter data = new IOParameter(new ParameterID(new BigInteger("1")),
 				"tinker",
 				null,
 				null,

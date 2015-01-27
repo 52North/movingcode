@@ -17,8 +17,6 @@ package org.n52.movingcode.runtime.iodata;
 
 import java.util.SortedMap;
 
-import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
-
 public interface IIOParameterMap extends SortedMap<ParameterID, IOParameter> {
 
     /**

@@ -23,7 +23,6 @@ import net.opengis.wps.x100.InputDescriptionType;
 import net.opengis.wps.x100.OutputDescriptionType;
 
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.ExecutionParameterType;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;

@@ -75,7 +75,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		for (IOParameter param : paramsMap.values()) {
 			report.append(
 					"Parameter "
-					+ param.getIdentifier().getHarmonizedValue()
+					+ param.getIdentifier().toString()
 					+ ": "
 					+ param.getMinMultiplicity()
 					+ ".."
@@ -125,7 +125,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 		for (IOParameter param : paramsMap.values()) {
 			report.append(
 					"Parameter "
-					+ param.getIdentifier().getHarmonizedValue()
+					+ param.getIdentifier().toString()
 					+ ": "
 					+ param.getMinMultiplicity()
 					+ ".."
@@ -177,7 +177,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 					report.append("--- Parameters ---" + CR);
 					for (IOParameter param : processor.values()) {
-						report.append("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
+						report.append("Parameter " + param.getIdentifier().toString() + ": "
 								+ param.getMinMultiplicity() + ".." + param.getMaxMultiplicity() + CR);
 						if (param.isMessageIn()) {
 							report.append("ServiceInputID: " + param.getMessageInputIdentifier() + CR);
@@ -233,7 +233,7 @@ public class MovingCodeRepositoryTests extends MCRuntimeTestConfig {
 
 					report.append("--- Parameters ---" + CR);
 					for (IOParameter param : processor.values()) {
-						report.append("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
+						report.append("Parameter " + param.getIdentifier().toString() + ": "
 								+ param.getMinMultiplicity() + ".." + param.getMaxMultiplicity() + CR);
 						if (param.isMessageIn()) {
 							report.append("ServiceInputID: " + param.getMessageInputIdentifier() + CR);
