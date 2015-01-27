@@ -38,13 +38,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.IODataType;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.iodata.MimeTypeDatabase;
 import org.n52.movingcode.runtime.iodata.IIOParameter.Direction;
-import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
+import org.n52.movingcode.runtime.iodata.ParameterID;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
@@ -112,7 +111,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
 				setValue(item);
 			}
 			catch (IOException e) {
-				throw new IOException("Could not deal with parameter: " + item.getIdentifier().getHarmonizedValue()
+				throw new IOException("Could not deal with parameter: " + item.getIdentifier().toString()
 						+ "\n" + e.getMessage());
 			}
 		}
@@ -170,7 +169,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
 
 		// update executionData - file data only
 		// code below is all about setting the input stream for output media data
-		for (IIOParameter.ParameterID identifier : this.keySet()) {
+		for (ParameterID identifier : this.keySet()) {
 			if (this.get(identifier).isMessageOut()) {
 				if (this.get(identifier).supportsType(IODataType.MEDIA)) {
 					@SuppressWarnings("unchecked")

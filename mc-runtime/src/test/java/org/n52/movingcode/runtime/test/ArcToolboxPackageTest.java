@@ -23,8 +23,8 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
+import org.n52.movingcode.runtime.iodata.ParameterID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
@@ -72,13 +72,13 @@ public class ArcToolboxPackageTest extends MCRuntimeTestConfig{
 		// processor
 
 		// add NIR
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(nir_position),
+		Assert.assertTrue(processor.addData(new ParameterID(nir_position),
 				new MediaData(new FileInputStream(new File(nir_data)), mimeType)));
 		// add RED
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(red_position),
+		Assert.assertTrue(processor.addData(new ParameterID(red_position),
 				new MediaData(new FileInputStream(new File(red_data)), mimeType)));
 		// add output (NDVI) declaration
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(ndvi_position), new MediaData(null, mimeType)));
+		Assert.assertTrue(processor.addData(new ParameterID(ndvi_position), new MediaData(null, mimeType)));
 
 		// Assert
 		Assert.assertTrue(processor.isFeasible());

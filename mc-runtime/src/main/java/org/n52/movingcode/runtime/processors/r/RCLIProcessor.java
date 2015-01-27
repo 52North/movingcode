@@ -41,7 +41,7 @@ import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.iodata.MimeTypeDatabase;
 import org.n52.movingcode.runtime.iodata.IIOParameter.Direction;
-import org.n52.movingcode.runtime.iodata.IIOParameter.ParameterID;
+import org.n52.movingcode.runtime.iodata.ParameterID;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;

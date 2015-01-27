@@ -61,7 +61,7 @@ public class FeedReadTest extends MCRuntimeTestConfig {
 
 					report.append("--- Parameters ---" + CR);
 					for (IOParameter param : processor.values()) {
-						report.append("Parameter " + param.getIdentifier().getHarmonizedValue() + ": "
+						report.append("Parameter " + param.getIdentifier().toString() + ": "
 								+ param.getMinMultiplicity() + ".." + param.getMaxMultiplicity() + CR);
 						if (param.isMessageIn()) {
 							report.append("ServiceInputID: " + param.getMessageInputIdentifier() + CR);

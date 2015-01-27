@@ -22,10 +22,9 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
-import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
+import org.n52.movingcode.runtime.iodata.ParameterID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.ProcessorFactory;
 
@@ -59,14 +58,14 @@ public class PythonGecaTest extends MCRuntimeTestConfig {
 		AbstractProcessor processor = ProcessorFactory.getInstance().newProcessor(mcPackage);
 
 		// add input
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(1), "MIP_NL__2P"));
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(2), "GOM_NL__2P"));
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(3), "2"));
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(4), "1000"));
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(5), "nearest_neighbour"));
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(6), "satellite_b"));
+		Assert.assertTrue(processor.addData(new ParameterID(1), "MIP_NL__2P"));
+		Assert.assertTrue(processor.addData(new ParameterID(2), "GOM_NL__2P"));
+		Assert.assertTrue(processor.addData(new ParameterID(3), "2"));
+		Assert.assertTrue(processor.addData(new ParameterID(4), "1000"));
+		Assert.assertTrue(processor.addData(new ParameterID(5), "nearest_neighbour"));
+		Assert.assertTrue(processor.addData(new ParameterID(6), "satellite_b"));
 		// add output declaration
-		Assert.assertTrue(processor.addData(new IIOParameter.ParameterID(7), new MediaData(null, mimeType)));
+		Assert.assertTrue(processor.addData(new ParameterID(7), new MediaData(null, mimeType)));
 
 		// Assert
 		Assert.assertTrue(processor.isFeasible());
