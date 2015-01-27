@@ -10,14 +10,7 @@
 	<packaging>jar</packaging>
 	
 	<name>Moving Code XML Schema</name>
-	<description>XML Schemas for Moving Code files and XMLBeans generation</description>
-	
-	<scm>
-        <!-- Specification of the Source-Content-Managementsystem -->
-		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode-schema/trunk</connection>
-		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode-schema/trunk</developerConnection>
-		<url>https://svn.52north.org/cgi-bin/viewvc.cgi/main/movingcode-schema/trunk/?root=geoprocessing</url>
-	</scm>
+	<description>XML Schemas for Moving Code packages and XMLBeans generation</description>
 	
 	<dependencies>
 		<dependency>

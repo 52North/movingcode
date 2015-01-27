@@ -30,7 +30,9 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
 		</license>
 	</licenses>
+	
 	<inceptionYear>2012</inceptionYear>
+	
 	<developers>
 		<developer>
 			<id>matthias</id>
@@ -48,10 +50,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<!-- Specification of the Source-Content-Managementsystem -->
-		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</connection>
-		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
-		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
+		<connection>scm:git:https://github.com/52North/movingcode.git</connection>
+		<url>https://github.com/52North/movingcode</url>
+		<developerConnection>scm:git:https://github.com/52North/movingcode.git</developerConnection>
 	</scm>
 
 
@@ -100,7 +101,7 @@
 			<dependency>
 				<groupId>org.n52.mc</groupId>
 				<artifactId>mc-schema</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.xmlbeans</groupId>
@@ -260,7 +261,7 @@
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
 							<connectionUrl>
-								scm:git:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/
+								scm:git:https://github.com/52North/movingcode.git
 							</connectionUrl>
 							<preparationGoals>clean</preparationGoals>
 							<!-- make use of system prop set by hudson -->
@@ -271,4 +272,5 @@
 			</build>
 		</profile>
 	</profiles>
+	<url>https://github.com/52North/movingcode</url>
 </project>
