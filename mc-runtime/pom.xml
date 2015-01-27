@@ -27,12 +27,6 @@
 			<properties />
 		</developer>
 	</developers>
-	<scm>
-		<!-- Specification of the Source-Content-Managementsystem -->
-		<connection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</connection>
-		<developerConnection>scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</developerConnection>
-		<url>https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk</url>
-	</scm>
 
 	<repositories>
 		<repository>
