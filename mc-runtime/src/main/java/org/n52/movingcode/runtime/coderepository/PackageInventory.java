@@ -143,6 +143,9 @@ public class PackageInventory {
 	 */
 	MovingCodePackage[] getPackagesByFunctionId(String functionId){
 		Collection<MovingCodePackage> retval = packagesByFunctionIdMap.asMap().get(functionId);
+		if (retval == null){
+			return new MovingCodePackage[0];
+		}
 		return retval.toArray(new MovingCodePackage[retval.size()]);
 	}
 	
