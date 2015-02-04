@@ -19,6 +19,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,11 +57,13 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
 public class GlobalRepositoryManager implements MovingCodeRepository {
 
 	private static GlobalRepositoryManager instance;
-
-	private Map<String, MovingCodeRepository> repositories = new HashMap<String, MovingCodeRepository>();
+	
+	// synchronized map for an up-to-date view of the registered repositories
+	// performance should not be crucial here
+	private final Map<String, MovingCodeRepository> repositories = Collections.synchronizedMap(new HashMap<String, MovingCodeRepository>());
 
 	// registered changeListerners
-	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
+	private volatile List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
 
 	/**
 	 * private constructor for singleton pattern
@@ -113,7 +116,7 @@ public class GlobalRepositoryManager implements MovingCodeRepository {
 		final String repoID = directory;
 
 		// add new repo
-		MovingCodeRepository repo = MovingCodeRepository.Factory.createFromZipFilesFolder(new File(directory)); 
+		MovingCodeRepository repo = MovingCodeRepository.Factory.createFromZipFilesFolder(new File(directory));
 		return registerRepo(repoID, repo);
 
 	}
