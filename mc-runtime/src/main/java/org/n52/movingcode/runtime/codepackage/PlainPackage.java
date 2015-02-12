@@ -26,8 +26,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -44,7 +45,7 @@ final class PlainPackage implements ICodePackage {
 	private final PackageDescriptionDocument plainDescription;
 
 	// logger
-	static Logger logger = Logger.getLogger(PlainPackage.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlainPackage.class);
 
 	/**
 	 * Constructor to create a {@link PlainPackage} from a plain workspace and process description XML.
@@ -74,9 +75,9 @@ final class PlainPackage implements ICodePackage {
 		try {
 			doc = PackageDescriptionDocument.Factory.parse(descriptionXMLFile);
 		} catch (XmlException e) {
-			logger.error("PackageDescription could not be read. " + e.getMessage());
+			LOGGER.error("PackageDescription could not be read. " + e.getMessage());
 		} catch (IOException e) {
-			logger.error("PackageDescription could not be read." + e.getMessage());
+			LOGGER.error("PackageDescription could not be read." + e.getMessage());
 		} finally {
 			this.plainDescription = doc;
 		}
@@ -103,7 +104,7 @@ final class PlainPackage implements ICodePackage {
 			}
 		}
 		catch (IOException e) {
-			logger.error("Error! Could copy from " + plainWorkspace.getAbsolutePath() + " to "
+			LOGGER.error("Error! Could copy from " + plainWorkspace.getAbsolutePath() + " to "
 					+ targetDirectory.getAbsolutePath());
 		}
 	}

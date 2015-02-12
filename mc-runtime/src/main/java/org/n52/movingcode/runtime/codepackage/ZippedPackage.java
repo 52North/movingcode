@@ -28,8 +28,9 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -47,7 +48,7 @@ final class ZippedPackage implements ICodePackage {
 	// Web location (URL) of the zipped package
 	private final URL zipURL;
 
-	static Logger logger = Logger.getLogger(ZippedPackage.class);
+	private static final Logger logger = LoggerFactory.getLogger(ZippedPackage.class);
 
 	/**
 	 * Constructor to create a {@link ZippedPackage} from a local zipfile (i.e. a zipped package).

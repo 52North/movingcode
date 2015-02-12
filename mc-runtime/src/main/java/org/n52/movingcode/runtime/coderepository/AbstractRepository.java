@@ -18,10 +18,11 @@ package org.n52.movingcode.runtime.coderepository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.codepackage.PID;
 import org.n52.movingcode.runtime.codepackage.XMLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -48,7 +49,7 @@ public abstract class AbstractRepository implements MovingCodeRepository{
 	// registered changeListerners
 	private List<RepositoryChangeListener> changeListeners =  new ArrayList<RepositoryChangeListener>();
 
-	static Logger logger = Logger.getLogger(AbstractRepository.class);
+	static final Logger LOGGER = LoggerFactory.getLogger(AbstractRepository.class);
 
 	/**
 	 * Protected method for registering packages with this repository.

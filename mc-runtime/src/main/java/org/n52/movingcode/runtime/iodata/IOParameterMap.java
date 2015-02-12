@@ -86,11 +86,6 @@ public class IOParameterMap extends TreeMap<ParameterID, IOParameter> implements
         }
     }
 
-    @Override
-    public void putAll(Map map) {
-        super.putAll(map);
-    }
-
     /**
      * Add data to a parameter contained by this map. Returns false if: 1) the parameterID is not in this map
      * 2) the value cannot be added to the parameter

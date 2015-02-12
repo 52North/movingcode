@@ -22,9 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processors.config.ProcessorConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument.PackageDescription;
 import de.tudresden.gis.geoprocessing.movingcode.schema.PlatformType;
@@ -45,7 +46,7 @@ public class ProcessorFactory {
 	private Map<String, File> scratchworkspaceMap;
 	private Map<String, PropertyMap> processorProperties;
 
-	Logger logger = Logger.getLogger(ProcessorFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessorFactory.class);
 
 	private ProcessorFactory() {
 		super();
@@ -65,13 +66,13 @@ public class ProcessorFactory {
 		String processorID = findCompatibleProcessor(mcPackage.getDescriptionAsDocument().getPackageDescription());
 
 		if (processorID != null) {
-			logger.trace("Creating new processor for package: " + mcPackage.getPackageId().toString());
+			LOGGER.debug("Creating new processor for package: " + mcPackage.getPackageId().toString());
 			return loadProcessor(processorID,
 					getScratchworkspace(processorID),
 					mcPackage,
 					getProcessorProperties(processorID));
 		} else {
-			logger.debug("Could not find a suitable processor for package: " + mcPackage.getPackageId().toString());
+			LOGGER.debug("Could not find a suitable processor for package: " + mcPackage.getPackageId().toString());
 			return null; // if no suitable processor was found
 		}
 		
@@ -129,7 +130,7 @@ public class ProcessorFactory {
 
 		}
 		catch (Exception e) {
-			logger.error(e.getMessage());
+			LOGGER.error(e.getMessage());
 		}
 		
 	}

@@ -17,11 +17,12 @@ package org.n52.movingcode.feed;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.coderepository.MovingCodeRepository;
 import org.n52.movingcode.runtime.feed.FeedTemplate;
 import org.n52.movingcode.runtime.feed.CodePackageFeed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -36,7 +37,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class FeedUtils {
 	
-	static Logger logger = Logger.getLogger(FeedUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FeedUtils.class);
 	
 	/**
 	 * Static method to update an AtomFeed file in a zipped feed directory. (Supports nested folders etc.)

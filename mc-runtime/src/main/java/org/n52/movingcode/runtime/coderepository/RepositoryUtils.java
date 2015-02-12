@@ -20,19 +20,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-
-
-
-
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.n52.movingcode.runtime.codepackage.PID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -46,7 +42,7 @@ import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocume
  */
 public class RepositoryUtils {
 
-	private static final Logger logger = Logger.getLogger(RepositoryUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryUtils.class);
 
 	/**
 	 * Computes a fingerprint for a given directory
@@ -75,7 +71,7 @@ public class RepositoryUtils {
 
 			return result;
 		} catch (NoSuchAlgorithmException e) {
-			logger.error("Could not find SHA-1 algorithm.");
+			LOGGER.error("Could not find SHA-1 algorithm.");
 			return null;
 		}
 

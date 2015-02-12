@@ -29,8 +29,9 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link CodePackageFeed} is a class that provides access to a set of {@link GeoprocessingFeedEntry}.
@@ -40,7 +41,7 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
  */
 public final class CodePackageFeed {
 
-	static Logger logger = Logger.getLogger(CodePackageFeed.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CodePackageFeed.class);
 
 	private final Feed feed;
 	
@@ -56,13 +57,13 @@ public final class CodePackageFeed {
 	 * @param atomStream {@link InputStream}
 	 */
 	public CodePackageFeed(InputStream atomStream) {
-		logger.debug("Loading Feed from " + atomStream);
+		LOGGER.debug("Loading Feed from " + atomStream);
 
 		Parser parser = Abdera.getInstance().getParser();
 		Document<Feed> doc = parser.parse(atomStream);
 		feed = doc.getRoot();
 
-		logger.info("New Feed: " + feed.getTitle());
+		LOGGER.info("New Feed: " + feed.getTitle());
 	}
 
 	/**

@@ -93,7 +93,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
 		Collection<Path> potentialPackageFolders = listSubdirs(repoRoot);
 
-		logger.info("Scanning directory: " + directory.getAbsolutePath());
+		LOGGER.info("Scanning directory: " + directory.getAbsolutePath());
 		
 		for (Path currentFolder : potentialPackageFolders) {
 			
@@ -130,10 +130,10 @@ public final class LocalPlainRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				newInventory.add(mcPackage);
-				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getPackageId().toString());
+				LOGGER.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getPackageId().toString());
 			}
 			else {
-				logger.error(currentFolder + " is an invalid package.");
+				LOGGER.error(currentFolder + " is an invalid package.");
 			}
 		}
 		
@@ -178,7 +178,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 
 			while(true){ // spin forever
 
-				logger.debug("Update thread started."
+				LOGGER.debug("Update thread started."
 						+"\nDirectory: " + directory.getAbsolutePath()
 						+ "\nUpdate interval: " + updateInterval + " milliseconds"
 						);
@@ -186,7 +186,7 @@ public final class LocalPlainRepository extends AbstractRepository {
 				try {
 					Thread.sleep(updateInterval);
 				} catch (InterruptedException e1) {
-					logger.debug("Interrupt received. Update thread stopped.");
+					LOGGER.debug("Interrupt received. Update thread stopped.");
 					this.interrupt();
 				}
 				

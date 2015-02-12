@@ -72,7 +72,7 @@ public class PythonGecaTest extends MCRuntimeTestConfig {
 
 		try {
 			processor.execute(0);
-			LOGGER.info(processor.pollLastEntry());
+			LOGGER.info(processor.pollLastEntry().toString());
 		}
 		catch (RuntimeException e) {
 			// TODO Auto-generated catch block

@@ -18,11 +18,12 @@ package org.n52.movingcode.runtime.processors.r.util;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RConnector {
 
@@ -30,7 +31,7 @@ public class RConnector {
 
     private static final int START_ATTEMP_COUNT = 5;
 
-    private static Logger log = Logger.getLogger(RConnector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RConnector.class);
 
     public RConnection getNewConnection(boolean enableBatchStart, String host, int port, String user, String password) throws RserveException {
         RConnection con = null;
@@ -42,23 +43,23 @@ public class RConnector {
     }
 
     public RConnection getNewConnection(boolean enableBatchStart, String host, int port) throws RserveException {
-        log.debug("New connection using batch " + enableBatchStart + " at host:port" + host + ":" + port);
+        LOGGER.debug("New connection using batch " + enableBatchStart + " at host:port" + host + ":" + port);
 
         RConnection con = null;
         try {
             con = newConnection(host, port);
         }
         catch (RserveException rse) {
-            log.debug("Could not connect to RServe: " + rse.getMessage());
+            LOGGER.debug("Could not connect to RServe: " + rse.getMessage());
 
             if (rse.getMessage().startsWith("Cannot connect") && enableBatchStart) {
-                log.info("Attempting to start RServe.");
+                LOGGER.info("Attempting to start RServe.");
 
                 try {
                     con = attemptStarts(host, port);
                 }
                 catch (Exception e) {
-                    log.error("Attempted to start Rserve and establish a connection failed", e);
+                    LOGGER.error("Attempted to start Rserve and establish a connection failed", e);
                     //XXX: Throwable#addSuppressed(e) is Java 1.7+ only. If 1.7
                     //is needed, change configuration of maven-compiler-plugin
 //                    rse.addSuppressed(e);
@@ -94,7 +95,7 @@ public class RConnector {
     }
 
     private static RConnection newConnection(String host, int port) throws RserveException {
-        log.debug("Creating new RConnection");
+        LOGGER.debug("Creating new RConnection");
 
         RConnection con;
         con = new RConnection(host, port);
@@ -102,10 +103,10 @@ public class RConnector {
 
         REXP info = con.eval("capture.output(sessionInfo())");
         try {
-            log.info("NEW CONNECTION >>> sessionInfo:\n" + Arrays.deepToString(info.asStrings()));
+            LOGGER.info("NEW CONNECTION >>> sessionInfo:\n" + Arrays.deepToString(info.asStrings()));
         }
         catch (REXPMismatchException e) {
-            log.warn("Error creating session info.", e);
+            LOGGER.warn("Error creating session info.", e);
         }
         return con;
     }
@@ -121,7 +122,7 @@ public class RConnector {
     }
 
     public void startRserve() throws InterruptedException, IOException {
-        log.debug("Starting Rserve locally...");
+        LOGGER.debug("Starting Rserve locally...");
 
         if (System.getProperty("os.name").toLowerCase().indexOf("linux") > -1) {
             startRServeOnLinux();
@@ -130,6 +131,6 @@ public class RConnector {
             startRServeOnWindows();
         }
 
-        log.debug("Started RServe.");
+        LOGGER.debug("Started RServe.");
     }
 }

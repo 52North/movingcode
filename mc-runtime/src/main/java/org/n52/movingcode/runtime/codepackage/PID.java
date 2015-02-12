@@ -52,6 +52,20 @@ public class PID implements Comparable<PID> {
 	public boolean isNewerThan(final PID packageId){
 		return timestamp.isAfter(packageId.timestamp);
 	}
+	
+	/**
+	 * Canonical String representation of this PID
+	 * pattern: <name>_<timestamp>
+	 * 
+	 * @return
+	 */
+	public String getCanonicalName(){
+		return new StringBuilder()
+		.append(name)
+		.append("_")
+		.append(timestamp.withZone(DateTimeZone.UTC).toString())
+		.toString();
+	}
 
 	@Override
 	public boolean equals(Object o){
@@ -73,7 +87,10 @@ public class PID implements Comparable<PID> {
 		hash = hash * 13 + (int)timestamp.getMillis();
 		return hash;
 	}
-
+	
+	// TODO: check classes calling this method.
+	// if they rely on the canonical String representation
+	// they should be calling #getCanonicalName()
 	@Override
 	public String toString(){
 		return new StringBuilder()

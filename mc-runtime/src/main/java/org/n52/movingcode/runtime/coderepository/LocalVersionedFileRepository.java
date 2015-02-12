@@ -157,7 +157,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 		Path repoRoot = FileSystems.getDefault().getPath(directory.getAbsolutePath());
 		Collection<Path> packageFolders = listSubdirs(repoRoot);
 
-		logger.info("Scanning directory: " + directory.getAbsolutePath());
+		LOGGER.info("Scanning directory: " + directory.getAbsolutePath());
 
 
 		for (Path currentFolder : packageFolders) {
@@ -167,7 +167,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			// deal with empty inventory folders
 			if (!packageDescriptionFile.exists()){
 				// TODO: remove such invalid folders?
-				logger.warn("Found empty inventory folder: " + currentFolder.toAbsolutePath());
+				LOGGER.warn("Found empty inventory folder: " + currentFolder.toAbsolutePath());
 				continue; // skip this and immediately jump to the next iteration
 			}
 
@@ -183,7 +183,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			}
 
 			// packageID = absolute path
-			logger.info("Found package: " + currentFolder + "; using ID: " + RepositoryUtils.extractId(pd).toString());
+			LOGGER.info("Found package: " + currentFolder + "; using ID: " + RepositoryUtils.extractId(pd).toString());
 
 			// attempt to access workspace root folder
 			String workspace = pd.getPackageDescription().getWorkspace().getWorkspaceRoot();
@@ -204,10 +204,10 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				newInventory.add(mcPackage);
-				logger.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getPackageId().toString());
+				LOGGER.info("Found package: " + currentFolder + "; using ID: " + mcPackage.getPackageId().toString());
 			}
 			else {
-				logger.error(currentFolder + " is an invalid package.");
+				LOGGER.error(currentFolder + " is an invalid package.");
 			}
 		}
 		
@@ -269,7 +269,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 
 			while(true){ // spin forever
 
-				logger.debug("Update thread started."
+				LOGGER.debug("Update thread started."
 						+"\nDirectory: " + directory.getAbsolutePath()
 						+ "\nUpdate interval: " + updateInterval + " milliseconds"
 						);
@@ -277,7 +277,7 @@ public class LocalVersionedFileRepository extends AbstractRepository {
 				try {
 					sleep(updateInterval);
 				} catch (InterruptedException e1) {
-					logger.debug("Interrupt received. Update thread stopped.");
+					LOGGER.debug("Interrupt received. Update thread stopped.");
 					this.interrupt();
 				}
 				

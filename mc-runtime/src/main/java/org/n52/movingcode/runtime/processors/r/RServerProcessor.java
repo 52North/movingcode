@@ -26,8 +26,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
 import org.n52.movingcode.runtime.iodata.IODataType;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
@@ -38,6 +36,8 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.PropertyMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class RServerProcessor extends AbstractProcessor {
 
     private static final long serialVersionUID = 365036617414065260L;
 
-    private static Logger logger = Logger.getLogger(RServerProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RServerProcessor.class);
 
     private static MimeTypeDatabase mimeRegistry = getMimeRegistry();
     
@@ -87,7 +87,7 @@ public class RServerProcessor extends AbstractProcessor {
         File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath() + File.separator + AUID.randomAUID());
 
         if ( !tmpWorkspace.mkdir()) {
-            logger.error("Could not create instance workspace!");
+            LOGGER.error("Could not create instance workspace!");
             return false;
         }
 
@@ -96,7 +96,7 @@ public class RServerProcessor extends AbstractProcessor {
             this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
         }
         catch (Exception e) {
-            logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
+            LOGGER.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
             return false;
         }
 

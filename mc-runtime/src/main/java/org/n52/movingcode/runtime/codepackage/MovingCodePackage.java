@@ -23,10 +23,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import net.opengis.wps.x100.ProcessDescriptionType;
+
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 import static org.n52.movingcode.runtime.codepackage.Constants.*;
@@ -42,7 +45,7 @@ import static org.n52.movingcode.runtime.codepackage.Constants.*;
  */
 public class MovingCodePackage implements Comparable<MovingCodePackage>{
 
-	private static final Logger logger = Logger.getLogger(MovingCodePackage.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MovingCodePackage.class);
 
 	// the physical instance of this package
 	private final ICodePackage archive;
@@ -52,16 +55,22 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 	
 	// immutable representation of the package description XML
 	private final String packageDescription;
-
+	
+	
+	
 	// identifier of the provided functionality (e.g. WPS process identifier)
 	private final String functionIdentifier;
 
 	// Package id and time stamp, i.e. date of creation or last modification
 	private final PID packageId;
 	
+	private final String functionTitle;
+	private final String functionAbstract;
+	
 	private final boolean isValid;
 
 	private final List<FunctionalType> supportedFuncTypes;
+	
 
 	/**
 	 * Constructor for zipFiles. Creates a MovingCodePackage from a zipFile on disk.
@@ -75,7 +84,15 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		
 		// assign properties fields
 		if (doc != null) {
-			functionIdentifier = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
+			ProcessDescriptionType pd = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription();
+			functionIdentifier = pd.getIdentifier().getStringValue();
+			functionTitle = pd.getTitle().getStringValue();
+			if (pd.isSetAbstract()){
+				functionAbstract = pd.getAbstract().getStringValue();
+			} else {
+				functionAbstract = null;
+			}
+			
 			supportedFuncTypes = getFunctionalTypes(doc);
 			
 			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
@@ -86,6 +103,8 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		}
 		else {
 			functionIdentifier = null;
+			functionTitle = null;
+			functionAbstract = null;
 			supportedFuncTypes = null;
 			packageId = null;
 			packageDescription = null;
@@ -119,7 +138,15 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		// how can deal with that?
 		// assign properties fields
 		if (doc != null) {
-			functionIdentifier = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
+			ProcessDescriptionType pd = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription();
+			functionIdentifier = pd.getIdentifier().getStringValue();
+			functionTitle = pd.getTitle().getStringValue();
+			if (pd.isSetAbstract()){
+				functionAbstract = pd.getAbstract().getStringValue();
+			} else {
+				functionAbstract = null;
+			}
+			
 			supportedFuncTypes = getFunctionalTypes(doc);
 				
 			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
@@ -129,6 +156,8 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		}
 		else {
 			functionIdentifier = null;
+			functionTitle = null;
+			functionAbstract = null;
 			supportedFuncTypes = null;
 			packageId = null;
 			packageDescription = null;
@@ -152,7 +181,15 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		
 		// assign properties fields
 		if (doc != null) {
-			functionIdentifier = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription().getIdentifier().getStringValue();
+			ProcessDescriptionType pd = doc.getPackageDescription().getFunctionality().getWps100ProcessDescription();
+			functionIdentifier = pd.getIdentifier().getStringValue();
+			functionTitle = pd.getTitle().getStringValue();
+			if (pd.isSetAbstract()){
+				functionAbstract = pd.getAbstract().getStringValue();
+			} else {
+				functionAbstract = null;
+			}
+			
 			supportedFuncTypes = getFunctionalTypes(doc);
 			
 			DateTime timestamp = new DateTime(doc.getPackageDescription().getTimestamp());
@@ -162,6 +199,8 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		}
 		else {
 			functionIdentifier = null;
+			functionTitle = null;
+			functionAbstract = null;
 			supportedFuncTypes = null;
 			packageId = null;
 			packageDescription = null;
@@ -260,6 +299,25 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 	public final String getFunctionIdentifier() {
 		return this.functionIdentifier;
 	}
+	
+	/**
+	 * Returns a human readable title of the provided function.
+	 * 
+	 * @return
+	 */
+	public final String getTitle(){
+		return functionTitle;
+	}
+	
+	/**
+	 * Returns a human readable abstract of the provided function.
+	 * Returns NULL if the abstract is empty
+	 * 
+	 * @return
+	 */
+	public final String getAbstract(){
+		return functionAbstract;
+	}
 
 	/**
 	 * Returns the timestamp of this package. The timestamp indicates the last update of the package content
@@ -335,7 +393,7 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		if (!doc.validate()) {
 			List<XmlError> errors = new ArrayList<XmlError>();
 			doc.validate(new XmlOptions().setErrorListener(errors));
-			logger.warn("Package is not valid: "+errors);
+			LOGGER.warn("Package is not valid: "+errors);
 			return false;
 		} else {
 			return true;
