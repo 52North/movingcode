@@ -23,8 +23,9 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.processors.IPlatformComponentProbe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Probes an R runtime environment.
@@ -35,7 +36,7 @@ public class RCLIProbe implements IPlatformComponentProbe {
 
     private static final String VERSION_CALL = "config --version";
 
-    private static Logger log = Logger.getLogger(RCLIProbe.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RCLIProbe.class);
 
     public String probe() {
         // is there an R executable?
@@ -101,7 +102,7 @@ public class RCLIProbe implements IPlatformComponentProbe {
             return (versionString);
         }
         catch (Exception e) {
-            log.error("Could not get version string.", e);
+            LOGGER.error("Could not get version string.", e);
             return null;
         }
     }

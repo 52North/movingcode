@@ -20,9 +20,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -49,7 +48,7 @@ public class ProcessorConfig {
 	static final String configFile = "processors.json";
 	private static final HashMap<String, ProcessorDescription> processors = readProperties();
 
-	private static transient Logger LOGGER = Logger.getLogger(ProcessorConfig.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessorConfig.class);
 
 
 	/**

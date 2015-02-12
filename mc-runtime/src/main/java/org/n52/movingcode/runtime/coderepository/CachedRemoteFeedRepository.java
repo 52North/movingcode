@@ -21,8 +21,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.PID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements an {@link MovingCodeRepository} for Remote Geoprocessing Feeds
@@ -33,7 +34,7 @@ import org.n52.movingcode.runtime.codepackage.PID;
  */
 public class CachedRemoteFeedRepository extends AbstractRepository {
 
-	static Logger logger = Logger.getLogger(CachedRemoteFeedRepository.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CachedRemoteFeedRepository.class);
 
 	private final URL atomFeedURL;
 	private final File cacheDirectory;
@@ -168,7 +169,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 		@Override
 		public void run() {
 
-			logger.info("Loading remote repository from URL " +  atomFeedURL.toString());
+			LOGGER.info("Loading remote repository from URL " +  atomFeedURL.toString());
 			// create new remote repo
 			remoteRepo = new RemoteFeedRepository(atomFeedURL);
 
@@ -179,7 +180,7 @@ public class CachedRemoteFeedRepository extends AbstractRepository {
 					updateLocalMirror();
 				}
 			});
-			logger.info("Finished loading remote repository from URL " +  atomFeedURL.toString());
+			LOGGER.info("Finished loading remote repository from URL " +  atomFeedURL.toString());
 			
 			// since we added a change listener, an update may already have taken place before we get here
 			// so we need to check initDone variable.

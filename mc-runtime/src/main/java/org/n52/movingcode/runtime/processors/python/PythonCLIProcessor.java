@@ -36,8 +36,6 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
 import org.n52.movingcode.runtime.iodata.IODataType;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
@@ -48,6 +46,8 @@ import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.PropertyMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PythonCLIProcessor extends AbstractProcessor {
 
@@ -58,7 +58,7 @@ public class PythonCLIProcessor extends AbstractProcessor {
 
 	protected static final String pythonExecutable = "python";
 
-	Logger logger = Logger.getLogger(PythonCLIProcessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PythonCLIProcessor.class);
 
 	/**
 	 * A sorted Map containing all executionValues in an ascending order
@@ -77,17 +77,17 @@ public class PythonCLIProcessor extends AbstractProcessor {
 		File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath() + File.separator + AUID.randomAUID());
 
 		if ( !tmpWorkspace.mkdir()) {
-			this.logger.error("Could not create instance workspace!");
+			LOGGER.error("Could not create instance workspace!");
 			return false;
 		}
 
 		// 3. unzip workspace from package and assign workspaceDir
 		try {
 			this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
-			this.logger.info("Using temporary workspace at "+this.clonedWorkspace);
+			LOGGER.info("Using temporary workspace at "+this.clonedWorkspace);
 		}
 		catch (Exception e) {
-			this.logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
+			LOGGER.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
 			return false;
 		}
 
@@ -147,13 +147,13 @@ public class PythonCLIProcessor extends AbstractProcessor {
 			resultHandler.waitFor();
 			int exitVal = resultHandler.getExitValue();
 			if (exitVal != 0) {
-				logger.error("stderr was: "+errorStream.toString());
-				logger.error("stdout was: "+outputStream.toString());
+				LOGGER.error("stderr was: "+errorStream.toString());
+				LOGGER.error("stdout was: "+outputStream.toString());
 			}
 			else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("stdout was:"+outputStream.toString());
-					logger.debug("stderr was:"+errorStream.toString());
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("stdout was:"+outputStream.toString());
+					LOGGER.debug("stderr was:"+errorStream.toString());
 				}
 			}
 		}

@@ -15,20 +15,21 @@
  */
 package org.n52.movingcode.runtime.processors.r;
 
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.processors.IPlatformComponentProbe;
 import org.n52.movingcode.runtime.processors.r.util.RConnector;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Probes an R runtime environment.
  */
 public class R_RServeProbe implements IPlatformComponentProbe {
 
-    private static Logger LOGGER = Logger.getLogger(R_RServeProbe.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(R_RServeProbe.class);
 
     private RConnector c = new RConnector();
 

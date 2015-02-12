@@ -93,10 +93,10 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		// recursively obtain all zipfiles in sourceDirectory
 		Collection<File> zipFiles = scanForZipFiles(directory);
 
-		logger.info("Scanning directory: " + directory.getAbsolutePath());
+		LOGGER.info("Scanning directory: " + directory.getAbsolutePath());
 
 		for (File currentFile : zipFiles) {
-			logger.debug("Found package: " + currentFile);
+			LOGGER.debug("Found package: " + currentFile);
 
 			MovingCodePackage mcPackage = new MovingCodePackage(currentFile);
 
@@ -105,9 +105,9 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 			// and add current file to zipFiles map
 			if (mcPackage.isValid()) {
 				newInventory.add(mcPackage);
-				logger.debug("Registered package: " + currentFile + "; using ID: " + mcPackage.getPackageId().toString());	
+				LOGGER.debug("Registered package: " + currentFile + "; using ID: " + mcPackage.getPackageId().toString());	
 			} else {
-				logger.error(currentFile.getAbsolutePath() + " is an invalid package.");
+				LOGGER.error(currentFile.getAbsolutePath() + " is an invalid package.");
 			}
 
 		}
@@ -138,7 +138,7 @@ public final class LocalZipPackageRepository extends AbstractRepository {
 		public void run() {
 			String newFingerprint = RepositoryUtils.directoryFingerprint(directory);
 			if (!newFingerprint.equals(fingerprint)){
-				logger.info("Repository content has silently changed. Running update ...");
+				LOGGER.info("Repository content has silently changed. Running update ...");
 				// set new fingerprint
 				fingerprint = newFingerprint;
 				

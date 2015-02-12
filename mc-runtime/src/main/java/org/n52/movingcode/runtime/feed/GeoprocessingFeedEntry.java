@@ -26,7 +26,8 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Link;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
@@ -45,7 +46,7 @@ final class GeoprocessingFeedEntry {
 
 	private Entry entry;
 
-	static Logger logger = Logger.getLogger(GeoprocessingFeedEntry.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeoprocessingFeedEntry.class);
 
 	/**
 	 * Creates a new entry from an existing entry. Both entries share the same content. If one of them is
@@ -198,10 +199,10 @@ final class GeoprocessingFeedEntry {
 				try {
 					return currentLink.getHref().toURL();
 				} catch (MalformedURLException e) {
-					logger.error("Wrong package URL: " + currentLink.getHref().toString());
+					LOGGER.error("Wrong package URL: " + currentLink.getHref().toString());
 					return null;
 				} catch (URISyntaxException e) {
-					logger.error("Wrong package URL: " + currentLink.getHref().toString());
+					LOGGER.error("Wrong package URL: " + currentLink.getHref().toString());
 					return null;
 				}
 			}

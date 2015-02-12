@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.feed.CodePackageFeed;
 
@@ -36,8 +35,6 @@ import org.n52.movingcode.runtime.feed.CodePackageFeed;
  * 
  */
 public final class RemoteFeedRepository extends AbstractRepository {
-
-	static Logger logger = Logger.getLogger(RemoteFeedRepository.class);
 
 	// Atom Feed URL
 	private final URL atomFeedURL;
@@ -74,7 +71,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 		
 		InputStream stream = null;
 		try {
-			logger.debug("Create RemoteFeedRepository from " + atomFeedURL);
+			LOGGER.debug("Create RemoteFeedRepository from " + atomFeedURL);
 			// TODO: Do it with Apache HTTPClient
 			stream = atomFeedURL.openStream();
 			CodePackageFeed feed = new CodePackageFeed(stream);
@@ -83,7 +80,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			for (String currentEntryID : feed.getEntryIDs()) {
 				// create new moving code package from the entry
 				MovingCodePackage mcp = feed.getPackage(currentEntryID);
-				logger.trace("Loading package for feed entry " + currentEntryID);
+				LOGGER.debug("Loading package for feed entry " + currentEntryID);
 
 				// validate
 				// and add to package map
@@ -92,7 +89,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 					newInventory.add(mcp);
 				}
 				else {
-					logger.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
+					LOGGER.debug("Info: " + atomFeedURL.toString() + " contains an invalid package: "
 							+ mcp.getPackageId().toString());
 				}
 			}
@@ -100,7 +97,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 			stream.close();
 		}
 		catch (IOException e) {
-			logger.error("Could read feed from URL: " + atomFeedURL);
+			LOGGER.error("Could read feed from URL: " + atomFeedURL);
 		}
 		finally {
 			if (stream != null)
@@ -108,14 +105,12 @@ public final class RemoteFeedRepository extends AbstractRepository {
 					stream.close();
 				}
 			catch (IOException e) {
-				logger.error("Could not close GeoprocessingFeed stream.", e);
+				LOGGER.error("Could not close GeoprocessingFeed stream.", e);
 				stream = null;
 			}
 		}
 		
 		updateInventory(newInventory);
-		
-		logger.trace("Created!");
 	}
 
 	/**
@@ -139,7 +134,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				// if feed's update time is newer than last known update time
 				// re-read the feed and update contents accordingly
 				if (feed.lastUpdated().after(lastFeedUpdate)){
-					logger.info("Repository content has  changed. Running update ...");
+					LOGGER.info("Repository content has  changed. Running update ...");
 					
 					// do a re-load
 					reloadContent();
@@ -151,7 +146,7 @@ public final class RemoteFeedRepository extends AbstractRepository {
 				
 			}
 			catch (IOException e) {
-				logger.error("Could read feed from URL: " + atomFeedURL);
+				LOGGER.error("Could read feed from URL: " + atomFeedURL);
 			}
 			finally {
 				if (stream != null)
@@ -159,12 +154,12 @@ public final class RemoteFeedRepository extends AbstractRepository {
 						stream.close();
 					}
 				catch (IOException e) {
-					logger.error("Could not close GeoprocessingFeed stream.", e);
+					LOGGER.error("Could not close GeoprocessingFeed stream.", e);
 					stream = null;
 				}
 			}
 			
-			logger.info("Reload finished.");
+			LOGGER.info("Reload finished.");
 		}
 	}
 	

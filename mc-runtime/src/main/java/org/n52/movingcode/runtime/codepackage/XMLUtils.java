@@ -19,23 +19,24 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 
 public class XMLUtils {
 	
-	static Logger logger = Logger.getLogger(XMLUtils.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtils.class);
 	
 	public static final PackageDescriptionDocument fromFile(final File descriptionXMLFile){
 		PackageDescriptionDocument doc = null;
 		try {
 			doc = PackageDescriptionDocument.Factory.parse(descriptionXMLFile);
 		} catch (XmlException e) {
-			logger.error("PackageDescription could not be read. " + e.getMessage());
+			LOGGER.error("PackageDescription could not be read. " + e.getMessage());
 		} catch (IOException e) {
-			logger.error("PackageDescription could not be read." + e.getMessage());
+			LOGGER.error("PackageDescription could not be read." + e.getMessage());
 		}
 		
 		return doc;
@@ -46,7 +47,7 @@ public class XMLUtils {
 		try {
 			doc = PackageDescriptionDocument.Factory.parse(xmlString);
 		} catch (XmlException e) {
-			logger.error("PackageDescription could not be read. " + e.getMessage());
+			LOGGER.error("PackageDescription could not be read. " + e.getMessage());
 		}
 		
 		return doc;
@@ -61,7 +62,7 @@ public class XMLUtils {
 				sw.flush();
 			}
 		} catch (IOException e) {
-			logger.error("PackageDescription could not be converted to String. " + e.getMessage());
+			LOGGER.error("PackageDescription could not be converted to String. " + e.getMessage());
 		}
 		return sw.toString();
 	}

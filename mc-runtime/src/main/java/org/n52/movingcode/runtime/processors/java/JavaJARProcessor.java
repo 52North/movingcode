@@ -29,8 +29,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
 import org.n52.movingcode.runtime.iodata.IODataType;
 import org.n52.movingcode.runtime.iodata.IOParameter;
 import org.n52.movingcode.runtime.iodata.MediaData;
@@ -42,6 +40,8 @@ import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.PropertyMap;
 import org.n52.movingcode.runtime.processors.python.PythonCLIProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavaJARProcessor extends AbstractProcessor {
 
@@ -50,7 +50,7 @@ public class JavaJARProcessor extends AbstractProcessor {
 	private static MimeTypeDatabase mimeRegistry = getMimeRegistry();
 	private static final String mimeTypeFile = "mime.types";
 
-	Logger logger = Logger.getLogger(JavaJARProcessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JavaJARProcessor.class);
 
 	/**
 	 * A sorted Map containing all executionValues in an ascending order
@@ -69,7 +69,7 @@ public class JavaJARProcessor extends AbstractProcessor {
 		File tmpWorkspace = new File(this.scratchWorkspace.getAbsolutePath() + File.separator + AUID.randomAUID());
 
 		if ( !tmpWorkspace.mkdir()) {
-			this.logger.error("Could not create instance workspace!");
+			LOGGER.error("Could not create instance workspace!");
 			return false;
 		}
 
@@ -78,7 +78,7 @@ public class JavaJARProcessor extends AbstractProcessor {
 			this.clonedWorkspace = new File(this.mcPackage.dumpWorkspace(tmpWorkspace));
 		}
 		catch (Exception e) {
-			this.logger.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
+			LOGGER.error("Cannot write to instance workspace. " + this.clonedWorkspace.getAbsolutePath());
 			return false;
 		}
 

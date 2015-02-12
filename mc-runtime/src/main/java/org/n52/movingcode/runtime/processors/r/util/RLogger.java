@@ -18,13 +18,14 @@ package org.n52.movingcode.runtime.processors.r.util;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RLogger {
 
-    private static Logger LOGGER = Logger.getLogger(RLogger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RLogger.class);
     
     private static DateFormat format = DateFormat.getDateTimeInstance();
 

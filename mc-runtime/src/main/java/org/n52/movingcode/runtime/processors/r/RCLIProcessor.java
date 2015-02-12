@@ -33,19 +33,17 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
 import org.n52.movingcode.runtime.iodata.IIOParameter;
 import org.n52.movingcode.runtime.iodata.IODataType;
 import org.n52.movingcode.runtime.iodata.IOParameter;
-import org.n52.movingcode.runtime.iodata.MediaData;
 import org.n52.movingcode.runtime.iodata.MimeTypeDatabase;
-import org.n52.movingcode.runtime.iodata.IIOParameter.Direction;
 import org.n52.movingcode.runtime.iodata.ParameterID;
 import org.n52.movingcode.runtime.codepackage.MovingCodePackage;
 import org.n52.movingcode.runtime.processors.AUID;
 import org.n52.movingcode.runtime.processors.AbstractProcessor;
 import org.n52.movingcode.runtime.processors.PropertyMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RCLIProcessor extends AbstractProcessor {
 
@@ -55,7 +53,7 @@ public class RCLIProcessor extends AbstractProcessor {
 
     protected static final String rExecutable = "R CMD";
 
-    private static Logger LOGGER = Logger.getLogger(RCLIProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RCLIProcessor.class);
 
     /**
      * A sorted Map containing all executionValues in an ascending order

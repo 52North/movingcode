@@ -25,10 +25,11 @@ import java.util.List;
 
 import net.opengis.wps.x100.ProcessDescriptionType;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudresden.gis.geoprocessing.movingcode.schema.PackageDescriptionDocument;
 import static org.n52.movingcode.runtime.codepackage.Constants.*;
@@ -44,7 +45,7 @@ import static org.n52.movingcode.runtime.codepackage.Constants.*;
  */
 public class MovingCodePackage implements Comparable<MovingCodePackage>{
 
-	private static final Logger logger = Logger.getLogger(MovingCodePackage.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MovingCodePackage.class);
 
 	// the physical instance of this package
 	private final ICodePackage archive;
@@ -392,7 +393,7 @@ public class MovingCodePackage implements Comparable<MovingCodePackage>{
 		if (!doc.validate()) {
 			List<XmlError> errors = new ArrayList<XmlError>();
 			doc.validate(new XmlOptions().setErrorListener(errors));
-			logger.warn("Package is not valid: "+errors);
+			LOGGER.warn("Package is not valid: "+errors);
 			return false;
 		} else {
 			return true;
