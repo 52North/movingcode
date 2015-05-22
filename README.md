@@ -3,7 +3,7 @@ A software framework to manage, share and execute computing components for spati
 
 ## Project Structure
 
-The components are written in Java. The client uses JSF with Primefaces
+The components are written in Java.
 
 * ``/mc-schema`` - XSD Schema that describes the structure and content of a code package
 * ``/mc-runtime`` - Library to create, read, update, manage and execute code packages
