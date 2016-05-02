@@ -169,16 +169,6 @@
 					<version>2.5</version>
 				</plugin>
 
-				<!-- Releases a maven project, doing "repetitive handwork" -->
-				<plugin>
-					<artifactId>maven-release-plugin</artifactId>
-					<configuration>
-						<connectionUrl>
-							scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode/movingcode-runtime/trunk/${project.artifactId}
-						</connectionUrl>
-					</configuration>
-				</plugin>
-
 				<!-- JAR plugin to build and sign JARs -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
