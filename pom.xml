@@ -50,9 +50,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:git:git@github.com:52North/movingcode.git</connection>
+		<connection>scm:git:git//github.com/52North/movingcode.git</connection>
 		<url>https://github.com/52North/movingcode</url>
-		<developerConnection>scm:git:git@github.com:52North/movingcode.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@github.com/52North/movingcode.git</developerConnection>
 	</scm>
 
 
