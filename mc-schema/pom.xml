@@ -89,14 +89,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<connectionUrl>
-						scm:svn:https://svn.52north.org/svn/geoprocessing/main/movingcode-schema/trunk/
-					</connectionUrl>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-scm-plugin</artifactId>
 				<version>1.9</version>
 				<configuration>
